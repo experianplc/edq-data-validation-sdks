@@ -1,0 +1,50 @@
+using DVSClient.Common;
+
+namespace DVSClient.Address.Layout.Attributes
+{
+    public enum NzlRegionalGeocodeAttribute
+    {
+        [EnumStringValue("front_of_property_nztm_x_coordinate")]
+        FrontOfPropertyNztmXCoordinate,
+        [EnumStringValue("front_of_property_nztm_y_coordinate")]
+        FrontOfPropertyNztmYCoordinate,
+        [EnumStringValue("centroid_of_property_nztm_x_coordinate")]
+        CentroidOfPropertyNztmXCoordinate,
+        [EnumStringValue("centroid_of_property_nztm_y_coordinate")]
+        CentroidOfPropertyNztmYCoordinate,
+        [EnumStringValue("linz_parcel_id")]
+        LinzParcelId,
+        [EnumStringValue("property_purpose_type")]
+        PropertyPurposeType,
+        [EnumStringValue("addressable")]
+        Addressable,
+        [EnumStringValue("mesh_block_code")]
+        MeshBlockCode,
+        [EnumStringValue("territorial_authority_code")]
+        TerritorialAuthorityCode,
+        [EnumStringValue("territorial_authority_name")]
+        TerritorialAuthorityName,
+        [EnumStringValue("regional_council_code")]
+        RegionalCouncilCode,
+        [EnumStringValue("regional_council_name")]
+        RegionalCouncilName,
+        [EnumStringValue("general_electorate_code")]
+        GeneralElectorateCode,
+        [EnumStringValue("general_electorate_name")]
+        GeneralElectorateName,
+        [EnumStringValue("maori_electorate_code")]
+        MaoriElectorateCode,
+        [EnumStringValue("maori_electorate_name")]
+        MaoriElectorateName,
+        [EnumStringValue("front_of_property_latitude")]
+        FrontOfPropertyLatitude,
+        [EnumStringValue("front_of_property_longitude")]
+        FrontOfPropertyLongitude,
+        [EnumStringValue("centroid_of_property_latitude")]
+        CentroidOfPropertyLatitude,
+        [EnumStringValue("centroid_of_property_longitude")]
+        CentroidOfPropertyLongitude,
+        [EnumStringValue("match_level")]
+        MatchLevel
+    }
+}
