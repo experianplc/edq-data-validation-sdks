@@ -220,6 +220,7 @@ public class Configuration extends com.experian.dvs.client.common.Configuration 
             return this;
         }
 
+
         public Builder setUseXAppAuthentication(boolean useXAppAuthentication) {
             super.setUseXAppAuthentication(useXAppAuthentication);
             return this;

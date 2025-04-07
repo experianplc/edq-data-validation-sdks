@@ -21,6 +21,12 @@ namespace DVSClient.Address.Layout
             {
                 return new Configuration(this);
             }
+
+            public Builder SetTransactionId(string transactionId)
+            {
+                base.SetTransactionId(transactionId);
+                return this;
+            }
         }
     }
 }

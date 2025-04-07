@@ -76,6 +76,7 @@ namespace DVSClient.Address.Layout.Tests
         public void Layout_Create_WithOptions()
         {
             var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(Guid.NewGuid().ToString())
                 .Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             // TODO
@@ -126,6 +127,7 @@ namespace DVSClient.Address.Layout.Tests
         {
             var configuration = Address.Configuration
                 .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(Guid.NewGuid().ToString())
                 .UseDataset(Dataset.AuAddress)
                 .UseLayout(Setup.ExistingTestLayout)
                 .Build();

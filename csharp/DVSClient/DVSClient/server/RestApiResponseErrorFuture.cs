@@ -56,7 +56,7 @@
             if (response.StatusCode != System.Net.HttpStatusCode.Accepted)
             {
                 var error = new RestApiResponseError
-                {
+                {   
                     Type = ((int)response.StatusCode).ToString(),
                     Title = response.ReasonPhrase ?? string.Empty
                 };

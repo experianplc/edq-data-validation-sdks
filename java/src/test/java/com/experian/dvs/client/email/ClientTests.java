@@ -8,6 +8,8 @@ import com.experian.dvs.client.exceptions.InvalidConfigurationException;
 import com.experian.dvs.client.exceptions.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -37,6 +39,7 @@ class ClientTests {
 
         final Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_EMAIL)
                 .includeMetadata()
+                .setTransactionId(UUID.randomUUID().toString())
                 .build();
 
         final Client client = ExperianDataValidation.getEmailClient(configuration);

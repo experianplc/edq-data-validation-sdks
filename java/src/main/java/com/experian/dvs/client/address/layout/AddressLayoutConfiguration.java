@@ -23,5 +23,11 @@ public class AddressLayoutConfiguration extends Configuration {
         public AddressLayoutConfiguration build() {
             return new AddressLayoutConfiguration(this);
         }
+
+        public Builder setTransactionId(String transactionId)
+        {
+            super.setTransactionId(transactionId);
+            return this;
+        }
     }
 }

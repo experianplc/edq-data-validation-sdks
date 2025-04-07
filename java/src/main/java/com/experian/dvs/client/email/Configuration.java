@@ -34,9 +34,9 @@ public class Configuration extends com.experian.dvs.client.common.Configuration 
             return this;
         }
 
-
+        public Builder setTransactionId(String transactionId) {
+            super.setTransactionId(transactionId);
+            return this;
+        }
     }
-
-
-
 }

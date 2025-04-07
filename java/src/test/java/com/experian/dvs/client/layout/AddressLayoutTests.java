@@ -89,6 +89,7 @@ public class AddressLayoutTests {
     void layout_Create_WithOptions() {
         final AddressLayoutConfiguration configuration = AddressLayoutConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId(UUID.randomUUID().toString())
                 .build();
         final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
         //todo add logic
@@ -112,6 +113,7 @@ public class AddressLayoutTests {
 
         final Configuration configuration = Configuration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId(UUID.randomUUID().toString())
                 .useDataset(Dataset.AU_ADDRESS)
                 .includeAusRegionalGeocodeAttribute(AUSRegionalGeocode.LATITUDE)
                 .includeAusRegionalGeocodeAttribute(AUSRegionalGeocode.LONGITUDE)
@@ -132,16 +134,15 @@ public class AddressLayoutTests {
         assertThat(formatResult.getAddressFormatted().getAddress()).hasSize(4);
         assertThat(formatResult.getAddressFormatted().getAddress().get("addr_line_1")).isNotEmpty();
         assertThat(formatResult.getAddressFormatted().getAddress().get("addr_line_2")).isNotEmpty();
-
-        //TODO
-        //assertThat(formatResult.getAddressFormatted().getAddress().get("post_code")).isNotEmpty();
-        //assertThat(formatResult.getAddressFormatted().getAddress().get("country_name")).isNotEmpty();
+        assertThat(formatResult.getAddressFormatted().getAddress().get("post_code")).isNotEmpty();
+        assertThat(formatResult.getAddressFormatted().getAddress().get("country_name")).isNotEmpty();
     }
 
     @Test
     public void suggestionsFormatWithCustomLayout() {
         final Configuration configuration = Configuration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId(UUID.randomUUID().toString())
                 .useDataset(Dataset.AU_ADDRESS)
                 .setFormatLayoutName(Setup.EXISTING_TEST_LAYOUT)
                 .build();

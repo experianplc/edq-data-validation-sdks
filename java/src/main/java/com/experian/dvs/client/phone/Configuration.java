@@ -72,6 +72,12 @@ public class Configuration extends com.experian.dvs.client.common.Configuration 
             super(token);
         }
 
+        public Builder setTransactionId(String transactionId)
+        {
+            super.setTransactionId(transactionId);
+            return this;
+        }
+
         public Builder includeMetadata() {
             this.metadata = true;
             return this;

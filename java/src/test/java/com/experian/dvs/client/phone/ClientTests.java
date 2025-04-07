@@ -7,6 +7,8 @@ import com.experian.dvs.client.exceptions.UnauthorizedException;
 import com.experian.dvs.client.phone.validate.PhoneType;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -50,6 +52,7 @@ public class ClientTests {
     void Validate_PhoneNumber_WithMetadata() {
         final Configuration configuration = Configuration
                 .newBuilder(Setup.VALID_TOKEN_PHONE)
+                .setTransactionId(UUID.randomUUID().toString())
                 .includeMetadata()
                 .build();
         final Client client = ExperianDataValidation.getPhoneClient(configuration);
