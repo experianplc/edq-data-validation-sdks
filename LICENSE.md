@@ -8,7 +8,7 @@ This is the Experian Software Development Kit Licence Agreement.
 
     1. "EDQ" means Experian Data Quality.
 
-    1. The SDK is the software stack for address code generation as made available under the EDQ Open Source Project, which is located at the following URL: https://github.com/experiandataquality, as updated from time to time. 
+    1. The SDK is the software stack for address code generation as made available under the EDQ Open Source Project, which is located at the following URL: https://github.com/experianplc/edq-data-validation-sdks, as updated from time to time. 
  
 1. Accepting this Licence Agreement
 
