@@ -157,8 +157,8 @@ namespace DVSClient.Address.Layout.Tests
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var line1 = new LayoutLineVariable("addr_line_1");
             var line2 = new LayoutLineVariable("addr_line_2");
-            var line3 = new LayoutLineFixed("post_code", new List<IAddressElement?> { Aus.PostalCode, Gbr.PostalCode.Postcode });
-            var line4 = new LayoutLineFixed("country_name", new List<IAddressElement?> { Aus.CountryName, Gbr.Country.Country });
+            var line3 = new LayoutLineFixed("post_code", new List<IAddressElement?> { Aus.PostalCode, Gbr.Postcode });
+            var line4 = new LayoutLineFixed("country_name", new List<IAddressElement?> { Aus.CountryName, Gbr.Country });
             var layoutName = Setup.ExistingTestLayout;
             var createLayoutResult = client.CreateLayout(
                 layoutName, 
