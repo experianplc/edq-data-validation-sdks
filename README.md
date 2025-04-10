@@ -3,9 +3,9 @@
 The Experian DVS SDKs provide convenient access to the RESTful Experian APIs.
 
 ## Build status
-https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/dotnet.yml/badge.svg
-https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/gradle.yml/badge.svg
-https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/typescript.yml/badge.svg
+![dotnet build status](https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/dotnet.yml/badge.svg)
+![java build status](https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/gradle.yml/badge.svg)
+![typescript build status](https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/typescript.yml/badge.svg)
 
 ## API Documentation
 
@@ -22,6 +22,10 @@ We welcome contributions from the community! Please follow the [fork and pull re
 ## Sample usage
 
 The examples below show how your application can easily create and customize address, email, and phone validation requests.
+
+- [.net](#dotnet)
+- [java](#java)
+- [typescript](#typescript)
 
 ### Dotnet
 
