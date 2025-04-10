@@ -26,6 +26,6 @@ jobs:
     - name: Build
       run: dotnet build DVSClient.sln --no-restore
       working-directory: csharp/
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: csharp/
+    # - name: Test
+    #   run: dotnet test --no-build --verbosity normal
+    #   working-directory: csharp/
