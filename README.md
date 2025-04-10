@@ -33,8 +33,8 @@ The examples below show how your application can easily create and customize add
 ```csharp
 // Create a client
 var configuration = Configuration
-    .NewBuilder(<YOUR AUTHENTICATION TOKEN>)
-    .SetTransactionId(<REFERENCE ID>)
+    .NewBuilder("YOUR AUTHENTICATION TOKEN")
+    .SetTransactionId("YOUR REFERENCE ID")
     .UseDataset(Dataset.GbAddress)
     .UseMaxSuggestions(10)
     .Build();
@@ -56,8 +56,8 @@ var result = client.Format(globalAddressKey);
 ```csharp
 // Create a client
 var configuration = Configuration
-    .NewBuilder(<YOUR AUTHENTICATION TOKEN>)
-    .SetTransactionId(<REFERENCE ID>)
+    .NewBuilder("YOUR AUTHENTICATION TOKEN")
+    .SetTransactionId("YOUR REFERENCE ID")
     .IncludeMetadata()
     .Build();
 var emailClient = ExperianDataValidation.GetEmailClient(configuration);
@@ -74,8 +74,8 @@ if (result.Confidence == Confidence.Verified) {
 ```csharp
 // Create a client
 var configuration = Configuration
-    .NewBuilder(<YOUR AUTHENTICATION TOKEN>)
-    .SetTransactionId(<REFERENCE ID>)
+    .NewBuilder("YOUR AUTHENTICATION TOKEN")
+    .SetTransactionId("YOUR REFERENCE ID")
     .IncludeMetadata()
     .Build();
 var client = ExperianDataValidation.GetPhoneClient(configuration);
@@ -94,8 +94,8 @@ if (result.PhoneType == Confidence.Landline) {
 ```java
 // Create a client
 final Configuration configuration = Configuration
-    .newBuilder(<YOUR AUTHENTICATION TOKEN>)
-    .setTransactionId(<REFERENCE ID>)
+    .newBuilder("YOUR AUTHENTICATION TOKEN")
+    .setTransactionId("YOUR REFERENCE ID")
     .useDataset(Dataset.AU_ADDRESS)
     .useMaxSuggestions(5)
     .build();
@@ -117,8 +117,8 @@ final var result = client.format(globalAddressKey);
 ```java
 // Create a client
 final Configuration configuration = Configuration
-    .newBuilder(<YOUR AUTHENTICATION TOKEN>)
-    .setTransactionId(<REFERENCE ID>)
+    .newBuilder("YOUR AUTHENTICATION TOKEN")
+    .setTransactionId("YOUR REFERENCE ID")
     .includeMetadata()
     .build();
 final Client client = ExperianDataValidation.getEmailClient(configuration);
@@ -135,8 +135,8 @@ if (result.getConfidence() == Confidence.VERIFIED) {
 ```java
 // Create a client
 final Configuration configuration = Configuration
-    .newBuilder(<YOUR AUTHENTICATION TOKEN>)
-    .setTransactionId(<REFERENCE ID>)
+    .newBuilder("YOUR AUTHENTICATION TOKEN")
+    .setTransactionId("YOUR REFERENCE ID")
     .includeMetadata()
     .build();
 final Client client = ExperianDataValidation.getPhoneClient(configuration);
@@ -154,9 +154,9 @@ if (result.getConfidence() == Confidence.VERIFIED) {
 ```typescript
 // Create a client
 const config = new EmailConfiguration(
-    <YOUR AUTHENTICATION TOKEN>,
+    "YOUR AUTHENTICATION TOKEN",
     {
-        transactionId: <REFERENCE ID>,
+        transactionId: "YOUR REFERENCE ID",
         datasets: [Datasets.AuAddress],
         maxSuggestions: 5}
     }        
@@ -179,9 +179,9 @@ const result = await client.format(globalAddressKey);
 ```typescript
 // Create a client
 const config = new EmailConfiguration(
-    <YOUR AUTHENTICATION TOKEN>,
+    "YOUR AUTHENTICATION TOKEN",
     {
-        transactionId: <REFERENCE ID>,
+        transactionId: "YOUR REFERENCE ID",
         includeMetadata: true
     }        
 );
@@ -199,9 +199,9 @@ if (result.getConfidence() == Confidence.VERIFIED) {
 ```typescript
 // Create a client
 const config = new PhoneConfiguration(
-    <YOUR AUTHENTICATION TOKEN>,
+    "YOUR AUTHENTICATION TOKEN",
     {
-        transactionId: <REFERENCE ID>,
+        transactionId: "YOUR REFERENCE ID",
         includeMetadata: true
     }        
 );
