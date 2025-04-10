@@ -8,7 +8,7 @@ public class Setup {
 
     // These tests assume that a layout with the following name already exists for use in these tests
     // We can't create one on the fly because they take a couple of minutes to complete.
-    public static final String EXISTING_TEST_LAYOUT = "DVSSDKTestLayoutJava";
+    public static final String EXISTING_TEST_LAYOUT = "DVSSDK_Java_TestLayout";
 
     // Any layouts created during the tests will be prefixed with this (so that we identify them to clean them up)
     public static final String TEST_LAYOUT_PREFIX = "DVSSDK_Java_";

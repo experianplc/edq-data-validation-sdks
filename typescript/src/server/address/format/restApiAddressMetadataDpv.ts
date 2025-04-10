@@ -1,0 +1,24 @@
+export type RestApiAddressMetadataDpv = {
+    cmra_indicator?: string;
+    seed_indicator?: string;
+    dpv_indicator?: string;
+    footnotes?: string;
+    vacancy_indicator?: string;
+    no_stats_indicator?: string;
+    pbsa_indicator?: string;
+    lacs_indicator?: string;
+    lacs_code?: string;
+    urbanization?: string;
+    delivery_line_1?: string;
+    delivery_line_2?: string;
+    last_line?: string;
+    no_stat_reason_code?: string;
+    drop?: string;
+    throwback?: string;
+    non_delivery_days_indicator?: string;
+    non_delivery_days_value?: string;
+    no_secure_location?: string;
+    door_not_accessible?: string;
+    enhanced_dpv_code?: string;
+    firm_name?: string;
+};

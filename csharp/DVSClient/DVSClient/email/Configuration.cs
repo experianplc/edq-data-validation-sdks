@@ -1,4 +1,7 @@
-﻿namespace DVSClient.Email
+﻿using System.Reflection.PortableExecutable;
+using System.Security.Cryptography.X509Certificates;
+
+namespace DVSClient.Email
 {
     public class Configuration : Common.Configuration
     {
@@ -27,37 +30,37 @@
                 return new Configuration(this);
             }
 
-            public Builder SetMaxDelay(int maxDelay)
+            public new Builder SetMaxDelay(int maxDelay)
             {
                 base.SetMaxDelay(maxDelay);
                 return this;
             }
 
-            public Builder SetInitialDelay(int initialDelay)
+            public new Builder SetInitialDelay(int initialDelay)
             {
                 base.SetInitialDelay(initialDelay);
                 return this;
             }
 
-            public Builder SetMaxRetries(int maxRetries)
+            public new Builder SetMaxRetries(int maxRetries)
             {
                 base.SetMaxRetries(maxRetries);
                 return this;
             }
 
-            public Builder SetApiRequestTimeoutInSeconds(int timeouts)
+            public new Builder SetApiRequestTimeoutInSeconds(int timeouts)
             {
                 base.SetApiRequestTimeoutInSeconds(timeouts);
                 return this;
             }
 
-            public Builder SetHttpClientTimeoutInSeconds(int timeouts)
+            public new Builder SetHttpClientTimeoutInSeconds(int timeouts)
             {
                 base.SetHttpClientTimeoutInSeconds(timeouts);
                 return this;
-            }    
+            }
 
-            public Builder SetTransactionId(string transactionId)
+            public new Builder SetTransactionId(string transactionId)
             {
                 base.SetTransactionId(transactionId);
                 return this;

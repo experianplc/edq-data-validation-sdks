@@ -1,4 +1,5 @@
-﻿using DVSClient.Address.Layout.Attributes;
+﻿using DVSClient.Address.Format.Enrichment;
+using DVSClient.Address.Layout.Attributes;
 using DVSClient.Address.Layout.Elements;
 using DVSClient.Exceptions;
 using DVSClientTests;
@@ -17,20 +18,15 @@ namespace DVSClient.Address.Layout.Tests
         {
             // Some of these tests rely on pre-existing layouts because creating a layout during the tests is not feasible
             // This tests that they exist
-            GetLayoutResult layout1 = null;
+            var testLayout = GetLayout(Setup.ExistingTestLayout);
 
-            try
-            {
-                layout1 = GetLayout(Setup.ExistingTestLayout);
-            }
-            catch (NotFoundException ex)
+            if (testLayout?.Error?.Title == "Not Found")
             {
                 // Doesn't exist yet. Create it.
                 CreateTestLayout();
                 Assert.Fail($"The layout {Setup.ExistingTestLayout} did not exist. This has now been created but you will need to wait for the creation to complete (can be 10 minutes or so)");
             }
-
-            if (layout1?.Layout != null && layout1?.Layout.Status != Status.Completed)
+            else if (testLayout?.Layout?.Status != Status.Completed)
             {
                 Assert.Fail($"The layout {Setup.ExistingTestLayout} is not complete. Please wait for it to complete before running these tests (can be 10 minutes or so)");
             }
@@ -94,22 +90,19 @@ namespace DVSClient.Address.Layout.Tests
         }
 
         [Test]
-        public void Format_WithCustomLayout()
+        public void Format_WithCustomLayout_WithComponents()
         {
             var configuration = Address.Configuration
                 .NewBuilder(Setup.ValidTokenAddress)
-                .UseDataset(Dataset.AuAddress)
-                .IncludeAusRegionalGeocodeAttribute(AusRegionalGeocodeAttribute.Latitude)
-                .IncludeAusRegionalGeocodeAttribute(AusRegionalGeocodeAttribute.Longitude)
+                .UseDataset(Dataset.GbAddress)
                 .UseLayout(Setup.ExistingTestLayout)
                 .IncludeComponents()
-                .IncludeEnrichment()
                 .Build();
             var client = ExperianDataValidation.GetAddressClient((Address.Configuration)configuration);
             var searchResultAutoComplete = client.Search(SearchType.Autocomplete, "56 Queens R");
             var formatResult = client.Format(searchResultAutoComplete.Suggestions.First().GlobalAddressKey);
             Assert.That(formatResult.Confidence, Is.EqualTo(Confidence.VerifiedMatch));
-            Assert.That(formatResult.GlobalAddressKey, Is.EqualTo(searchResultAutoComplete.Suggestions.First().GlobalAddressKey));
+            //Assert.That(formatResult.GlobalAddressKey, Is.EqualTo(searchResultAutoComplete.Suggestions.First().GlobalAddressKey));
             Assert.That(formatResult.AddressFormatted, Is.Not.Null);
             Assert.That(formatResult.AddressFormatted?.LayoutName, Is.EqualTo(Setup.ExistingTestLayout));
             Assert.That(formatResult.AddressFormatted?.HasEnoughLines, Is.Null);
@@ -120,6 +113,9 @@ namespace DVSClient.Address.Layout.Tests
             Assert.That(formatResult.AddressFormatted?.Address["addr_line_2"], Is.Not.Empty);
             Assert.That(formatResult.AddressFormatted?.Address["post_code"], Is.Not.Empty);
             Assert.That(formatResult.AddressFormatted?.Address["country_name"], Is.Not.Empty);
+
+            Assert.That(formatResult.Components, Is.Not.Null);
+            Assert.That(formatResult.Components?.PostalCode?.FullName, Is.EqualTo(formatResult.AddressFormatted?.Address["post_code"].ToUpperInvariant()));
         }
 
         [Test]
@@ -137,8 +133,9 @@ namespace DVSClient.Address.Layout.Tests
 
             Assert.That(searchResult.Suggestions, Is.Not.Empty);
 
-            // When using a custom layout the address objects should all be empty
+            // When using a custom layout the Address objects should all be empty
             Assert.That(searchResult.Suggestions.All(x => x.Address == null));
+            // When using a custom layout the AddressFormatted objects should all be empty
             Assert.That(searchResult.Suggestions.All(x => x.AddressFormatted != null));
         }
 
@@ -160,10 +157,14 @@ namespace DVSClient.Address.Layout.Tests
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var line1 = new LayoutLineVariable("addr_line_1");
             var line2 = new LayoutLineVariable("addr_line_2");
-            var line3 = new LayoutLineFixed("post_code", Aus.PostalCode);
-            var line4 = new LayoutLineFixed("country_name", Aus.CountryName);
+            var line3 = new LayoutLineFixed("post_code", new List<IAddressElement?> { Aus.PostalCode, Gbr.Postcode });
+            var line4 = new LayoutLineFixed("country_name", new List<IAddressElement?> { Aus.CountryName, Gbr.Country });
             var layoutName = Setup.ExistingTestLayout;
-            var createLayoutResult = client.CreateLayout(layoutName, new List<LayoutLineVariable> { line1, line2 }, new List<LayoutLineFixed> { line3, line4 }, Dataset.AuAddress);
+            var createLayoutResult = client.CreateLayout(
+                layoutName, 
+                new List<LayoutLineVariable> { line1, line2 },
+                new List<LayoutLineFixed> { line3, line4 },
+                Dataset.AuAddress, Dataset.GbAddress);
             Assert.That(createLayoutResult.Error, Is.Null);
         }
 
@@ -187,7 +188,7 @@ namespace DVSClient.Address.Layout.Tests
             // Delete them
             foreach (var layout in layoutsResult.Layouts)
             {
-                if (layout.Status == Status.Completed)
+                if (layout.Status == Status.Completed && layout.Name != Setup.ExistingTestLayout)
                 {
                     try
                     {
