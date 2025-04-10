@@ -28,7 +28,7 @@ var configuration = Configuration
 var client = ExperianDataValidation.GetAddressClient(configuration);
 
 // Search for an address
-var searchResult = client.Search(SearchType.Autocomplete, "56 Queens R");
+var searchResult = client.Search(SearchType.Autocomplete, "160 Blackfriars Rd");
 
 // Pick the first address in the list of suggestions
 var globalAddressKey = searchResult.Suggestions.First().GlobalAddressKey;
