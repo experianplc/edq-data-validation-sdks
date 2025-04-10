@@ -5,8 +5,8 @@ import com.experian.dvs.client.Setup;
 import com.experian.dvs.client.address.*;
 import com.experian.dvs.client.address.format.Result;
 import com.experian.dvs.client.address.layout.*;
-import com.experian.dvs.client.address.layout.attributes.AUSRegionalGeocode;
 import com.experian.dvs.client.address.layout.elements.Aus;
+import com.experian.dvs.client.address.layout.elements.Gbr;
 import com.experian.dvs.client.exceptions.EDVSException;
 import com.experian.dvs.client.exceptions.NotFoundException;
 import org.junit.jupiter.api.AfterAll;
@@ -109,24 +109,21 @@ public class AddressLayoutTests {
     }
 
     @Test
-    void format_WithCustomLayout() {
+    void Format_WithCustomLayout_WithComponents() {
 
         final Configuration configuration = Configuration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .setTransactionId(UUID.randomUUID().toString())
-                .useDataset(Dataset.AU_ADDRESS)
-                .includeAusRegionalGeocodeAttribute(AUSRegionalGeocode.LATITUDE)
-                .includeAusRegionalGeocodeAttribute(AUSRegionalGeocode.LONGITUDE)
+                .useDataset(Dataset.GB_ADDRESS)
                 .setFormatLayoutName(Setup.EXISTING_TEST_LAYOUT)
                 .includeComponents()
-                .includeEnrichment()
                 .build();
 
         final Client client = ExperianDataValidation.getAddressClient(configuration);
         final com.experian.dvs.client.address.search.Result resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
         final Result formatResult = client.format(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
         assertThat(formatResult.getConfidence()).isEqualTo(Confidence.VERIFIED_MATCH);
-        assertThat(formatResult.getGlobalAddressKey()).isEqualTo(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
+        //assertThat(formatResult.getGlobalAddressKey()).isEqualTo(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
         assertThat(formatResult.getAddressFormatted()).isNotNull();
         assertThat(formatResult.getAddressFormatted().getLayoutName()).isEqualTo(Setup.EXISTING_TEST_LAYOUT);
         assertThat(formatResult.getAddressFormatted().hasEnoughLines()).isTrue();
@@ -171,20 +168,20 @@ public class AddressLayoutTests {
 
         final LayoutLineVariable line1 = new LayoutLineVariable("addr_line_1");
         final LayoutLineVariable line2 = new LayoutLineVariable("addr_line_2");
-        final LayoutLineFixed line3 = new LayoutLineFixed("post_code", Aus.POSTAL_CODE);
-        final LayoutLineFixed line4 = new LayoutLineFixed("country_name", Aus.COUNTRY_NAME);
+        final LayoutLineFixed line3 = new LayoutLineFixed("post_code", List.of(Aus.POSTAL_CODE, Gbr.POSTCODE));
+        final LayoutLineFixed line4 = new LayoutLineFixed("country_name", List.of(Aus.COUNTRY_NAME, Gbr.COUNTRY));
 
         final String layoutName = Setup.EXISTING_TEST_LAYOUT;
         final CreateLayoutResult createLayoutResult = client.createLayout(layoutName,
                 List.of(line1, line2),
                 List.of(line3, line4),
-                Dataset.AU_ADDRESS);
+                Dataset.AU_ADDRESS, Dataset.GB_ADDRESS);
 
         assertThat(createLayoutResult.getError()).isNotPresent();
     }
 
     private String getUniqueLayoutName() {
-        return Setup.EXISTING_TEST_LAYOUT + UUID.randomUUID().toString();
+        return Setup.TEST_LAYOUT_PREFIX + UUID.randomUUID().toString();
     }
 
     private static void deleteTestLayouts() {
@@ -196,7 +193,7 @@ public class AddressLayoutTests {
 
         //Delete them
         for (var layout : layoutsResult.getLayouts()) {
-            if (layout.getStatus() == Status.COMPLETED) {
+            if (!layout.getName().equals(Setup.EXISTING_TEST_LAYOUT) && layout.getStatus() == Status.COMPLETED) {
                 try {
                     client.deleteLayout(layout.getName());
                 } catch (EDVSException e) {

@@ -369,7 +369,7 @@ public class ClientTests {
     void format_WithMetadata() {
         final Configuration configuration = Configuration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
-                .useDataset(Dataset.AU_ADDRESS)
+                .useDataset(Dataset.GB_ADDRESS)
                 .includeMetadata()
                 .build();
         final Client client = ExperianDataValidation.getAddressClient(configuration);

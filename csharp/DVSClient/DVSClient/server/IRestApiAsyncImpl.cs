@@ -143,7 +143,8 @@ namespace DVSClient.Server
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return JsonConvert.DeserializeObject<T>(content);
+                        return JsonConvert.DeserializeObject<T>(content) 
+                            ?? throw new InvalidOperationException("Deserialization returned null.");
                     }
 
                     if ((int)response.StatusCode >= 500)
@@ -154,18 +155,21 @@ namespace DVSClient.Server
                     {
                         // Only Get / Delete on missing layout is throwing 404
                         var errorResponse = new { Error = new { Title = response.ReasonPhrase } };
-                        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(errorResponse));
+                        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(errorResponse))
+                               ?? throw new InvalidOperationException("Deserialization returned null.");
                     }
                     else if ((int)response.StatusCode >= 400 && (int)response.StatusCode < 500)
                     {
                         // Do not retry on client errors (4xx)
                         if (!string.IsNullOrWhiteSpace(content))
                         {
-                            return JsonConvert.DeserializeObject<T>(content);
+                            return JsonConvert.DeserializeObject<T>(content)
+                                   ?? throw new InvalidOperationException("Deserialization returned null.");
                         }
                         else
                         {
-                            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(new { Error = new { Title = response.ReasonPhrase } }));
+                            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(new { Error = new { Title = response.ReasonPhrase } }))
+                                   ?? throw new InvalidOperationException("Deserialization returned null.");
                         }
                     }
                 }
@@ -210,6 +214,11 @@ namespace DVSClient.Server
         {
             return await ExecuteWithRetryAsync<T>(async () =>
             {
+                if (_client.BaseAddress == null)
+                {
+                    throw new InvalidOperationException("BaseAddress is not set on the HttpClient.");
+                }
+
                 var uriBuilder = new UriBuilder(new Uri(_client.BaseAddress, endPoint));
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 foreach (var param in parameters)
@@ -230,6 +239,11 @@ namespace DVSClient.Server
         {
             return await ExecuteWithRetryAsync<T>(async () =>
             {
+                if (_client.BaseAddress == null)
+                {
+                    throw new InvalidOperationException("BaseAddress is not set on the HttpClient.");
+                }
+
                 var uriBuilder = new UriBuilder(new Uri(_client.BaseAddress, endPoint));
                 var query = HttpUtility.ParseQueryString(uriBuilder.Query);
                 foreach (var param in parameters)

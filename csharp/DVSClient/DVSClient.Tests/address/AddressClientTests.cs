@@ -507,8 +507,8 @@ namespace DVSClient.Address.Tests
 
             Assert.That(formatted.Enrichment, Is.Not.Null);
             Assert.That(formatted.Enrichment?.Geocodes, Is.Not.Null);
-            Assert.That(formatted.Enrichment?.Geocodes?.Latitude, Is.Not.Null);
-            Assert.That(formatted.Enrichment?.Geocodes?.Longitude, Is.Not.Null);
+            Assert.That(formatted.Enrichment?.Geocodes?.Latitude, Is.Positive);
+            Assert.That(formatted.Enrichment?.Geocodes?.Longitude, Is.Negative);
 
             // MatchLevel should be null as attribute was not requested
             Assert.That(formatted.Enrichment?.Geocodes?.MatchLevel, Is.Null);

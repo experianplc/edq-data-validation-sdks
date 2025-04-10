@@ -1,0 +1,32 @@
+{
+    "name": "@experian-edq/dvs.sdk",
+    "version": "0.0.0",
+    "type": "module",
+    "main": "src/index.js",
+    "types": "src/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "vitest run",
+        "start": "node dist/index.js"
+    },
+    "keywords": [
+        "Address Validation",
+        "Email Validation",
+        "Phone Validation"
+    ],
+    "author": "Experian",
+    "license": "SEE LICENSE IN https://github.com/experianplc/edq-data-validation-sdks?tab=License-1-ov-file",
+    "description": "SDK to ease integrating Experian Address Validation, Email Validation and Phone Validation.",
+    "devDependencies": {
+        "@types/node": "^22.13.10",
+        "typescript": "^5.8.2",
+        "@vitest/coverage-istanbul": "^1.5.0",
+        "dotenv": "^16.3.1"
+    },
+    "repository": {
+        "url": "github:experianplc/edq-data-validation-sdks"
+    },
+    "publishConfig": {
+        "registry": "https://edq-repo.pkgs.visualstudio.com/_packaging/EDQ.Package/npm/registry/"
+    }
+}

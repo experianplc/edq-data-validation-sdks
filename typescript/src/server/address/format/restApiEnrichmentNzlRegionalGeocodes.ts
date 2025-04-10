@@ -1,0 +1,23 @@
+export type RestApiEnrichmentNzlRegionalGeocodes = {
+    front_of_property_nztm_x_coordinate?: number;
+    front_of_property_nztm_y_coordinate?: number;
+    centroid_of_property_nztm_x_coordinate?: number;
+    centroid_of_property_nztm_y_coordinate?: number;
+    linz_parcel_id?: string;
+    property_purpose_type?: string;
+    addressable?: string;
+    mesh_block_code?: string;
+    territorial_authority_code?: string;
+    territorial_authority_name?: string;
+    regional_council_code?: string;
+    regional_council_name?: string;
+    general_electorate_code?: string;
+    general_electorate_name?: string;
+    maori_electorate_code?: string;
+    maori_electorate_name?: string;
+    front_of_property_latitude?: number;
+    front_of_property_longitude?: number;
+    centroid_of_property_latitude?: number;
+    centroid_of_property_longitude?: number;
+    match_level?: string;
+};

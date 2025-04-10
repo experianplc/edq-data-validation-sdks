@@ -12,7 +12,8 @@ namespace DVSClient.Common
 
         public static string GetReference(string uuid, bool allowsDotInReferenceId = true)
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            var assembly = Assembly.GetExecutingAssembly();
+            var version = assembly?.GetName().Version?.ToString() ?? "0.0.0.0";
 
             // TODO once API has been updated.
             if (!allowsDotInReferenceId)

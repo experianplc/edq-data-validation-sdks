@@ -12,7 +12,8 @@ namespace DVSClient.Address.Layout.Elements
         private static readonly Dictionary<Dataset, Type> DatasetToAddressElementClassMap = new Dictionary<Dataset, Type>
         {
             { Dataset.AuAddress, typeof(Aus) },
-            { Dataset.AuAddressGnaf, typeof(Aug) }
+            { Dataset.AuAddressGnaf, typeof(Aug) },
+            { Dataset.GbAddress, typeof(Gbr) },
         };
 
         private static readonly Dictionary<Dataset, Dictionary<string, IAddressElement>> ElementNameToAddressElementMap = new Dictionary<Dataset, Dictionary<string, IAddressElement>>();

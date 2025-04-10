@@ -12,7 +12,7 @@ namespace DVSClient.Common
                 var attribute = field.GetCustomAttribute<EnumStringValueAttribute>();
                 if (attribute != null && attribute.JsonName.Equals(stringValue, StringComparison.OrdinalIgnoreCase))
                 {
-                    return (TEnum)field.GetValue(null);
+                    return (TEnum?)field.GetValue(null);
                 }
             }
             return null;
@@ -41,7 +41,7 @@ namespace DVSClient.Common
 
         public static IList<T?> GetAllEnumValues<T>() where T : Enum
         {
-            return new List<T>((T[])Enum.GetValues(typeof(T)));
+            return new List<T?>((T[])Enum.GetValues(typeof(T)));
         }
     }
 }

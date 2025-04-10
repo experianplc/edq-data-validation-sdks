@@ -18,7 +18,8 @@ public abstract class ElementLibrary {
 
     private static final Map<Dataset, Class<? extends AddressElement>> DATASET_TO_ADDRESS_ELEMENT_CLASS_MAP = Map.of(
             Dataset.AU_ADDRESS, Aus.class,
-            Dataset.AU_ADDRESS_GNAF, Aug.class
+            Dataset.AU_ADDRESS_GNAF, Aug.class,
+            Dataset.GB_ADDRESS, Gbr.class
     );
 
     private static final Map<Dataset, Map<String, AddressElement>> ELEMENT_NAME_TO_ADDRESS_ELEMENT_MAP = new EnumMap<>(Dataset.class);
