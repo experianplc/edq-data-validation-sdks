@@ -15,6 +15,9 @@ import { NzlRegionalGeocodeAttribute } from './layout/attributes/nzlRegionalGeoc
 import { UsaRegionalGeocodeAttribute } from './layout/attributes/usaRegionalGeocodeAttribute';
 import { Configuration, ConfigurationOptions } from '../common/configuration';
 
+/**
+ * Interface defining the options for configuring the Address client.
+ */
 export interface AddressConfigurationOptions extends ConfigurationOptions {
     transliterate?: boolean;
     datasets?: Dataset[];
@@ -40,26 +43,40 @@ export interface AddressConfigurationOptions extends ConfigurationOptions {
     gbrHealth?: GbrHealthAttribute[];
     nzlRegionalGeocodes?: NzlRegionalGeocodeAttribute[];
     usaRegionalGeocodes?: UsaRegionalGeocodeAttribute[];
-
 }
 
+/**
+ * Configuration class for setting up the Address client.
+ * Provides options for customizing address-related API requests.
+ */
 export class AddressConfiguration extends Configuration {
 
     public static readonly defaultMaxSuggestions = 7;
     public static readonly defaultLayoutName = "default";
     public static readonly defaultLaoutFormat = LayoutFormat.Default;
     public options: AddressConfigurationOptions = {};
+
+    /**
+     * Initializes a new instance of the {@link AddressConfiguration} class with the specified token and options.
+     *
+     * @param token   The authentication token for the API.
+     * @param options The configuration options for the Address client.
+     */
     constructor(token: string, options: AddressConfigurationOptions = {}) {
         const defaultedOptions = AddressConfiguration.applyDefaultOptions(options);
         super(token, defaultedOptions);
         this.options = defaultedOptions;
-        
     }
- 
-    protected static applyDefaultOptions(options: AddressConfigurationOptions) : AddressConfigurationOptions {
-                
+
+    /**
+     * Applies default values to the provided configuration options.
+     *
+     * @param options The configuration options to apply defaults to.
+     * @return The configuration options with default values applied.
+     */
+    protected static applyDefaultOptions(options: AddressConfigurationOptions): AddressConfigurationOptions {
         const baseResult = super.applyDefaultOptions(options);
-        const result = {...options, ...baseResult};
+        const result = { ...options, ...baseResult };
 
         if (!result.maxSuggestions) {
             result.maxSuggestions = AddressConfiguration.defaultMaxSuggestions;
@@ -72,8 +89,5 @@ export class AddressConfiguration extends Configuration {
         }
 
         return result;
-
     }
-
-    
 }

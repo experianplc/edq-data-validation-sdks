@@ -10,6 +10,7 @@ import com.experian.dvs.client.common.Country;
 import com.experian.dvs.client.exceptions.EDVSException;
 import com.experian.dvs.client.exceptions.InvalidConfigurationException;
 import com.experian.dvs.client.exceptions.UnauthorizedException;
+import com.experian.dvs.client.server.address.Address;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -166,6 +166,9 @@ namespace DVSClient.Address.Layout.Tests
                 new List<LayoutLineFixed> { line3, line4 },
                 Dataset.AuAddress, Dataset.GbAddress);
             Assert.That(createLayoutResult.Error, Is.Null);
+            var result = client.GetLayout(layoutName);
+            Assert.That(result?.Layout?.Status.HasValue, Is.True);
+            Assert.That(result?.Layout?.Status.Value, Is.EqualTo(Status.CreationInProgress));
         }
 
         private void DeleteTestLayouts()

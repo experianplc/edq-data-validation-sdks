@@ -11,16 +11,33 @@ import com.experian.dvs.client.server.phone.RestApiPhoneValidateResponse;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Client class for interacting with the phone-related APIs.
+ * Provides methods for validating phone numbers.
+ */
 public class Client {
 
     private final Configuration configuration;
     private final RestApiAsyncStub restApiAsyncStub;
 
+    /**
+     * Initializes a new instance of the {@link Client} class with the specified configuration.
+     *
+     * @param configuration The configuration settings for the client.
+     */
     public Client(Configuration configuration) {
         this.configuration = configuration;
         this.restApiAsyncStub = new RestApiAsyncImpl(configuration);
     }
 
+    /**
+     * Validates a phone number synchronously.
+     *
+     * @param phoneNumber The phone number to validate.
+     * @return The validation result.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     * @throws EDVSException If the API response contains an error.
+     */
     public Result validate(String phoneNumber) {
         final RestApiPhoneValidateRequest request = RestApiPhoneValidateRequest.using(configuration);
         request.setNumber(phoneNumber);
@@ -41,3 +58,4 @@ public class Client {
         }
     }
 }
+

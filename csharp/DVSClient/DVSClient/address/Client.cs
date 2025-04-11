@@ -14,17 +14,29 @@ namespace DVSClient.Address
         private readonly Address.Configuration _configuration;
         private readonly IRestApiAsyncStub _restApiAsyncStub;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Client"/> class with the specified configuration.
+        /// </summary>
+        /// <param name="configuration">The configuration object for the client.</param>
         public Client(Configuration configuration)
         {
             _configuration = configuration;
             _restApiAsyncStub = new RestApiAsyncImpl(configuration);
         }
 
+        /// <summary>
+        /// Disposes of the resources used by the client.
+        /// </summary>
         public void Dispose()
         {
             _restApiAsyncStub.Dispose();
         }
 
+        /// <summary>
+        /// Retrieves datasets for the specified country.
+        /// </summary>
+        /// <param name="country">The country for which datasets are requested.</param>
+        /// <returns>A result containing the datasets for the specified country.</returns>
         public GetDatasetsResult GetDatasets(Country country)
         {
             try
@@ -37,6 +49,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Performs a search using the specified input.
+        /// </summary>
+        /// <param name="searchInput">The search input string.</param>
+        /// <returns>The search result.</returns>
         public Search.Result Search(string searchInput)
         {
             try
@@ -49,6 +66,12 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Performs a search using the specified search type and input.
+        /// </summary>
+        /// <param name="searchType">The type of search to perform.</param>
+        /// <param name="searchInput">The search input string.</param>
+        /// <returns>The search result.</returns>
         public Search.Result Search(SearchType searchType, string searchInput)
         {
             try
@@ -61,6 +84,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Formats an address using the specified address key.
+        /// </summary>
+        /// <param name="addressKey">The key of the address to format.</param>
+        /// <returns>The formatted address result.</returns>
         public Format.Result Format(string addressKey)
         {
             try
@@ -73,6 +101,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Validates an address using the specified input string.
+        /// </summary>
+        /// <param name="searchInput">The address input string to validate.</param>
+        /// <returns>The validation result.</returns>
         public Validate.Result Validate(string searchInput)
         {
             try
@@ -85,6 +118,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Validates an address using the specified list of address lines.
+        /// </summary>
+        /// <param name="addressLines">The list of address lines to validate.</param>
+        /// <returns>The validation result.</returns>
         public Validate.Result Validate(List<string> addressLines)
         {
             try
@@ -97,6 +135,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Steps into a suggestion using the specified global address key.
+        /// </summary>
+        /// <param name="globalAddressKey">The global address key for the suggestion.</param>
+        /// <returns>The search result after stepping into the suggestion.</returns>
         public Search.Result SuggestionsStepIn(string globalAddressKey)
         {
             try
@@ -109,6 +152,12 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Refines a suggestion using the specified key and refinement string.
+        /// </summary>
+        /// <param name="key">The key of the suggestion to refine.</param>
+        /// <param name="refinement">The refinement string.</param>
+        /// <returns>The search result after refining the suggestion.</returns>
         public Search.Result SuggestionsRefine(string key, string refinement)
         {
             try
@@ -121,6 +170,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Formats suggestions based on the specified search input.
+        /// </summary>
+        /// <param name="searchInput">The search input string for formatting suggestions.</param>
+        /// <returns>The formatted suggestions result.</returns>
         public Suggestions.Result SuggestionsFormat(string searchInput)
         {
             try
@@ -133,6 +187,11 @@ namespace DVSClient.Address
             }
         }
 
+        /// <summary>
+        /// Asynchronously retrieves datasets for the specified country.
+        /// </summary>
+        /// <param name="country">The country for which datasets are requested.</param>
+        /// <returns>A task representing the asynchronous operation, containing the datasets result.</returns>
         public Task<GetDatasetsResult> GetDatasetsAsync(Country country)
         {
             var headers = _configuration.GetCommonHeaders();
@@ -140,6 +199,11 @@ namespace DVSClient.Address
             return new GetDatasetsResultFuture(datasetsResponse).GetAsync();
         }
 
+        /// <summary>
+        /// Asynchronously steps into a suggestion using the specified global address key.
+        /// </summary>
+        /// <param name="globalAddressKey">The global address key for the suggestion.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result after stepping into the suggestion.</returns>
         public Task<Search.Result> SuggestionsStepInAsync(string globalAddressKey)
         {
             var headers = _configuration.GetCommonHeaders();
@@ -147,6 +211,12 @@ namespace DVSClient.Address
             return new Search.ResultFuture(stepInResponse).GetAsync();
         }
 
+        /// <summary>
+        /// Asynchronously refines a suggestion using the specified key and refinement string.
+        /// </summary>
+        /// <param name="key">The key of the suggestion to refine.</param>
+        /// <param name="refinement">The refinement string.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result after refining the suggestion.</returns>
         public Task<Search.Result> SuggestionsRefineAsync(string key, string refinement)
         {
             var request = RestApiSuggestionsRefineRequest.Using(_configuration);
@@ -156,6 +226,11 @@ namespace DVSClient.Address
             return new Search.ResultFuture(refineResponse).GetAsync();
         }
 
+        /// <summary>
+        /// Asynchronously formats suggestions based on the specified search input.
+        /// </summary>
+        /// <param name="searchInput">The search input string for formatting suggestions.</param>
+        /// <returns>A task representing the asynchronous operation, containing the formatted suggestions result.</returns>
         public Task<Suggestions.Result> SuggestionsFormatAsync(string searchInput)
         {
             var request = RestApiSuggestionsFormatRequest.Using(_configuration);
@@ -165,16 +240,32 @@ namespace DVSClient.Address
             return new Suggestions.ResultFuture(suggestionsFormatResponse).GetAsync();
         }
 
+        /// <summary>
+        /// Asynchronously performs a search using the specified input.
+        /// </summary>
+        /// <param name="searchInput">The search input string.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result.</returns>
         public Task<Search.Result> SearchAsync(string searchInput)
         {
             return SearchAsync(SearchType.Autocomplete, searchInput);
         }
 
+        /// <summary>
+        /// Asynchronously performs a search using the specified search type and input.
+        /// </summary>
+        /// <param name="searchType">The type of search to perform.</param>
+        /// <param name="searchInput">The search input string.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result.</returns>
         public Task<Search.Result> SearchAsync(SearchType searchType, string searchInput)
         {
             return PerformSearchWithSearchTypeAsync(searchType, searchInput);
         }
 
+        /// <summary>
+        /// Asynchronously formats an address using the specified address key.
+        /// </summary>
+        /// <param name="addressKey">The key of the address to format.</param>
+        /// <returns>A task representing the asynchronous operation, containing the formatted address result.</returns>
         public Task<Format.Result> FormatAsync(string addressKey)
         {
             var request = RestApiFormatRequest.Using(_configuration);
@@ -183,11 +274,21 @@ namespace DVSClient.Address
             return new Format.ResultFuture(formatResponse).GetAsync();
         }
 
+        /// <summary>
+        /// Asynchronously validates an address using the specified input string.
+        /// </summary>
+        /// <param name="address">The address input string to validate.</param>
+        /// <returns>A task representing the asynchronous operation, containing the validation result.</returns>
         public Task<Validate.Result> ValidateAsync(string address)
         {
             return ValidateAsync(new List<string> { address });
         }
 
+        /// <summary>
+        /// Asynchronously validates an address using the specified list of address lines.
+        /// </summary>
+        /// <param name="addressLines">The list of address lines to validate.</param>
+        /// <returns>A task representing the asynchronous operation, containing the validation result.</returns>
         public Task<Validate.Result> ValidateAsync(List<string> addressLines)
         {
             return ValidateImplAsync(addressLines);
