@@ -153,7 +153,7 @@ if (result.getConfidence() == Confidence.VERIFIED) {
 #### Address validation
 ```typescript
 // Create a client
-const config = new EmailConfiguration(
+const config = new AddressConfiguration(
     "YOUR AUTHENTICATION TOKEN",
     {
         transactionId: "YOUR REFERENCE ID",
