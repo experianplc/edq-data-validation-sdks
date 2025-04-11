@@ -83,6 +83,7 @@ public class AddressLayoutTests {
         assertThat(createLayoutResult.getError()).isNotPresent();
         //Check if the layout was created
         final GetLayoutResult result = client.getLayout(layoutName);
+        assertThat(result.getLayout().getStatus()).isEqualTo(Status.CREATION_IN_PROGRESS);
     }
 
     @Test

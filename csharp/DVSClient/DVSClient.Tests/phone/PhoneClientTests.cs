@@ -12,10 +12,10 @@ namespace DVSClient.Phone.Tests
         public void Authentication_TokenNotSupplied_Throws()
         {
             var ex = Assert.Throws<InvalidConfigurationException>(() => Configuration.NewBuilder("").Build());
-            Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token");
+            Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token.");
 
             ex = Assert.Throws<InvalidConfigurationException>(() => Configuration.NewBuilder(null).Build());
-            Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token");
+            Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token.");
         }
 
         [Test]
