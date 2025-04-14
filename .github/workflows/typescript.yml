@@ -23,6 +23,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@experianplc''
     - name: Build
       working-directory: typescript/
       run: |
@@ -31,7 +33,7 @@ jobs:
     - name: Publish
       working-directory: typescript/
       run: |
-        npm config set @experianplc:registry="https://npm.pkg.github.com"
+        npm config set @experianplc:registry=https://npm.pkg.github.com
         npm login
         npm publish
       env:

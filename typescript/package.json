@@ -25,6 +25,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/experianplc/edq-data-validation-sdks.git"
+        "url": "git+https://github.com/experianplc/edq-data-validation-sdks.git"
     }
 }
