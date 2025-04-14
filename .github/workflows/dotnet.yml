@@ -43,6 +43,6 @@ jobs:
     #  if: ${{ always() }}
     - name: Pack and publish
       run: |
-        dotnet pack --configuration Release -p:PackageVersion=0.0.1 -p:NuspecFile=~/DVS.SDKs.nuspec DVSClient/DVSClient/DVSClient.csproj
+        dotnet pack --configuration Release -p:PackageVersion=0.0.1 -p:NuspecFile=DVS.SDKs.nuspec DVSClient/DVSClient/DVSClient.csproj
         dotnet nuget push "DVSClient/DVSClient/bin/Release/*.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
       working-directory: csharp/
