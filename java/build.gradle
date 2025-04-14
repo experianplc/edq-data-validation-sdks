@@ -51,7 +51,7 @@ publishing {
             name = "GitHubPackages"
             url = "https://github.com/experianplc/edq-data-validation-sdks"
             credentials {
-                username = System.getenv("GITHUB_ACTOR")
+                username = "Experian"
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
