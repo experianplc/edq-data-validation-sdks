@@ -29,8 +29,10 @@ jobs:
       working-directory: typescript/
       run: |
         npm install
-        npm version ${{ env.SDKVERSION }}
+        npm version $SDKVERSION
         npm run build
+      env:
+        SDKVERSION: ${{ env.SDKVERSION }}
     - name: Publish
       working-directory: typescript/
       run: |
@@ -38,5 +40,6 @@ jobs:
         npm login
         npm publish
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
+        SDKVERSION: ${{ env.SDKVERSION }}
 

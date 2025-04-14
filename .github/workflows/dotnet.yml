@@ -30,7 +30,7 @@ jobs:
       run: dotnet restore
       working-directory: csharp/
     - name: Build
-          run: dotnet build --no-restore --configuration Release -p:Version=${{ env.SDKVERSION }} DVSClient.sln
+      run: dotnet build --no-restore --configuration Release -p:Version=${{ env.SDKVERSION }} DVSClient.sln
       working-directory: csharp/
     #- name: Test with dotnet
     #  run: dotnet test --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
