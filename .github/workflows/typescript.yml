@@ -21,17 +21,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        registry-url: https://npm.pkg.github.com/
+        registry-url: 'https://npm.pkg.github.com'
 
-    - name: Build
+    - name: Build and publish
       working-directory: typescript/
       run: |
         npm install
         npm run build
-
-    - name: Build
-      working-directory: typescript/
-      run: npm publish
+        npm publish
       env:
         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
