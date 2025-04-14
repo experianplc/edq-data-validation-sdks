@@ -44,5 +44,5 @@ jobs:
     - name: Pack and publish
       run: |
         dotnet pack --configuration Release DVSClient/DVSClient/DVSClient.csproj
-        dotnet nuget push "DVSClient/DVSClient/bin/Release/*.nupkg" -api-key ${{ secrets.GITHUB_TOKEN }}
+        dotnet nuget push "DVSClient/DVSClient/bin/Release/*.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
       working-directory: csharp/
