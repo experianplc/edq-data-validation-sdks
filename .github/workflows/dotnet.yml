@@ -12,14 +12,17 @@ on:
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: [ '8.0.x' ]
 
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: ${{ matrix.dotnet-version }}
         source-url: https://nuget.pkg.github.com/experianplc/index.json
       env:
         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -27,13 +30,19 @@ jobs:
       run: dotnet restore
       working-directory: csharp/
     - name: Build
-      run: dotnet build --no-restore --configuration Release DVSClient
+      run: dotnet build --no-restore --configuration Release DVSClient.sln
       working-directory: csharp/
-    # - name: Test
-    #   run: dotnet test --no-build --verbosity normal
-    #   working-directory: csharp/
+    #- name: Test with dotnet
+    #  run: dotnet test --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+    #- name: Upload dotnet test results
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    name: dotnet-results-${{ matrix.dotnet-version }}
+    #    path: TestResults-${{ matrix.dotnet-version }}
+    #  # Use always() to always run this step to publish test results when there are test failures
+    #  if: ${{ always() }}
     - name: Pack
-      run: dotnet pack --configuration Release DVSClient
+      run: dotnet pack --configuration Release DVSClient/DVSClient/DVSClient.csproj
       working-directory: csharp/
     - name: Publish
       run: dotnet nuget push "DVSClient/bin/Release/*.nupkg"
