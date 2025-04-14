@@ -29,6 +29,12 @@ jobs:
     # - name: Test
     #   run: dotnet test --no-build --verbosity normal
     #   working-directory: csharp/
-    - name: Publish
+    - name: Authenticate with registry
       run: dotnet nuget add source --username Experian --password ${{ secrets.GITHUB_TOKEN }}  --store-password-in-clear-text --name github "https://nuget.pkg.github.com/experianplc/index.json"
-      working-directory: csharp/ 
+      working-directory: csharp/
+    - name: Pack
+      run: dotnet pack --configuration Release
+      working-directory: csharp/
+    - name: Publish
+      run: dotnet nuget push "bin/Release/DVSClient.0.0.1.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
+      working-directory: csharp/  
