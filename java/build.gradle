@@ -13,11 +13,11 @@ repositories {
 publishing {
     publications {
         dvssdk(MavenPublication) {
-            groupId 'com.experianplc.edq-data-validation-sdks'
+            //groupId 'com.experianplc.edq-data-validation-sdks'
             version System.getenv("sdkVersion")
             artifactId = 'sdk'
             pom {
-                name = 'com.experianplc.edq-data-validation-sdks.sdk'
+                name = 'sdk'
                 description = 'SDK to ease integrating Experian Address Validation, Email Validation and Phone Validation.'
                 url = 'https://github.com/experianplc/edq-data-validation-sdks'
                 licenses {
