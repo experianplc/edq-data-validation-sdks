@@ -49,7 +49,7 @@ publishing {
 
         maven {
             name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/octocat/hello-world"
+            url = "https://github.com/experianplc/edq-data-validation-sdks"
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
