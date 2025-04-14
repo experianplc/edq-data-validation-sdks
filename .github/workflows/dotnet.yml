@@ -20,21 +20,21 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+        source-url: https://nuget.pkg.github.com/experianplc/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     - name: Restore dependencies
       run: dotnet restore
       working-directory: csharp/
     - name: Build
-      run: dotnet build DVSClient.sln --no-restore
+      run: dotnet build --no-restore --configuration Release DVSClient
       working-directory: csharp/
     # - name: Test
     #   run: dotnet test --no-build --verbosity normal
     #   working-directory: csharp/
-    - name: Authenticate with registry
-      run: dotnet nuget add source --username Experian --password ${{ secrets.GITHUB_TOKEN }}  --store-password-in-clear-text --name github "https://nuget.pkg.github.com/experianplc/index.json"
-      working-directory: csharp/
     - name: Pack
-      run: dotnet pack --configuration Release
+      run: dotnet pack --configuration Release DVSClient
       working-directory: csharp/
     - name: Publish
-      run: dotnet nuget push "bin/Release/DVSClient.0.0.1.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
-      working-directory: csharp/  
+      run: dotnet nuget push "DVSClient/bin/Release/*.nupkg"
+      working-directory: csharp/
