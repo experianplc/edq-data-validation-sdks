@@ -24,6 +24,6 @@
         "dotenv": "^16.3.1"
     },
     "repository": {
-        "url": "github:experianplc/edq-data-validation-sdks"
+        "url": "https://github.com/experianplc/edq-data-validation-sdks.git"
     }
 }
