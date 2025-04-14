@@ -26,7 +26,7 @@ jobs:
       run: |
         npm install
         npm run build
-        npm config set registry=https://npm.pkg.github.com
+        npm config set @experianplc:registry="https://npm.pkg.github.com"
         npm publish
       env:
         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
