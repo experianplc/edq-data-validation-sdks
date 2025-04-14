@@ -24,7 +24,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://npm.pkg.github.com'
-        scope: '@experianplc''
+        scope: '@experianplc'
     - name: Build
       working-directory: typescript/
       run: |
