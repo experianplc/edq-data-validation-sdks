@@ -45,5 +45,5 @@ jobs:
       run: dotnet pack --configuration Release DVSClient/DVSClient/DVSClient.csproj
       working-directory: csharp/
     - name: Publish
-      run: dotnet nuget push "DVSClient/bin/Release/*.nupkg"
+      run: dotnet nuget push "DVSClient/DVSClient/bin/Release/*.nupkg"
       working-directory: csharp/
