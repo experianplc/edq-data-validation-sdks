@@ -35,13 +35,13 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build -x test 
+      run: ./gradlew build -x test -PSDKVERSION=${{ env.SDKVERSION }}
       working-directory: java/
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
     - name: Publish to GitHub Packages
-      run: ./gradlew publish --info
+      run: ./gradlew publish -PSDKVERSION=${{ env.SDKVERSION }}
       working-directory: java/
       env:
         GITHUB_ACTOR: ${{ github.actor }}

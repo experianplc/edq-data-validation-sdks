@@ -29,6 +29,7 @@ jobs:
       working-directory: typescript/
       run: |
         npm install
+        npm version ${{ env.SDKVERSION }}
         npm run build
     - name: Publish
       working-directory: typescript/

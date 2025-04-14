@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.experian.dvs'
-version sdkVersion
+version SDKVERSION
 
 repositories {
     mavenCentral()
@@ -14,7 +14,7 @@ publishing {
     publications {
         dvssdk(MavenPublication) {
             groupId 'com.experian.dvs'
-            version System.getenv("sdkVersion")
+            version System.getenv("SDKVERSION")
             artifactId = 'sdk'
             pom {
                 name = 'com.experian.dvs.sdk'
