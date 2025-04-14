@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'com.experian.dvs'
+group 'com.experianplc.dvs'
 version sdkVersion
 
 repositories {
@@ -13,11 +13,11 @@ repositories {
 publishing {
     publications {
         dvssdk(MavenPublication) {
-            groupId 'com.experian.dvs'
+            groupId 'com.experianplc.dvs'
             version System.getenv("sdkVersion")
             artifactId = 'sdk'
             pom {
-                name = 'com.experian.dvs.sdk'
+                name = 'com.experianplc.dvs.sdk'
                 description = 'SDK to ease integrating Experian Address Validation, Email Validation and Phone Validation.'
                 url = 'https://github.com/experianplc/edq-data-validation-sdks'
                 licenses {
@@ -51,7 +51,7 @@ publishing {
             name = "GitHubPackages"
             url = "https://github.com/experianplc/edq-data-validation-sdks"
             credentials {
-                username = "Experian"
+                username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
             }
         }
