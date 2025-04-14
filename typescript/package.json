@@ -1,5 +1,5 @@
 {
-    "name": "@experian-edq/dvs.sdk",
+    "name": "@experianplc/edq.dvs.sdk",
     "version": "0.0.1",
     "type": "module",
     "main": "src/index.js",
