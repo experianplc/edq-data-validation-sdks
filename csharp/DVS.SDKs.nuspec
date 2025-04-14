@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+    <metadata>
+        <id>Experian.DVS.NET.SDK</id>
+        <version>0.0.1</version>
+        <title>Experian.DVS.NET.SDK</title>
+        <authors>Experian</authors>
+        <owners></owners>
+        <licenseUrl>https://github.com/experianplc/edq-data-validation-sdks/tree/Versioning?tab=License-1-ov-file</licenseUrl>
+        <projectUrl>https://github.com/experianplc/edq-data-validation-sdks/</projectUrl>
+        <requireLicenseAcceptance>true</requireLicenseAcceptance>
+        <description>SDK to ease integrating Experian Address Validation, Email Validation and Phone Validation.</description>
+        <copyright>© Experian 2025. All rights reserved.</copyright>
+        <tags>AddressValidation EmailValidation PhoneValidation</tags>
+    </metadata>
+</package>
