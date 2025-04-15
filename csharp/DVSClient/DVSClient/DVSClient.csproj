@@ -13,8 +13,6 @@
     <RepositoryUrl>https://github.com/experianplc/edq-data-validation-sdks.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>AddressValidation;EmailValidation;PhoneValidation</PackageTags>
-    <PackageLicenseExpression>https://github.com/experianplc/edq-data-validation-sdks/tree/Versioning?tab=License-1-ov-file</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
