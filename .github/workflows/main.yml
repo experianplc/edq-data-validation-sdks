@@ -19,8 +19,9 @@ jobs:
           Write-Host "$version"
           $split_version = $version.split(".")
           $split_version[2] = [int]$split_version[2] + 1
-          $SDKVERSION = $split_version -join "."
-          echo "SDKVERSION=$SDKVERSION" >> $GITHUB_ENV
+          $SDKVERSION = $split_version -join "." 
+          Write-Host "$SDKVERSION"
+          Write-Host "SDKVERSION=$SDKVERSION" >> $GITHUB_ENV
         shell: pwsh
       - name: Set Repository Variable
         uses: action-pack/set-variable@v1
