@@ -21,7 +21,7 @@ jobs:
         token: ${{ secrets.INCREASEVERSION }}
         repository: 'edq-data-validation-sdks'
         owner: 'experianplc'
-        org: true
+        org: true   
 
   buildDotNet:
     runs-on: ubuntu-latest 
