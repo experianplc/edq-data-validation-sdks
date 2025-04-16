@@ -17,11 +17,8 @@ jobs:
       uses: action-pack/set-variable@v1
       with:
         name: 'SDKVERSION'
-        value: '0.2.0'
+        value: '0.1.0'
         token: ${{ secrets.INCREASEVERSION }}
-        #repository: 'edq-data-validation-sdks'
-        #owner: 'experianplc'
-        #org: true   
 
   buildDotNet:
     runs-on: ubuntu-latest 
@@ -59,8 +56,3 @@ jobs:
     #    path: TestResults-${{ matrix.dotnet-version }}
     #  # Use always() to always run this step to publish test results when there are test failures
     #  if: ${{ always() }}
-    - name: Pack and publish
-      run: |
-        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj --no-build
-        dotnet nuget push "DVSClient/DVSClient/bin/Release/*${{ vars.SDKVERSION }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
-      working-directory: csharp/
