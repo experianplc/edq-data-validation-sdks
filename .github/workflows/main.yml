@@ -20,7 +20,8 @@ jobs:
           $split_version = $version.split(".")
           $split_version[2] = [int]$split_version[2] + 1
           $sdkversion = $split_version -join "." 
-          echo "sdkversion=$sdkversion" >> $GITHUB_OUTPUT
+          #echo "sdkversion=$sdkversion" >> $GITHUB_OUTPUT
+          echo "sdkversion=$sdkversion" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
         shell: pwsh
       - name: Set Repository Variable
         uses: action-pack/set-variable@v1
