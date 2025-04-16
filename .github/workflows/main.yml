@@ -9,10 +9,77 @@ on:
 jobs:
   buildDotNet:
     uses: ./.github/workflows/dotnet.yml
+  buildJava:
+    uses: ./.github/workflows/gradle.yml
+  buildTypescript:
+    uses: ./.github/workflows/typescript.yml
+
+  publishTypescript:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: 'write'
+
+    needs: [ buildTypescript ]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@experianplc'
+    - name: Build and publish
+      working-directory: typescript/
+      run: |
+        npm install
+        npm version ${{ vars.SDKVERSION }}
+        npm run build
+        npm config set @experianplc:registry=https://npm.pkg.github.com
+        npm login
+        npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publishJava:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: 'write'   
+
+    needs: [ buildJava ]
+
+    steps:
+     - name: Publish to GitHub Packages
+       run: ./gradlew publish -PSDKVERSION=${{ vars.SDKVERSION }}-${{ github.event.number }}-
+       working-directory: java/
+       env:
+         GITHUB_ACTOR: ${{ github.actor }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_PR_NUMBER: ${{ github.event.number }}
+  
+  publishDotNet:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: 'write'  
+
+    needs: [ buildDotNet ]
+
+    steps:
+    - name: Pack and publish
+      run: |
+        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj --no-build
+        dotnet nuget push "DVSClient/DVSClient/bin/Release/*${{ vars.SDKVERSION }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
+      working-directory: csharp/
 
   increaseVersionNumber:
     runs-on: ubuntu-latest
     name: Increase version number
+
+    needs: [ publishDotNet, publishJava, publishTypescript ]
 
     steps:
       - uses: actions/checkout@v1
