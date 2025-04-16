@@ -15,15 +15,18 @@ jobs:
       - uses: actions/checkout@v1
       - name: Script
         run: |
-          Write-Host "Line 1"
-          Write-Host "Line 2"
-          Write-Host "Line 3"
+          $version = ${{ vars.SDKVERSION }}
+
+          $split_version = $version.split(".")
+          $split_version[2] = [int]$split_version[2] + 1
+          $SDKVERSION = $split_version -join "."
+          echo "SDKVERSION=$SDKVERSION" >> $GITHUB_ENV
         shell: pwsh
       - name: Set Repository Variable
         uses: action-pack/set-variable@v1
         with:
           name: 'SDKVERSION'
-          value: '0.1.0'
+          value: ${{ env.SDKVERSION }}
           token: ${{ secrets.INCREASEVERSION }}
 
   buildDotNet:
