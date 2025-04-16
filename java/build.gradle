@@ -38,15 +38,6 @@ publishing {
 
     // Repositories *to* which Gradle can publish artifacts
     repositories {
-        //maven {
-        //    url 'https://pkgs.dev.azure.com/edq-repo/_packaging/' + azureDevOpsFeed + '/maven/v1'
-        //    name azureDevOpsFeed
-        //    credentials {
-        //        username azureDevOpsFeed
-        //        password System.getenv("SYSTEM_ACCESSTOKEN") != null ? System.getenv("SYSTEM_ACCESSTOKEN") : azureDevOpsMavenAccessToken
-        //    }
-        //}
-
         maven {
             name = "GitHubPackages"
             url = "https://maven.pkg.github.com/experianplc/edq-data-validation-sdks"
