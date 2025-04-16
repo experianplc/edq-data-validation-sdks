@@ -8,7 +8,7 @@ on:
 
 jobs:
   buildDotNet:
-    uses: ./.github/workflows/workflow-2.yml
+    uses: ./.github/workflows/dotnet.yml
 
   increaseVersionNumber:
     runs-on: ubuntu-latest
