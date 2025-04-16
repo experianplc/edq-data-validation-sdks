@@ -38,10 +38,10 @@ jobs:
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle
-    - name: Publish to GitHub Packages
-      run: ./gradlew publish -PSDKVERSION=${{ vars.SDKVERSION }}-${{ github.event.number }}-
-      working-directory: java/
-      env:
-        GITHUB_ACTOR: ${{ github.actor }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GITHUB_PR_NUMBER: ${{ github.event.number }}
+    #- name: Publish to GitHub Packages
+    #  run: ./gradlew publish -PSDKVERSION=${{ vars.SDKVERSION }}-${{ github.event.number }}-
+    #  working-directory: java/
+    #  env:
+    #    GITHUB_ACTOR: ${{ github.actor }}
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #    GITHUB_PR_NUMBER: ${{ github.event.number }}

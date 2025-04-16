@@ -47,9 +47,9 @@ jobs:
         npm install
         npm version ${{ vars.SDKVERSION }}
         npm run build
-        npm config set @experianplc:registry=https://npm.pkg.github.com
-        npm login
-        npm publish
+        #npm config set @experianplc:registry=https://npm.pkg.github.com
+        #npm login
+        #npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
