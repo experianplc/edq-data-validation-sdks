@@ -19,9 +19,9 @@ jobs:
         name: 'SDKVERSION'
         value: '0.2.0'
         token: ${{ secrets.INCREASEVERSION }}
-        #repository: 'edq-data-validation-sdks'
-        #owner: 'experianplc'
-        #org: true
+        repository: 'edq-data-validation-sdks'
+        owner: 'experianplc'
+        org: true
 
   buildDotNet:
     runs-on: ubuntu-latest 
