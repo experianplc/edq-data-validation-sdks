@@ -16,7 +16,7 @@ jobs:
       - name: Script
         run: |
           $version = '${{ vars.SDKVERSION }}'
-
+          Write-Host "$version"
           $split_version = $version.split(".")
           $split_version[2] = [int]$split_version[2] + 1
           $SDKVERSION = $split_version -join "."
