@@ -8,8 +8,6 @@
 name: Java
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -47,5 +45,3 @@ jobs:
         GITHUB_ACTOR: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_PR_NUMBER: ${{ github.event.number }}
-        GITHUB_RUN_ATTEMPT
-        GITHUB_REF_NAME
