@@ -19,14 +19,14 @@ jobs:
           $version = '${{ vars.SDKVERSION }}'
           $split_version = $version.split(".")
           $split_version[2] = [int]$split_version[2] + 1
-          $SDKVERSION = $split_version -join "." 
-          echo "SDKVERSION=$SDKVERSION" >> $GITHUB_OUTPUT
+          $sdkversion = $split_version -join "." 
+          echo "sdkversion=$sdkversion" >> $GITHUB_OUTPUT
         shell: pwsh
       - name: Set Repository Variable
         uses: action-pack/set-variable@v1
         with:
           name: 'SDKVERSION'
-          value: ${{ steps.vars.outputs.SDKVERSION }}
+          value: ${{ steps.vars.outputs.sdkversion }}
           token: ${{ secrets.INCREASEVERSION }}
 
   buildDotNet:
