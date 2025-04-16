@@ -23,11 +23,11 @@ We welcome contributions from the community! Please follow the [fork and pull re
 
 The examples below show how your application can easily create and customize address, email, and phone validation requests.
 
-- [.net](#dotnet)
-- [java](#java)
-- [typescript](#typescript)
+- [.NET](#dotnet)
+- [Java](#java)
+- [Typescript](#typescript)
 
-### Dotnet
+### .NET
 
 #### Address validation
 ```csharp

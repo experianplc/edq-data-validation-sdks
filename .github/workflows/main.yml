@@ -1,15 +1,37 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: main
 
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 jobs:
-  build:
+  increaseVersionNumber:
     runs-on: ubuntu-latest
+    name: Increase version number
+
+    steps:
+
+    - name: Set Repository Variable
+      # You may pin to the exact commit or the version.
+      # uses: action-pack/set-variable@54de69c1565d1c9de606af2f1406814aa5d7551c
+      uses: action-pack/set-variable@v1.13
+      with:
+        # Name
+        name: SDKVERSION
+        # Value
+        value: 0.2.0
+        # Repository name
+        repository: edq-data-validation-sdks
+        # Repository owner
+        owner: experianplc
+        # Flag for organization
+        org: true
+        # Repository access token
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  buildDotNet:
+    runs-on: ubuntu-latest 
+    name: .NET build and publish
 
     permissions:
       contents: 'read'
@@ -43,3 +65,8 @@ jobs:
     #    path: TestResults-${{ matrix.dotnet-version }}
     #  # Use always() to always run this step to publish test results when there are test failures
     #  if: ${{ always() }}
+    - name: Pack and publish
+      run: |
+        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj --no-build
+        dotnet nuget push "DVSClient/DVSClient/bin/Release/*${{ vars.SDKVERSION }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
+      working-directory: csharp/

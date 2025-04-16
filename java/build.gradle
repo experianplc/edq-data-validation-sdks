@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.experian.dvs'
-version sdkVersion
+version SDKVERSION
 
 repositories {
     mavenCentral()
@@ -14,16 +14,16 @@ publishing {
     publications {
         dvssdk(MavenPublication) {
             groupId 'com.experian.dvs'
-            version System.getenv("sdkVersion")
+            version System.getenv("SDKVERSION")
             artifactId = 'sdk'
             pom {
                 name = 'com.experian.dvs.sdk'
                 description = 'SDK to ease integrating Experian Address Validation, Email Validation and Phone Validation.'
-                url = 'https://github.com/pschott/sdks'
+                url = 'https://github.com/experianplc/edq-data-validation-sdks'
                 licenses {
                     license {
                         name = 'Experian SDK License Agreement'
-                        url = 'https://github.com/pschott/sdks?tab=License-1-ov-file'
+                        url = 'https://github.com/experianplc/edq-data-validation-sdks?tab=License-1-ov-file'
                     }
                 }
                 developers {
@@ -39,11 +39,11 @@ publishing {
     // Repositories *to* which Gradle can publish artifacts
     repositories {
         maven {
-            url 'https://pkgs.dev.azure.com/edq-repo/_packaging/' + azureDevOpsFeed + '/maven/v1'
-            name azureDevOpsFeed
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/experianplc/edq-data-validation-sdks"
             credentials {
-                username azureDevOpsFeed
-                password System.getenv("SYSTEM_ACCESSTOKEN") != null ? System.getenv("SYSTEM_ACCESSTOKEN") : azureDevOpsMavenAccessToken
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
