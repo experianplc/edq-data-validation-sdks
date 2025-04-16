@@ -14,22 +14,14 @@ jobs:
     steps:
 
     - name: Set Repository Variable
-      # You may pin to the exact commit or the version.
-      # uses: action-pack/set-variable@54de69c1565d1c9de606af2f1406814aa5d7551c
-      uses: action-pack/set-variable@v1.13
+      uses: action-pack/set-variable@v1
       with:
-        # Name
-        name: SDKVERSION
-        # Value
-        value: 0.2.0
-        # Repository name
-        repository: edq-data-validation-sdks
-        # Repository owner
-        owner: experianplc
-        # Flag for organization
-        org: true
-        # Repository access token
+        name: 'SDKVERSION'
+        value: '0.2.0'
         token: ${{ secrets.INCREASEVERSION }}
+        repository: 'edq-data-validation-sdks'
+        owner: 'experianplc'
+        org: true
 
   buildDotNet:
     runs-on: ubuntu-latest 
