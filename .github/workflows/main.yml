@@ -14,6 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Script
+        id: vars
         run: |
           $version = '${{ vars.SDKVERSION }}'
           $split_version = $version.split(".")
@@ -25,7 +26,7 @@ jobs:
         uses: action-pack/set-variable@v1
         with:
           name: 'SDKVERSION'
-          value: ${{ steps.Script.outputs.SDKVERSION }}
+          value: ${{ steps.vars.outputs.SDKVERSION }}
           token: ${{ secrets.INCREASEVERSION }}
 
   buildDotNet:
