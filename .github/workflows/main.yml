@@ -12,13 +12,19 @@ jobs:
     name: Increase version number
 
     steps:
-
-    - name: Set Repository Variable
-      uses: action-pack/set-variable@v1
-      with:
-        name: 'SDKVERSION'
-        value: '0.1.0'
-        token: ${{ secrets.INCREASEVERSION }}
+      - uses: actions/checkout@v1
+      - name: Script
+        run: |
+          Write-Host "Line 1"
+          Write-Host "Line 2"
+          Write-Host "Line 3"
+        shell: pwsh
+      - name: Set Repository Variable
+        uses: action-pack/set-variable@v1
+        with:
+          name: 'SDKVERSION'
+          value: '0.1.0'
+          token: ${{ secrets.INCREASEVERSION }}
 
   buildDotNet:
     runs-on: ubuntu-latest 
