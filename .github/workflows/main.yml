@@ -7,6 +7,9 @@ on:
     branches: [ "main" ]
 
 jobs:
+  buildDotNet:
+    uses: ./.github/workflows/workflow-2.yml
+
   increaseVersionNumber:
     runs-on: ubuntu-latest
     name: Increase version number
@@ -20,7 +23,6 @@ jobs:
           $split_version = $version.split(".")
           $split_version[2] = [int]$split_version[2] + 1
           $sdkversion = $split_version -join "." 
-          #echo "sdkversion=$sdkversion" >> $GITHUB_OUTPUT
           echo "sdkversion=$sdkversion" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
         shell: pwsh
       - name: Set Repository Variable
@@ -29,40 +31,3 @@ jobs:
           name: 'SDKVERSION'
           value: ${{ steps.vars.outputs.sdkversion }}
           token: ${{ secrets.INCREASEVERSION }}
-
-  buildDotNet:
-    runs-on: ubuntu-latest 
-    name: .NET build and publish
-
-    permissions:
-      contents: 'read'
-      packages: 'write'
-
-    strategy:
-      matrix:
-        dotnet-version: [ '8.0.x' ]
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ matrix.dotnet-version }}
-        source-url: https://nuget.pkg.github.com/experianplc/index.json
-      env:
-        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-    - name: Restore dependencies
-      run: dotnet restore
-      working-directory: csharp/
-    - name: Build
-      run: dotnet build --no-restore --configuration Release -p:Version=${{ vars.SDKVERSION }} DVSClient.sln
-      working-directory: csharp/
-    #- name: Test with dotnet
-    #  run: dotnet test --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
-    #- name: Upload dotnet test results
-    #  uses: actions/upload-artifact@v4
-    #  with:
-    #    name: dotnet-results-${{ matrix.dotnet-version }}
-    #    path: TestResults-${{ matrix.dotnet-version }}
-    #  # Use always() to always run this step to publish test results when there are test failures
-    #  if: ${{ always() }}
