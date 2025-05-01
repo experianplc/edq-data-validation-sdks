@@ -5,68 +5,103 @@ on:
     branches: [ "main" ]
 
 jobs:
-  increaseVersionNumber:
-    runs-on: ubuntu-latest
-    name: Increase version number
-
-    steps:
-
-    - name: Set Repository Variable
-      # You may pin to the exact commit or the version.
-      # uses: action-pack/set-variable@54de69c1565d1c9de606af2f1406814aa5d7551c
-      uses: action-pack/set-variable@v1.13
-      with:
-        # Name
-        name: SDKVERSION
-        # Value
-        value: 0.2.0
-        # Repository name
-        repository: edq-data-validation-sdks
-        # Repository owner
-        owner: experianplc
-        # Flag for organization
-        org: true
-        # Repository access token
-        token: ${{ secrets.GITHUB_TOKEN }}
-
   buildDotNet:
-    runs-on: ubuntu-latest 
-    name: .NET build and publish
+    uses: ./.github/workflows/dotnet.yml
+  buildJava:
+    uses: ./.github/workflows/gradle.yml
+  buildTypescript:
+    uses: ./.github/workflows/typescript.yml
 
+  publishTypescript:
+    runs-on: ubuntu-latest
     permissions:
       contents: 'read'
       packages: 'write'
 
-    strategy:
-      matrix:
-        dotnet-version: [ '8.0.x' ]
+    needs: [ buildTypescript ]
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
-        source-url: https://nuget.pkg.github.com/experianplc/index.json
+        node-version: '20.x'
+        registry-url: 'https://npm.pkg.github.com'
+        scope: '@experianplc'
+    - name: Build and publish
+      working-directory: typescript/
+      run: |
+        npm install
+        npm version ${{ vars.SDKVERSION }}
+        npm run build
+        npm config set @experianplc:registry=https://npm.pkg.github.com
+        npm login
+        npm publish
       env:
-        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-    - name: Restore dependencies
-      run: dotnet restore
-      working-directory: csharp/
-    - name: Build
-      run: dotnet build --no-restore --configuration Release -p:Version=${{ vars.SDKVERSION }} DVSClient.sln
-      working-directory: csharp/
-    #- name: Test with dotnet
-    #  run: dotnet test --no-restore --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
-    #- name: Upload dotnet test results
-    #  uses: actions/upload-artifact@v4
-    #  with:
-    #    name: dotnet-results-${{ matrix.dotnet-version }}
-    #    path: TestResults-${{ matrix.dotnet-version }}
-    #  # Use always() to always run this step to publish test results when there are test failures
-    #  if: ${{ always() }}
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publishJava:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: 'write'   
+
+    needs: [ buildJava ]
+
+    steps:
+     - uses: actions/checkout@v4
+     - name: Setup Gradle
+       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+     - name: Change Gradle wrapper permissions
+       working-directory: java/
+       run: chmod +x ./gradlew
+     - name: Publish to GitHub Packages
+       run: ./gradlew publish -PSDKVERSION=${{ vars.SDKVERSION }}-${{ github.event.number }}
+       working-directory: java/
+       env:
+         GITHUB_ACTOR: ${{ github.actor }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         GITHUB_PR_NUMBER: ${{ github.event.number }}
+  
+  publishDotNet:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: 'write'  
+
+    needs: [ buildDotNet ]
+
+    steps:
+    - uses: actions/checkout@v4
     - name: Pack and publish
       run: |
-        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj --no-build
-        dotnet nuget push "DVSClient/DVSClient/bin/Release/*${{ vars.SDKVERSION }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
+        dotnet restore
+        dotnet nuget add source --username Experian --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/experianplc/index.json"
+        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj
+        dotnet nuget push "DVSClient/DVSClient/bin/Release/*${{ vars.SDKVERSION }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }} --source "github"
       working-directory: csharp/
+
+  increaseVersionNumber:
+    runs-on: ubuntu-latest
+    name: Increase version number
+
+    needs: [ publishDotNet, publishJava, publishTypescript ]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Script
+        id: vars
+        run: |
+          $version = '${{ vars.SDKVERSION }}'
+          $split_version = $version.split(".")
+          $split_version[2] = [int]$split_version[2] + 1
+          $sdkversion = $split_version -join "." 
+          echo "sdkversion=$sdkversion" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+        shell: pwsh
+      - name: Set Repository Variable
+        uses: action-pack/set-variable@v1
+        with:
+          name: 'SDKVERSION'
+          value: ${{ steps.vars.outputs.sdkversion }}
+          token: ${{ secrets.INCREASEVERSION }}
