@@ -81,7 +81,7 @@ jobs:
       working-directory: csharp/
     - name: Pack and publish
       run: |
-        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj --no-build
+        dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj
         dotnet nuget push "DVSClient/DVSClient/bin/Release/*${{ vars.SDKVERSION }}.nupkg" --api-key ${{ secrets.GITHUB_TOKEN }}
       working-directory: csharp/
 
