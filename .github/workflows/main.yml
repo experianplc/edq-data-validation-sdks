@@ -76,6 +76,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: csharp/
     - name: Pack and publish
       run: |
         dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj --no-build
