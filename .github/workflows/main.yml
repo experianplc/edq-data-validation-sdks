@@ -79,6 +79,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       working-directory: csharp/
+    - name: Prep packages
+      run: dotnet nuget add source --username Experian --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/experianplc/index.json"
     - name: Pack and publish
       run: |
         dotnet pack --configuration Release -p:PackageVersion=${{ vars.SDKVERSION }} DVSClient/DVSClient/DVSClient.csproj
