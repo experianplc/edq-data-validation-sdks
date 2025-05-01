@@ -32,7 +32,7 @@ The examples below show how your application can easily create and customize add
 #### Address validation
 ```csharp
 // Create a client
-var configuration = Configuration
+var configuration = AddressConfiguration
     .NewBuilder("YOUR AUTHENTICATION TOKEN")
     .SetTransactionId("YOUR REFERENCE ID")
     .UseDataset(Dataset.GbAddress)
@@ -55,7 +55,7 @@ var result = client.Format(globalAddressKey);
 #### Email validation
 ```csharp
 // Create a client
-var configuration = Configuration
+var configuration = EmailConfiguration
     .NewBuilder("YOUR AUTHENTICATION TOKEN")
     .SetTransactionId("YOUR REFERENCE ID")
     .IncludeMetadata()
@@ -73,7 +73,7 @@ if (result.Confidence == Confidence.Verified) {
 #### Phone validation
 ```csharp
 // Create a client
-var configuration = Configuration
+var configuration = PhoneConfiguration
     .NewBuilder("YOUR AUTHENTICATION TOKEN")
     .SetTransactionId("YOUR REFERENCE ID")
     .IncludeMetadata()
@@ -93,7 +93,7 @@ if (result.PhoneType == Confidence.Landline) {
 #### Address validation
 ```java
 // Create a client
-final Configuration configuration = Configuration
+final Configuration configuration = AddressConfiguration
     .newBuilder("YOUR AUTHENTICATION TOKEN")
     .setTransactionId("YOUR REFERENCE ID")
     .useDataset(Dataset.AU_ADDRESS)
@@ -102,7 +102,7 @@ final Configuration configuration = Configuration
 var client = ExperianDataValidation.GetAddressClient(configuration);
 
 // Search for an address
-final com.experian.dvs.client.address.search.Result result = client.search(SearchType.SINGLELINE, "56 Queens R");
+final SearchResult result = client.search(SearchType.SINGLELINE, "56 Queens R");
 
 // Pick the first address in the list of suggestions
 final var globalAddressKey = result.getSuggestions().get(0).getGlobalAddressKey();
@@ -116,12 +116,12 @@ final var result = client.format(globalAddressKey);
 #### Email validation
 ```java
 // Create a client
-final Configuration configuration = Configuration
+final Configuration configuration = EmailConfiguration
     .newBuilder("YOUR AUTHENTICATION TOKEN")
     .setTransactionId("YOUR REFERENCE ID")
     .includeMetadata()
     .build();
-final Client client = ExperianDataValidation.getEmailClient(configuration);
+final EmailClient client = ExperianDataValidation.getEmailClient(configuration);
 
 // Validate an email address
 final var result = client.validate("support@experian.com");
@@ -134,12 +134,12 @@ if (result.getConfidence() == Confidence.VERIFIED) {
 #### Phone validation
 ```java
 // Create a client
-final Configuration configuration = Configuration
+final Configuration configuration = PhoneConfiguration
     .newBuilder("YOUR AUTHENTICATION TOKEN")
     .setTransactionId("YOUR REFERENCE ID")
     .includeMetadata()
     .build();
-final Client client = ExperianDataValidation.getPhoneClient(configuration);
+final PhoneClient client = ExperianDataValidation.getPhoneClient(configuration);
 
 // Validate a phone number
 final var result = client.validate("+442074987788");
