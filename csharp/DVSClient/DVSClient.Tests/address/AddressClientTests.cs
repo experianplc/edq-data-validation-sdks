@@ -1,4 +1,6 @@
-﻿using DVSClient.Address.Format;
+﻿using DVSClient.address.lookup;
+using DVSClient.Address.Format;
+using DVSClient.Address.Validate;
 using DVSClient.Common;
 using DVSClient.Exceptions;
 using DVSClientTests;
@@ -6,15 +8,22 @@ using NUnit.Framework;
 
 namespace DVSClient.Address.Tests
 {
+    
     public class AddressClientTests
     {
+        [OneTimeSetUp]
+        public void TestSetup()
+        {
+            Setup.LoadEnv();
+        }
+
         [Test]
         public void Authentication_TokenNotSupplied_Throws()
         {
-            var ex = Assert.Throws<InvalidConfigurationException>(() => Configuration.NewBuilder("").Build());
+            var ex = Assert.Throws<InvalidConfigurationException>(() => AddressConfiguration.NewBuilder("").Build());
             Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token.");
 
-            ex = Assert.Throws<InvalidConfigurationException>(() => Configuration.NewBuilder(null).Build());
+            ex = Assert.Throws<InvalidConfigurationException>(() => AddressConfiguration.NewBuilder(null).Build());
             Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token.");
         }
 
@@ -22,7 +31,7 @@ namespace DVSClient.Address.Tests
         public void Authentication_InvalidTokenSupplied_Throws()
         {
             const string token = "ThisIsNotAValidToken";
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(token)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.AuAddress)
@@ -33,11 +42,12 @@ namespace DVSClient.Address.Tests
             Assert.That(ex?.Message == "The authentication token you've provided is incorrect. Please check the Self Service Portal to find the right token.");
         }
 
+
         [Test]
         public void Authentication_AlternateTokenSupplied()
         {
             // Use the alternate token in the x-app-key header instead of Auth-Token header
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetUseXAppAuthentication()
                 .SetTransactionId(new Guid().ToString())
@@ -55,10 +65,118 @@ namespace DVSClient.Address.Tests
             Assert.That(searchResult, Is.Not.Null);
         }
 
+        
+        [Test]
+        public void Lookup_NoDatasets_Throws()
+        {
+            var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(new Guid().ToString())
+                .Build();
+
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+
+            var ex = Assert.Throws<EDVSException>(() => client.Lookup("SW1E 5JL", LookupType.PostalCode));
+            Assert.That(ex?.Message, Is.EqualTo("No datasets have been supplied in the configuration."));
+        }
+
+        [Test]
+        public void DatasetsFromDifferentCountries_Throws()
+        {
+            try {
+                var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(new Guid().ToString())
+                .UseDataset(Dataset.GbAddress)
+                .UseDataset(Dataset.AuAddress)
+                .Build();
+                Assert.Fail("Expected InvalidConfigurationException was not thrown.");
+            } catch (InvalidConfigurationException ex) {
+                Assert.That(ex?.Message, Is.EqualTo("Multiple datasets are currently only supported for the United Kingdom"));
+            }
+            
+        }
+
+        [Test]
+        public async Task Lookup_WithNoOptions_ReturnsExpectedResults()
+        {
+            var configuration = AddressConfiguration
+            .NewBuilder(Setup.ValidTokenAddress)
+            .SetTransactionId(Guid.NewGuid().ToString())
+            .UseDataset(Dataset.GbAddress)
+            .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+
+            var result = await client.LookupAsync("SW1E 5JL", LookupType.PostalCode);
+
+            Assert.That(result.Confidence, Is.EqualTo(AddressConfidence.NoMatches));
+            Assert.That(result.MoreResultsAvailable, Is.False);
+            Assert.That(result.Suggestions!.Count, Is.EqualTo(1));
+            Assert.That(result.Suggestions!.ElementAt(0).Locality?.Region?.Name, Is.EqualTo("England"));
+            Assert.That(result.Suggestions!.ElementAt(0).Locality?.SubRegion?.Name, Is.EqualTo("Greater London"));
+            Assert.That(result.Suggestions!.ElementAt(0).Locality?.Town?.Name, Is.EqualTo("London"));
+            Assert.That(result.Suggestions!.ElementAt(0).LocalityKey?.Length, Is.GreaterThan(0));
+            Assert.That(result.Suggestions!.ElementAt(0).PostalCodeKey?.Length, Is.GreaterThan(0));
+            Assert.That(result.Suggestions!.ElementAt(0).PostalCode?.FullName, Is.EqualTo("SW1E 5JL"));
+        }
+
+        [Test]
+        public async Task Lookup_With_Options_ReturnsExpectedResults()
+        {
+            var configuration = AddressConfiguration
+            .NewBuilder(Setup.ValidTokenAddress)
+            .SetTransactionId(Guid.NewGuid().ToString())
+            .UseDataset(Dataset.GbAddress)
+            .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var result = await client.LookupAsync("SW1E 5", LookupType.PostalCode);
+            Assert.That(result.Confidence, Is.EqualTo(AddressConfidence.NoMatches));
+
+            //Number of suggestions should be the default max of 7
+            Assert.That(result.Suggestions!.Count, Is.EqualTo(7));
+
+            //Test max suggestions of 3
+            configuration = AddressConfiguration
+            .NewBuilder(Setup.ValidTokenAddress)
+            .SetTransactionId(Guid.NewGuid().ToString())
+            .UseDataset(Dataset.GbAddress)
+            .UseMaxSuggestions(3)
+            .Build();
+            client = ExperianDataValidation.GetAddressClient(configuration);
+            result = await client.LookupAsync("SW1E 5", LookupType.PostalCode);
+            Assert.That(result.Suggestions!.Count, Is.EqualTo(3));
+
+            //Add address and final address
+            configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(Guid.NewGuid().ToString())
+                .UseDataset(Dataset.GbAddress)
+                .SetLookupAddAddresses()
+                .SetLookupAddFinalAddress()
+                .Build();
+            client = ExperianDataValidation.GetAddressClient(configuration);
+            result = await client.LookupAsync("SW1E 5", LookupType.PostalCode);
+            //There should be the default 100 addresses
+            Assert.That(result.Addresses!.Count, Is.EqualTo(100));
+        
+            //Make that number lower
+            configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(Guid.NewGuid().ToString())
+                .UseDataset(Dataset.GbAddress)
+                .SetLookupAddAddresses()
+                .SetLookupAddFinalAddress()
+                .SetLookupMaxAddressses(20)
+                .Build();
+            client = ExperianDataValidation.GetAddressClient(configuration);
+            result = await client.LookupAsync("SW1E 5", LookupType.PostalCode);
+            Assert.That(result.Addresses!.Count, Is.EqualTo(20));        
+        }
+
         [Test]
         public void Timeouts()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .SetApiRequestTimeoutInSeconds(2)
@@ -74,7 +192,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetSearchTypeCombinations_Invalid_Throws()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.IeAdditionalEircode)
@@ -87,7 +205,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetSearchTypeCombinations_Valid()
         {
-            var configurationAutocomplete = Configuration
+            var configurationAutocomplete = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAdditionalBusiness)
@@ -96,7 +214,7 @@ namespace DVSClient.Address.Tests
             var clientAutocomplete = ExperianDataValidation.GetAddressClient(configurationAutocomplete);
             clientAutocomplete.Search(SearchType.Autocomplete, "80 Victoria St");
 
-            var configurationSingleline = Configuration
+            var configurationSingleline = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAdditionalBusiness)
@@ -106,7 +224,7 @@ namespace DVSClient.Address.Tests
             var clientSingleline = ExperianDataValidation.GetAddressClient(configurationSingleline);
             clientSingleline.Search(SearchType.Singleline, "Experian, Cardinal Place, 80 Victoria St, London");
 
-            var configurationTypedown = Configuration
+            var configurationTypedown = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAdditionalMultipleresidence)
@@ -119,7 +237,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetSearchTypeCombinations_Valid_ButOutOfOrder()
         {
-            var configurationAutocomplete = Configuration
+            var configurationAutocomplete = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAdditionalMultipleresidence)
@@ -132,7 +250,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetSearchTypeCombinations_Invalid_Singleline_Throws()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddressWales)
@@ -147,7 +265,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetSearchTypeCombinations_Invalid_Autocomplete_Throws()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAdditionalBusiness)
@@ -162,7 +280,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetSearchTypeCombinations_Invalid_Typedown_Throws()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddressAddressbase)
@@ -178,7 +296,7 @@ namespace DVSClient.Address.Tests
         public void Search_Attributes_MaxSuggestions()
         {
             // Max suggestions set to 20 - should return at most 20 items in the list of suggestions
-            var configuration = Configuration 
+            var configuration = AddressConfiguration 
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -191,7 +309,7 @@ namespace DVSClient.Address.Tests
             Assert.That(searchResult.Suggestions.Count, Is.EqualTo(20));
 
             // Max suggestions set to 5 - should return at most 5 items in the list of suggestions
-            configuration = Configuration
+            configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -208,7 +326,7 @@ namespace DVSClient.Address.Tests
         public void Search_Attributes_Location()
         {
             // No location set - default ordering alphabetical
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.UsAddress)
@@ -222,7 +340,7 @@ namespace DVSClient.Address.Tests
 
             // Location set to Los Angeles - search results are weighted towards LA. The list of suggestions contains matching addresses
             // closer to the provided lat/long
-            configuration = Configuration
+            configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.UsAddress)
@@ -240,7 +358,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Search_Address_Autocomplete()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.AuAddress)
@@ -263,7 +381,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Search_Address_Singleline()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.AuAddress)
@@ -286,7 +404,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Search_Address_Typedown()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -313,7 +431,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Suggestions_Refine()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.AuAddress)
@@ -338,7 +456,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Suggestions_Format()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -355,7 +473,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Validate_Address()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.AuAddress)
@@ -363,8 +481,9 @@ namespace DVSClient.Address.Tests
             var client = ExperianDataValidation.GetAddressClient(configuration);
             var result = client.Validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
 
-            Assert.That(result.Confidence, Is.EqualTo(Confidence.VerifiedMatch));
+            Assert.That(result.Confidence, Is.EqualTo(AddressConfidence.VerifiedMatch));
             Assert.That(result.Address, Is.Not.Null);
+            Assert.That(result.AddressFormatted, Is.Null);
             Assert.That(result.Address?.AddressLine1, Is.EqualTo("U 1  8 Main Ave"));
             Assert.That(result.Address?.AddressLine2, Is.Empty);
             Assert.That(result.Address?.AddressLine3, Is.Empty);
@@ -372,12 +491,114 @@ namespace DVSClient.Address.Tests
             Assert.That(result.Address?.Region, Is.EqualTo("NSW"));
             Assert.That(result.Address?.PostalCode, Is.EqualTo("2141"));
             Assert.That(result.Address?.Country, Is.EqualTo("AUSTRALIA"));
+            Assert.That(result.MatchConfidence, Is.EqualTo(ValidateMatchConfidence.High));
+            Assert.That(result.MatchType, Is.EqualTo(ValidateMatchType.FullMatchWithPostalCode));
+        }
+
+        [Test]
+        public void Validate_Address_ReturnsMultiple()
+        {
+            var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(new Guid().ToString())
+                .UseDataset(Dataset.AuAddress)
+                .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var result = client.Validate("Main Ave, Lidcombe, 2141");
+
+            Assert.That(result.Confidence, Is.EqualTo(AddressConfidence.StreetPartial));
+            Assert.That(result.Suggestions.Count(), Is.EqualTo(7));
+            Assert.That(result.Address, Is.Null);
+            Assert.That(result.AddressFormatted, Is.Null);
+            Assert.That(result.SuggestionsKey, Is.Not.Empty);
+            Assert.That(result.SuggestionsPrompt, Is.Not.Empty);
+        }
+
+        [Test]
+        public void Validate_WithComponents()
+        {
+            var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(new Guid().ToString())
+                .UseDataset(Dataset.AuAddress)
+                .IncludeComponents()
+                .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var result = client.Validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+            Assert.That(result.Components, Is.Not.Null);
+            Assert.That(result.Components?.PostalCode, Is.Not.Null);
+            Assert.That(result.Components?.PostalCode?.FullName, Is.EqualTo("2141"));
+            Assert.That(result.Components?.Street, Is.Not.Null);
+            Assert.That(result.Components?.Street?.FullName, Is.EqualTo("Main Ave"));
+            Assert.That(result.Components?.Street?.Name, Is.EqualTo("Main"));
+            Assert.That(result.Components?.Street?.Type, Is.EqualTo("Ave"));
+        }
+
+        [Test]
+        public void Validate_WithEnrichment()
+        {
+            var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
+                .SetTransactionId(new Guid().ToString())
+                .UseDataset(Dataset.AuAddress)
+                .IncludeEnrichment()
+                .IncludeAusRegionalGeocodes()
+                .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var result = client.Validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+            Assert.That(result.Enrichment, Is.Not.Null);
+            Assert.That(result.Enrichment?.AusRegionalGeocodes, Is.Not.Null);
+            Assert.That(result.Enrichment?.AusRegionalGeocodes?.Longitude, Is.Positive);
+            Assert.That(result.Enrichment?.AusRegionalGeocodes?.Latitude, Is.Negative);
+        }
+
+        [Test]
+        public void Validate_WithMetadata()
+        {
+            var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
+                .SetTransactionId(new Guid().ToString())
+                .UseDataset(Dataset.AuAddress)
+                .IncludeMetadata()
+                .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var result = client.Validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+            Assert.That(result.Metadata, Is.Not.Null);
+            Assert.That(result.Metadata?.Dpid, Is.Not.Null);
+            Assert.That(result.Metadata?.Hin, Is.Not.Null);
+        }
+
+        [Test]
+        public void Validate_WithMatchInfo()
+        {
+            var configuration = AddressConfiguration
+                .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
+                .SetTransactionId(new Guid().ToString())
+                .UseDataset(Dataset.AuAddress)
+                .IncludeExtraMatchInfo()
+                .Build();
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var result = client.Validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+            Assert.That(result.MatchInfo, Is.Not.Null);
+            Assert.That(result.MatchInfo?.PostalCodeAction, Is.EqualTo(PostalCodeAction.Ok));
+            Assert.That(result.MatchInfo?.AddressAction, Is.EqualTo(AddressAction.Corrected));
+            Assert.That(result.MatchInfo?.GenericInfo, Is.Not.Null);
+            Assert.That(result.MatchInfo?.GenericInfo?.Contains("address_cleaned"), Is.True);
+            Assert.That(result.MatchInfo?.AusInfo, Is.Not.Null);
+            Assert.That(result.MatchInfo?.AusInfo?.Contains("bsp_state_nsw"), Is.True);
+
+            // All other countries should be null
+            Assert.That(result.MatchInfo?.GbrInfo, Is.Null);
         }
 
         [Test]
         public void Datasets_Valid()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -392,7 +613,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Format_WithMetadata()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -417,7 +638,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Format_WithComponents()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -444,7 +665,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Search_Address_Autocomplete_AdditionalDatasets()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAdditionalMultipleresidence)
@@ -458,7 +679,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Format_WithEnrichment_SelectAllElementsFromEnrichmentSet()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -486,7 +707,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Format_WithEnrichment_SelectSpecificElementsFromEnrichmentSet()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)
@@ -517,7 +738,7 @@ namespace DVSClient.Address.Tests
         [Test]
         public void Format_WithEnrichment_SelectSpecificElementsFromEnrichmentSet1()
         {
-            var configuration = Configuration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
                 .SetTransactionId(new Guid().ToString())
                 .UseDataset(Dataset.GbAddress)

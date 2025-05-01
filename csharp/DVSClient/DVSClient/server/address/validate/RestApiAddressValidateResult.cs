@@ -43,9 +43,9 @@ namespace DVSClient.Server.Address.Validate
         public string? MatchConfidence { get; set; }
 
         [JsonProperty("match_info")]
-        public MatchInfoFlags? MatchInfo { get; set; }
+        public RestApiValidateMatchInfoFlags? MatchInfo { get; set; }
 
-        public class MatchInfoFlags
+        public class RestApiValidateMatchInfoFlags
         {
             [JsonProperty("postcode_action")]
             public string? PostcodeAction { get; set; }
@@ -58,6 +58,24 @@ namespace DVSClient.Server.Address.Validate
 
             [JsonProperty("aus_info")]
             public IEnumerable<string>? AusInfo { get; set; }
+
+            [JsonProperty("deu_info")]
+            public IEnumerable<string>? DeuInfo { get; set; }
+
+            [JsonProperty("fra_info")]
+            public IEnumerable<string>? FraInfo { get; set; }
+
+            [JsonProperty("gbr_info")]
+            public IEnumerable<string>? GbrInfo { get; set; }
+
+            [JsonProperty("nld_info")]
+            public IEnumerable<string>? NldInfo { get; set; }
+
+            [JsonProperty("nzl_info")]
+            public IEnumerable<string>? NzlInfo { get; set; }
+
+            [JsonProperty("sgp_info")]
+            public IEnumerable<string>? SgpInfo { get; set; }
         }
     }
 }

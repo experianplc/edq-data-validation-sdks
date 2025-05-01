@@ -8,13 +8,19 @@ namespace DVSClient.Phone.Tests
     [TestFixture]
     public class PhoneClientTests
     {
+        [OneTimeSetUp]
+        public void TestSetup()
+        {
+            Setup.LoadEnv();
+        }
+        
         [Test]
         public void Authentication_TokenNotSupplied_Throws()
         {
-            var ex = Assert.Throws<InvalidConfigurationException>(() => Configuration.NewBuilder("").Build());
+            var ex = Assert.Throws<InvalidConfigurationException>(() => PhoneConfiguration.NewBuilder("").Build());
             Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token.");
 
-            ex = Assert.Throws<InvalidConfigurationException>(() => Configuration.NewBuilder(null).Build());
+            ex = Assert.Throws<InvalidConfigurationException>(() => PhoneConfiguration.NewBuilder(null).Build());
             Assert.That(ex?.Message == "The supplied configuration must contain an authorisation token.");
         }
 
@@ -22,7 +28,7 @@ namespace DVSClient.Phone.Tests
         public void Authentication_InvalidTokenSupplied_Throws()
         {
             var token = "ThisIsNotAValidToken";
-            var configuration = Configuration.NewBuilder(token).Build();
+            var configuration = PhoneConfiguration.NewBuilder(token).Build();
             var client = ExperianDataValidation.GetPhoneClient(configuration);
 
             var ex = Assert.Throws<UnauthorizedException>(() => client.ValidateAsync("+44123456767").GetAwaiter().GetResult());
@@ -32,7 +38,7 @@ namespace DVSClient.Phone.Tests
         [Test]
         public void Validate_PhoneNumber_WithOutputFormat()
         {
-            var configuration = Configuration
+            var configuration = PhoneConfiguration
                 .NewBuilder(Setup.ValidTokenPhone)
                 .SetTransactionId(new Guid().ToString())
                 .UseOutputFormat("NATIONAL")
@@ -40,7 +46,7 @@ namespace DVSClient.Phone.Tests
             var client = ExperianDataValidation.GetPhoneClient(configuration);
             var result = client.ValidateAsync("+442074987788").GetAwaiter().GetResult();
 
-            Assert.That(result.Confidence, Is.EqualTo(Confidence.NoCoverage));
+            Assert.That(result.Confidence, Is.EqualTo(PhoneConfidence.NoCoverage));
             Assert.That(result.PhoneType, Is.EqualTo(PhoneType.Landline));
             Assert.That(result.FormattedPhoneNumber, Is.EqualTo("020 7498 7788"));
         }
@@ -48,7 +54,7 @@ namespace DVSClient.Phone.Tests
         [Test]
         public void Validate_PhoneNumber_WithMetadata()
         {
-            var configuration = Configuration
+            var configuration = PhoneConfiguration
                 .NewBuilder(Setup.ValidTokenPhone)
                 .SetTransactionId(new Guid().ToString())
                 .IncludeMetadata()
@@ -56,7 +62,7 @@ namespace DVSClient.Phone.Tests
             var client = ExperianDataValidation.GetPhoneClient(configuration);
             var result = client.ValidateAsync("+442074987788").GetAwaiter().GetResult();
 
-            Assert.That(result.Confidence, Is.EqualTo(Confidence.NoCoverage));
+            Assert.That(result.Confidence, Is.EqualTo(PhoneConfidence.NoCoverage));
             Assert.That(result.PhoneType, Is.EqualTo(PhoneType.Landline));
             Assert.That(result.Metadata, Is.Not.Null);
             Assert.That(result.Metadata?.PhoneDetail, Is.Not.Null);

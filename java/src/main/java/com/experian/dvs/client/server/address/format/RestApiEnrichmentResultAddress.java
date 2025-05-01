@@ -13,8 +13,8 @@ public class RestApiEnrichmentResultAddress {
     @JsonProperty("aus_regional_geocodes")
     private RestApiEnrichmentAusRegionalGeocodes ausRegionalGeocodes;
 
-    @JsonProperty("nz_regional_geocodes")
-    private RestApiEnrichmentNzlRegionalGeocodes nzRegionalGeocodes;
+    @JsonProperty("nzl_regional_geocodes")
+    private RestApiEnrichmentNzlRegionalGeocodes nzlRegionalGeocodes;
 
     @JsonProperty("uk_location_complete")
     private RestApiEnrichmentUKLocationComplete ukLocationComplete;
@@ -61,12 +61,12 @@ public class RestApiEnrichmentResultAddress {
         this.ausRegionalGeocodes = ausRegionalGeocodes;
     }
 
-    public RestApiEnrichmentNzlRegionalGeocodes getNzRegionalGeocodes() {
-        return nzRegionalGeocodes;
+    public RestApiEnrichmentNzlRegionalGeocodes getNzlRegionalGeocodes() {
+        return nzlRegionalGeocodes;
     }
 
-    public void setNzRegionalGeocodes(RestApiEnrichmentNzlRegionalGeocodes nzRegionalGeocodes) {
-        this.nzRegionalGeocodes = nzRegionalGeocodes;
+    public void setNzlRegionalGeocodes(RestApiEnrichmentNzlRegionalGeocodes nzlRegionalGeocodes) {
+        this.nzlRegionalGeocodes = nzlRegionalGeocodes;
     }
 
     public RestApiEnrichmentUKLocationComplete getUkLocationComplete() {

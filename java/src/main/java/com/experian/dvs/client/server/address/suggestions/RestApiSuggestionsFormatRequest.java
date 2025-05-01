@@ -1,6 +1,6 @@
 package com.experian.dvs.client.server.address.suggestions;
 
-import com.experian.dvs.client.address.Configuration;
+import com.experian.dvs.client.address.AddressConfiguration;
 import com.experian.dvs.client.address.Dataset;
 import com.experian.dvs.client.server.address.Address;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +23,7 @@ public class RestApiSuggestionsFormatRequest {
     @JsonProperty("layouts")
     private List<String> layouts;
 
-    public static com.experian.dvs.client.server.address.suggestions.RestApiSuggestionsFormatRequest using(final Configuration configuration) {
+    public static com.experian.dvs.client.server.address.suggestions.RestApiSuggestionsFormatRequest using(final AddressConfiguration configuration) {
 
         final com.experian.dvs.client.server.address.suggestions.RestApiSuggestionsFormatRequest formatRequest = new com.experian.dvs.client.server.address.suggestions.RestApiSuggestionsFormatRequest();
         //Country
@@ -35,7 +35,7 @@ public class RestApiSuggestionsFormatRequest {
             formatRequest.setDatasets(configuration.getDatasets().stream().map(Dataset::getDatasetCode).toList());
         }
         //Max suggestions
-        if (configuration.getMaxSuggestions() != Configuration.DEFAULT_MAX_SUGGESTIONS) {
+        if (configuration.getMaxSuggestions() != AddressConfiguration.DEFAULT_MAX_SUGGESTIONS) {
             formatRequest.setMaxSuggestions(configuration.getMaxSuggestions());
         }
         //Layout name

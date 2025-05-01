@@ -32,7 +32,7 @@ namespace DVSClient.Server.Address.Validate
         [JsonProperty("layout_format")]
         public string? LayoutFormat { get; set; }
 
-        public static RestApiAddressValidateRequest Using(DVSClient.Address.Configuration configuration)
+        public static RestApiAddressValidateRequest Using(DVSClient.Address.AddressConfiguration configuration)
         {
             var validateRequest = new RestApiAddressValidateRequest();
 
@@ -49,7 +49,7 @@ namespace DVSClient.Server.Address.Validate
             }
 
             // Max suggestions
-            if (configuration.MaxSuggestions != DVSClient.Address.Configuration.DefaultMaxSuggestions)
+            if (configuration.MaxSuggestions != DVSClient.Address.AddressConfiguration.DefaultMaxSuggestions)
             {
                 validateRequest.MaxSuggestions = configuration.MaxSuggestions;
             }
@@ -90,7 +90,7 @@ namespace DVSClient.Server.Address.Validate
             return validateRequest;
         }
 
-        public static RestApiFormatAttribute GetFormatAttribute(DVSClient.Address.Configuration configuration)
+        public static RestApiFormatAttribute GetFormatAttribute(DVSClient.Address.AddressConfiguration configuration)
         {
             var attributes = new RestApiFormatAttribute();
 

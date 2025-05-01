@@ -1,6 +1,6 @@
 package com.experian.dvs.client.server.address.layout;
 
-import com.experian.dvs.client.address.layout.AddressLayoutConfiguration;
+import com.experian.dvs.client.address.layout.LayoutConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -10,7 +10,7 @@ public class RestApiCreateLayoutRequest {
     @JsonProperty("layout")
     private RestApiAddressLayout layout;
 
-    public static RestApiCreateLayoutRequest using(final AddressLayoutConfiguration configuration) {
+    public static RestApiCreateLayoutRequest using(final LayoutConfiguration configuration) {
         return new RestApiCreateLayoutRequest();
     }
 

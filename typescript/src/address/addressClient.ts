@@ -8,13 +8,16 @@ import { Dataset } from "./dataset";
 import { DatasetCombinations } from "./datasetCombinations";
 import { getAddressSearchRequestFromConfig, RestApiAddressSearchRequest } from "../server/address/restApiSearchRequest";
 import { EDVSError } from "../exceptions/edvsException";
-import { AddressValidationResult, restApiResponseToValidationResult } from "./validate/addressValidateResult";
+import { ValidateResult, restApiResponseToValidationResult } from "./validate/validateResult";
 import { getAddressValidateRequestFromConfig } from "../server/address/validate/restApiAddressValidateRequest";
 import { FormatResult, restApiResponseToFormatResult } from "./format/formatResult";
 import { getFormatRequestFromConfig } from "../server/address/format/restApiFormatRequest";
 import { RestApiSuggestionsRefineRequest } from "../server/address/suggestions/restApiSuggestionsRefineRequest";
-import { restApiResponseToSuggestionsResult, SuggestionsResult } from "./suggestions/suggestionsResult";
+import { restApiResponseToSuggestionsResult, SuggestionsFormatResult } from "./suggestions/suggestionsFormatResult";
 import { getSuggestionsFormatRequestFromConfig } from "../server/address/suggestions/restApiSuggestionsFormatRequest";
+import { LookupType } from "./lookup/lookupType";
+import { getLookupRequestFromConfig } from "../server/address/lookup/restApiAddressLookupV2Request";
+import { LookupResult, restApiResponseToLookupResult } from "./lookup/lookupResult";
 
 /**
  * Client class for interacting with the address-related APIs.
@@ -45,6 +48,35 @@ export class AddressClient {
         const headers = this.configuration.getCommonHeaders();
         const resp = await this.restApiStub.getDatasetsV1(country.iso3Code, headers);
         return restApiGetDatasetsResponseToResult(resp);
+    }
+
+    /**
+     * Looks up an address based on a key.
+     * @param value The key being used to perform the lookup
+     * @param lookupType The type of lookup that you wish to perform.
+     * @returns A promise that resolves to the result containing the found addresses / suggestions.
+     */
+    public async lookup(value: string, lookupType: LookupType): Promise<LookupResult> {
+        const headers = this.configuration.getCommonHeaders();
+        const lookupOptions = this.configuration.options.lookup;
+        if (lookupOptions) {
+            if (lookupOptions.addAddresses) {
+                headers.set("Add-Addresses", "true" as String) //NOSONAR
+            }
+            if (lookupOptions.addFinalAddress) {
+                headers.set("Add-FinalAddress", "true" as String) //NOSONAR
+            }
+        }
+        
+
+        const request = getLookupRequestFromConfig(this.configuration);
+        request.key = {
+            type: lookupType,
+            value: value
+        }
+
+        const resp = await this.restApiStub.lookupV2(request, headers);
+        return restApiResponseToLookupResult(resp)    
     }
 
     /**
@@ -110,13 +142,14 @@ export class AddressClient {
         throw new EDVSError("Unsupported dataset / search type combination.");
     }
 
+
     /**
      * Validates an address using the supplied address lines.
      *
      * @param addressLines The address lines to validate.
      * @return A promise that resolves to the validation result.
      */
-    public async validate(addressLines: string[]): Promise<AddressValidationResult> {
+    public async validate(addressLines: string[]): Promise<ValidateResult> {
         const request = getAddressValidateRequestFromConfig(this.configuration);
         request.components = { unspecified: addressLines };
 
@@ -212,7 +245,7 @@ export class AddressClient {
      * @param searchInput The search input to format.
      * @return A promise that resolves to the formatted suggestions result.
      */
-    public async suggestionsFormat(searchInput: string): Promise<SuggestionsResult> {
+    public async suggestionsFormat(searchInput: string): Promise<SuggestionsFormatResult> {
         const request = getSuggestionsFormatRequestFromConfig(this.configuration);
         request.components = { unspecified: [searchInput] };
         const headers = this.configuration.getCommonHeaders();
@@ -227,6 +260,8 @@ export class AddressClient {
             return Promise.reject(error instanceof Error ? error : new Error(String(error)));
         }
     }
+
+    
 
     private getFormatRequestHeaders(): Map<string, object> {
         const headers = this.configuration.getCommonHeaders();

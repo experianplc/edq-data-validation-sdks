@@ -26,7 +26,7 @@ namespace DVSClient.Server.Phone
         [JsonProperty("supplementary_live_status")]
         public RestApiPhoneSupplementaryLiveStatus? SupplementaryLiveStatus { get; set; }
 
-        public static RestApiPhoneValidateRequest Using(Configuration phoneConfiguration)
+        public static RestApiPhoneValidateRequest Using(PhoneConfiguration phoneConfiguration)
         {
             var request = new RestApiPhoneValidateRequest();
 

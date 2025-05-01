@@ -1,9 +1,13 @@
 package com.experian.dvs.client;
 
-import com.experian.dvs.client.address.Client;
-import com.experian.dvs.client.address.Configuration;
-import com.experian.dvs.client.address.layout.AddressLayoutClient;
-import com.experian.dvs.client.address.layout.AddressLayoutConfiguration;
+import com.experian.dvs.client.address.AddressClient;
+import com.experian.dvs.client.address.AddressConfiguration;
+import com.experian.dvs.client.address.layout.LayoutClient;
+import com.experian.dvs.client.address.layout.LayoutConfiguration;
+import com.experian.dvs.client.email.EmailClient;
+import com.experian.dvs.client.email.EmailConfiguration;
+import com.experian.dvs.client.phone.PhoneClient;
+import com.experian.dvs.client.phone.PhoneConfiguration;
 
 /**
  * Entry point for the Experian Contact Validation Services client.
@@ -22,8 +26,8 @@ public class ExperianDataValidation {
      * @param configuration the configuration options to be used for each method call
      * @return the created client object
      */
-    public static Client getAddressClient(final Configuration configuration) {
-        return new Client(configuration);
+    public static AddressClient getAddressClient(final AddressConfiguration configuration) {
+        return new AddressClient(configuration);
     }
 
     /**
@@ -32,8 +36,8 @@ public class ExperianDataValidation {
      * @param configuration the configuration options to be used for each method call
      * @return the created client object
      */
-    public static AddressLayoutClient getAddressLayoutClient(final AddressLayoutConfiguration configuration) {
-        return new AddressLayoutClient(configuration);
+    public static LayoutClient getAddressLayoutClient(final LayoutConfiguration configuration) {
+        return new LayoutClient(configuration);
     }
 
     /**
@@ -41,8 +45,8 @@ public class ExperianDataValidation {
      * @param configuration the configuration options to be used for each validation
      * @return the created client object
      */
-    public static com.experian.dvs.client.phone.Client getPhoneClient(final com.experian.dvs.client.phone.Configuration configuration) {
-        return new com.experian.dvs.client.phone.Client(configuration);
+    public static PhoneClient getPhoneClient(final PhoneConfiguration configuration) {
+        return new PhoneClient(configuration);
     }
 
     /**
@@ -50,8 +54,8 @@ public class ExperianDataValidation {
      * @param configuration the configuration options to be used for each validation
      * @return the created client object
      */
-    public static com.experian.dvs.client.email.Client getEmailClient(final com.experian.dvs.client.email.Configuration configuration) {
-        return new com.experian.dvs.client.email.Client(configuration);
+    public static EmailClient getEmailClient(final EmailConfiguration configuration) {
+        return new EmailClient(configuration);
     }
 
 

@@ -4,13 +4,16 @@ import com.experian.dvs.client.ExperianDataValidation;
 import com.experian.dvs.client.Setup;
 import com.experian.dvs.client.address.datasets.GetDatasetsResult;
 import com.experian.dvs.client.address.format.GeocodeMatchLevel;
-import com.experian.dvs.client.address.format.Result;
+import com.experian.dvs.client.address.format.FormatResult;
 import com.experian.dvs.client.address.layout.attributes.GlobalGeocodeAttribute;
+import com.experian.dvs.client.address.search.SearchResult;
+import com.experian.dvs.client.address.suggestions.format.SuggestionsFormatResult;
+import com.experian.dvs.client.address.validate.*;
 import com.experian.dvs.client.common.Country;
 import com.experian.dvs.client.exceptions.EDVSException;
 import com.experian.dvs.client.exceptions.InvalidConfigurationException;
 import com.experian.dvs.client.exceptions.UnauthorizedException;
-import com.experian.dvs.client.server.address.Address;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,23 +21,34 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ClientTests {
+    @BeforeAll
+    public static void setup() {
+        Setup.loadEnv();
+    }
+
+    @Test
+    public void testValidTokenAddress() {
+        assertThat(Setup.VALID_TOKEN_ADDRESS).isNotEmpty();
+        assertThat(Setup.VALID_TOKEN_ADDRESS_WITH_ENRICHMENT).isNotEmpty();
+    }
+
     @Test
     void authentication_TokenNotSupplied() {
-        final Exception ex1 =  assertThrows(InvalidConfigurationException.class, () -> Configuration.newBuilder("").build());
+        final Exception ex1 =  assertThrows(InvalidConfigurationException.class, () -> AddressConfiguration.newBuilder("").build());
         assertThat(ex1.getMessage().equals("The supplied configuration must contain an authorisation token"));
 
-        final Exception ex2 =  assertThrows(InvalidConfigurationException.class, () -> Configuration.newBuilder(null).build());
+        final Exception ex2 =  assertThrows(InvalidConfigurationException.class, () -> AddressConfiguration.newBuilder(null).build());
         assertThat(ex2.getMessage().equals("The supplied configuration must contain an authorisation token"));
     }
 
     @Test
     void authentication_InvalidTokenSupplied() {
         final String token = "ThisIsNotAValidToken";
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(token)
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
         final Exception ex = assertThrows(UnauthorizedException.class, () -> client.search(SearchType.AUTOCOMPLETE, "56 Queens R"));
         assertThat(ex.getMessage().equals("The authentication token you've provided is incorrect. Please check the Self Service Portal to find the right token."));
@@ -43,12 +57,12 @@ public class ClientTests {
     @Test
     void  authentication_AlternateTokenSupplied() {
         // Use the alternate token in the x-app-key header instead of Auth-Token header
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .setUseXAppAuthentication(true)
                 .useDataset(Dataset.GB_ADDRESS)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
         assertThat(configuration.getCommonHeaders().containsKey("x-app-key"));
         assertThat(configuration.getCommonHeaders().get("x-app-key").equals(Setup.VALID_TOKEN_ADDRESS));
@@ -63,11 +77,11 @@ public class ClientTests {
     @Test
     void datasetSearchTypeCombinations_Invalid() {
         try {
-            final Configuration configuration = Configuration
+            final AddressConfiguration configuration = AddressConfiguration
                     .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                     .useDataset(Dataset.IE_ADDITIONAL_EIRCODE)
                     .build();
-            final Client client = ExperianDataValidation.getAddressClient(configuration);
+            final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
             client.search(SearchType.SINGLELINE, "some input");
             fail();
         } catch (EDVSException e) {
@@ -77,55 +91,55 @@ public class ClientTests {
 
     @Test
     void datasetSearchTypeCombinations_Valid() {
-        final Configuration configurationAutocomplete = Configuration
+        final AddressConfiguration configurationAutocomplete = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDITIONAL_BUSINESS)
                 .useDataset(Dataset.GB_ADDITIONAL_MULTIPLERESIDENCE)
                 .build();
 
-        final Client clientAutocomplete = ExperianDataValidation.getAddressClient(configurationAutocomplete);
+        final AddressClient clientAutocomplete = ExperianDataValidation.getAddressClient(configurationAutocomplete);
         clientAutocomplete.search(SearchType.AUTOCOMPLETE, "80 Victoria St");
 
-        final Configuration configurationSingleline = Configuration
+        final AddressConfiguration configurationSingleline = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDITIONAL_BUSINESS)
                 .useDataset(Dataset.GB_ADDITIONAL_MULTIPLERESIDENCE)
                 .useDataset(Dataset.GB_ADDITIONAL_NOTYETBUILT)
                 .build();
 
-        final Client clientSingleline = ExperianDataValidation.getAddressClient(configurationSingleline);
+        final AddressClient clientSingleline = ExperianDataValidation.getAddressClient(configurationSingleline);
         clientSingleline.search(SearchType.SINGLELINE, "Experian, Cardinal Place, 80 Victoria St, London");
 
-        final Configuration configurationTypedown = Configuration
+        final AddressConfiguration configurationTypedown = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDITIONAL_MULTIPLERESIDENCE)
                 .useDataset(Dataset.GB_ADDITIONAL_NOTYETBUILT)
                 .build();
-        final Client clientTypedown = ExperianDataValidation.getAddressClient(configurationTypedown);
+        final AddressClient clientTypedown = ExperianDataValidation.getAddressClient(configurationTypedown);
         clientTypedown.search(SearchType.TYPEDOWN, "London");
     }
 
     @Test
     void datasetSearchTypeCombinations_Valid_ButOutOfOrder() {
-        final Configuration configurationAutocomplete =  Configuration
+        final AddressConfiguration configurationAutocomplete =  AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDITIONAL_MULTIPLERESIDENCE)
                 .useDataset(Dataset.GB_ADDITIONAL_BUSINESS)
                 .build();
-        final Client clientAutocomplete = ExperianDataValidation.getAddressClient(configurationAutocomplete);
+        final AddressClient clientAutocomplete = ExperianDataValidation.getAddressClient(configurationAutocomplete);
         clientAutocomplete.search(SearchType.AUTOCOMPLETE, "80 Victoria St");
     }
 
     @Test
     void datasetSearchTypeCombinations_Invalid_Singleline() {
         try {
-            final Configuration configuration = Configuration
+            final AddressConfiguration configuration = AddressConfiguration
                     .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                     .useDataset(Dataset.GB_ADDRESS_WALES)
                     .useDataset(Dataset.GB_ADDITIONAL_NAMES)
                     .build()
                     ;
-            final Client client = ExperianDataValidation.getAddressClient(configuration);
+            final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
             client.search(SearchType.SINGLELINE, "Experian, Cardinal Place, 80 Victoria St, London");
             fail();
         } catch (EDVSException e) {
@@ -136,13 +150,13 @@ public class ClientTests {
     @Test
     void datasetSearchTypeCombinations_Invalid_Autocomplete() {
         try {
-            final Configuration configuration = Configuration
+            final AddressConfiguration configuration = AddressConfiguration
                     .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                     .useDataset(Dataset.GB_ADDITIONAL_BUSINESS)
                     .useDataset(Dataset.GB_ADDITIONAL_NAMES)
                     .build();
 
-            final Client client = ExperianDataValidation.getAddressClient(configuration);
+            final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
             client.search(SearchType.AUTOCOMPLETE, "1 main st,");
             fail();
         } catch (EDVSException e) {
@@ -153,13 +167,13 @@ public class ClientTests {
     @Test
     void datasetSearchTypeCombinations_Invalid_Typedown() {
         try {
-            final Configuration configuration = Configuration
+            final AddressConfiguration configuration = AddressConfiguration
                     .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                     .useDataset(Dataset.GB_ADDITIONAL_ADDRESSBASEISLANDS)
                     .useDataset(Dataset.GB_ADDITIONAL_NOTYETBUILT)
                     .build();
 
-            final Client client = ExperianDataValidation.getAddressClient(configuration);
+            final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
             client.search(SearchType.TYPEDOWN, "London");
             fail();
         } catch (EDVSException e) {
@@ -170,18 +184,18 @@ public class ClientTests {
     @Test
     public void searchAttributesMaxSuggestions() {
         // Max suggestions set to 20 - should return at most 20 items in the list of suggestions
-        Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDRESS)
                 .useMaxSuggestions(20)
                 .build();
-        Client client = ExperianDataValidation.getAddressClient(configuration);
+        AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        com.experian.dvs.client.address.search.Result result = client.search(SearchType.SINGLELINE, "mk65bj");
+        SearchResult result = client.search(SearchType.SINGLELINE, "mk65bj");
         assertThat(result.getSuggestions()).isNotEmpty();
         assertThat(result.getSuggestions()).hasSize(20);
 
         // Max suggestions set to 5 - should return at most 5 items in the list of suggestions
-        configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDRESS)
                 .useMaxSuggestions(5)
                 .build();
@@ -195,19 +209,19 @@ public class ClientTests {
     @Test
     public void searchAttributes_Location() {
         // No location set - default ordering alphabetical
-        Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.US_ADDRESS)
                 .build();
-        Client client = ExperianDataValidation.getAddressClient(configuration);
+        AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        com.experian.dvs.client.address.search.Result result = client.search(SearchType.AUTOCOMPLETE, "1 main st");
+        SearchResult result = client.search(SearchType.AUTOCOMPLETE, "1 main st");
         assertThat(result.getSuggestions()).isNotEmpty();
         // Ensure that not ALL suggestions are in the state of CA. Results are ordered alphabetically by city.
         assertThat(result.getSuggestions()).allMatch(suggestion -> !suggestion.getText().contains(" CA "));
 
         // Location set to Los Angeles - search results are weighted towards LA. The list of suggestions contains
         // matching addresses closer to the provided lat/long
-        configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.US_ADDRESS)
                 .useLocation("34.052235, -118.243683")
                 .build();
@@ -222,12 +236,12 @@ public class ClientTests {
 
     @Test
     void search_Autocomlete() {
-        final Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        final AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.AU_ADDRESS)
                 .useMaxSuggestions(20)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.search.Result result = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SearchResult result = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
         assertThat(result.getSuggestions()).isNotEmpty();
 
         // Pick the first one
@@ -240,12 +254,12 @@ public class ClientTests {
 
     @Test
     void search_Singleline() {
-        final Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        final AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.AU_ADDRESS)
                 .useMaxSuggestions(20)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.search.Result result = client.search(SearchType.SINGLELINE, "56 Queens R");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SearchResult result = client.search(SearchType.SINGLELINE, "56 Queens R");
         assertThat(result.getSuggestions()).isNotEmpty();
 
         // Pick the first one
@@ -258,13 +272,13 @@ public class ClientTests {
 
     @Test
     void search_Typedown() {
-        final Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        final AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDRESS)
                 .useMaxSuggestions(20)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        com.experian.dvs.client.address.search.Result result = client.search(SearchType.TYPEDOWN, "mk65bj");
+        SearchResult result = client.search(SearchType.TYPEDOWN, "mk65bj");
         assertThat(result.getSuggestions()).isNotEmpty();
 
         while (result.getSuggestions().stream()
@@ -286,18 +300,18 @@ public class ClientTests {
                 .getGlobalAddressKey();
 
         // Format with default layout
-        final Result formatResult = client.format(globalAddressKey);
+        final FormatResult formatResult = client.format(globalAddressKey);
         assertThat(formatResult.getConfidence()).isNotNull();
         assertThat(formatResult.getGlobalAddressKey()).isNotEmpty();
     }
 
     @Test
     public void suggestions_Refine() {
-        final Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        final AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        com.experian.dvs.client.address.search.Result result = client.search(SearchType.TYPEDOWN, "melbourne");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        SearchResult result = client.search(SearchType.TYPEDOWN, "melbourne");
         result = client.suggestionsStepIn(result.getSuggestions().stream()
                 .findFirst()
                 .orElseThrow()
@@ -324,11 +338,11 @@ public class ClientTests {
 
     @Test
     public void suggestions_Format() {
-        final Configuration configuration = Configuration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
+        final AddressConfiguration configuration = AddressConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDRESS)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.suggestions.format.Result searchResult = client.suggestionsFormat("160, SE1 8EZ");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SuggestionsFormatResult searchResult = client.suggestionsFormat("160, SE1 8EZ");
 
         assertThat(searchResult.getSuggestions()).isNotEmpty();
         assertThat(searchResult.getSuggestions()).allMatch(suggestion -> suggestion.getAddress() != null);
@@ -337,30 +351,122 @@ public class ClientTests {
 
     @Test
     void validate_Address() {
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.validate.Result result = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
-        assertThat(result.getConfidence()).isEqualTo(Confidence.VERIFIED_MATCH);
-        assertThat(result.getAddress().getAddressLine1()).isEqualTo("U 1  8 Main Ave");
-        assertThat(result.getAddress().getAddressLine2()).isEmpty();
-        assertThat(result.getAddress().getAddressLine3()).isEmpty();
-        assertThat(result.getAddress().getLocality()).isEqualTo("LIDCOMBE");
-        assertThat(result.getAddress().getRegion()).isEqualTo("NSW");
-        assertThat(result.getAddress().getPostalCode()).isEqualTo("2141");
-        assertThat(result.getAddress().getCountry()).isEqualTo("AUSTRALIA");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+        assertThat(validateResult.getConfidence()).isEqualTo(AddressConfidence.VERIFIED_MATCH);
+        assertThat(validateResult.getAddress().getAddressLine1()).isEqualTo("U 1  8 Main Ave");
+        assertThat(validateResult.getAddress().getAddressLine2()).isEmpty();
+        assertThat(validateResult.getAddress().getAddressLine3()).isEmpty();
+        assertThat(validateResult.getAddress().getLocality()).isEqualTo("LIDCOMBE");
+        assertThat(validateResult.getAddress().getRegion()).isEqualTo("NSW");
+        assertThat(validateResult.getAddress().getPostalCode()).isEqualTo("2141");
+        assertThat(validateResult.getAddress().getCountry()).isEqualTo("AUSTRALIA");
+        assertThat(validateResult.getMatchType()).isEqualTo(ValidateMatchType.FULL_MATCH_WITH_POSTAL_CODE);
+        assertThat(validateResult.getMatchConfidence()).isEqualTo(ValidateMatchConfidence.HIGH);
+    }
+
+    @Test
+    void validate_Address_ReturnsMuliple() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .useDataset(Dataset.AU_ADDRESS)
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final ValidateResult validateResult = client.validate("Main Ave, Lidcombe, 2141");
+
+        assertThat(validateResult.getConfidence()).isEqualTo(AddressConfidence.STREET_PARTIAL);
+        assertThat(validateResult.getSuggestions().size()).isEqualTo(7);
+        assertThat(validateResult.getAddress()).isNull();
+        assertThat(validateResult.getAddressFormatted()).isNull();
+        assertThat(validateResult.getSuggestionsKey()).isNotNull();
+        assertThat(validateResult.getSuggestionsPrompt()).isNotNull();
+    }
+
+    @Test
+    void validate_Address_WithComponents() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .useDataset(Dataset.AU_ADDRESS)
+                .includeComponents()
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+        assertThat(validateResult.getComponents()).isNotNull();
+        assertThat(validateResult.getComponents().get().getPostalCode()).isNotNull();
+        assertThat(validateResult.getComponents().get().getPostalCode().getFullName()).isEqualTo("2141");
+        assertThat(validateResult.getComponents().get().getStreet()).isNotNull();
+        assertThat(validateResult.getComponents().get().getStreet().getFullName()).isEqualTo("Main Ave");
+        assertThat(validateResult.getComponents().get().getStreet().getName()).isEqualTo("Main");
+        assertThat(validateResult.getComponents().get().getStreet().getType()).isEqualTo("Ave");
+    }
+
+    @Test
+    void validate_Address_WithEnrichment() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS_WITH_ENRICHMENT)
+                .useDataset(Dataset.AU_ADDRESS)
+                .includeEnrichment()
+                .includeAusRegionalGeocodes()
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+        assertThat(validateResult.getEnrichment()).isNotNull();
+        assertThat(validateResult.getEnrichment().get().getAusRegionalGeocodes()).isNotNull();
+        assertThat(validateResult.getEnrichment().get().getAusRegionalGeocodes().get().getLongitude()).isPositive();
+        assertThat(validateResult.getEnrichment().get().getAusRegionalGeocodes().get().getLatitude()).isNegative();
+    }
+
+    @Test
+    void validate_Address_WithMetadata() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .useDataset(Dataset.AU_ADDRESS)
+                .includeMetadata()
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+        assertThat(validateResult.getMetadata()).isNotNull();
+        assertThat(validateResult.getMetadata().get().getDpid()).isNotNull();
+        assertThat(validateResult.getMetadata().get().getHin()).isNotNull();
+    }
+
+    @Test
+    void validate_Address_WithMatchInfo() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .useDataset(Dataset.AU_ADDRESS)
+                .includeExtraMatchInfo()
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final ValidateResult result = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+
+        assertThat(result.getMatchInfo()).isNotNull();
+        assertThat(result.getMatchInfo().get().getAddressAction()).isEqualTo(AddressAction.CORRECTED);
+        assertThat(result.getMatchInfo().get().getPostalCodeAction()).isEqualTo(PostalCodeAction.OK);
+        assertThat(result.getMatchInfo().get().getGenericInfo()).isNotNull();
+        assertThat(result.getMatchInfo().get().getGenericInfo().contains("address_cleaned")).isTrue();
+        assertThat(result.getMatchInfo().get().getAusInfo()).isNotNull();
+        assertThat(result.getMatchInfo().get().getAusInfo().get().contains("bsp_state_nsw")).isTrue();
+
+        // all other match infos should be empty
+        assertThat(result.getMatchInfo().get().getGbrInfo().get()).isEmpty();
     }
 
     @Test
     void datasets_Valid() {
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
 
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
         final GetDatasetsResult result = client.getDatasets(Country.UNITED_KINGDOM);
         assertThat(result.getResult()).isNotEmpty();
         assertThat(result.getResult().stream().allMatch(p -> p.getCountry() == Country.UNITED_KINGDOM)).isTrue();
@@ -368,13 +474,13 @@ public class ClientTests {
 
     @Test
     void format_WithMetadata() {
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDRESS)
                 .includeMetadata()
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.search.Result resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
         assertThat(resultAutoComplete.getSuggestions()).isNotEmpty();
 
         final var globalAddressKey = resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey();
@@ -388,12 +494,12 @@ public class ClientTests {
     @Test
     void search_Address_Autocomplete_AdditionalDatasets() {
 
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .useDataset(Dataset.GB_ADDITIONAL_MULTIPLERESIDENCE)
                 .build();
 
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
         var result = client.search("flat 3, block a, oxford court, 23 stretford road, manchester, m15 6dd");
         assertThat(result.getSuggestions().stream().anyMatch(p -> p.getDataset().equals("Multiple Residence")));
     }
@@ -401,15 +507,15 @@ public class ClientTests {
     @Test
     void format_WithEnrichment_SelectAllOfElementsFromEnrichmentSet() {
 
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS_WITH_ENRICHMENT)
                 .useDataset(Dataset.AU_ADDRESS)
                 .includeEnrichment()
                 // Select all possible attributes for Global Geocodes enrichment dataset
                 .includeGlobalGeocodes()
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.search.Result resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
         assertThat(resultAutoComplete.getSuggestions()).isNotEmpty();
 
         final var globalAddressKey = resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey();
@@ -425,7 +531,7 @@ public class ClientTests {
     @Test
     void format_WithEnrichment_SelectSpecificElementsFromEnrichmentSet() {
 
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS_WITH_ENRICHMENT)
                 .useDataset(Dataset.AU_ADDRESS)
                 .includeEnrichment()
@@ -433,8 +539,8 @@ public class ClientTests {
                 .includeGlobalGeocodeAttribute(GlobalGeocodeAttribute.LATITUDE)
                 .includeGlobalGeocodeAttribute(GlobalGeocodeAttribute.LONGITUDE)
                 .build();
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.search.Result resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
         assertThat(resultAutoComplete.getSuggestions()).isNotEmpty();
 
         final var globalAddressKey = resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey();

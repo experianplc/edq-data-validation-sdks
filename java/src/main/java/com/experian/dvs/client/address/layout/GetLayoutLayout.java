@@ -13,7 +13,7 @@ public class GetLayoutLayout {
     private final String comment;
     private final List<AppliesTo> appliesTo;
     private final List<LayoutLine> lines;
-    private final Status status;
+    private final LayoutStatus status;
     private final String licenseId;
 
     public GetLayoutLayout(final RestApiGetLayoutLayout layout) {
@@ -22,7 +22,7 @@ public class GetLayoutLayout {
         this.comment = Objects.toString(layout.getComment(), "");
         this.appliesTo = layout.getAppliesTo() != null ? layout.getAppliesTo().stream().map(AppliesTo::new).toList() : List.of();
         this.lines = layout.getLines() != null ? layout.getLines().stream().map(p -> getLayoutLine(this.appliesTo, p)).toList() : List.of();
-        this.status = layout.getStatus() != null ? Status.fromName(layout.getStatus()) : null;
+        this.status = layout.getStatus() != null ? LayoutStatus.fromName(layout.getStatus()) : null;
         this.licenseId = Objects.toString(layout.getLicenseId(), "");
     }
 
@@ -46,7 +46,7 @@ public class GetLayoutLayout {
         return lines;
     }
 
-    public Status getStatus() {
+    public LayoutStatus getStatus() {
         return status;
     }
 

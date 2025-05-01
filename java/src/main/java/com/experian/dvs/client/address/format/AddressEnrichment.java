@@ -29,7 +29,7 @@ public class AddressEnrichment {
             this.geocodes = result.getGeocodes() != null ? new Geocodes(result.getGeocodes()) : null;
             this.usaRegionalGeocodes = result.getUsaRegionalGeocodes() != null ? new UsaRegionalGeocodes(result.getUsaRegionalGeocodes()) : null;
             this.ausRegionalGeocodes = result.getAusRegionalGeocodes() != null ? new AusRegionalGeocodes(result.getAusRegionalGeocodes()) : null;
-            this.nzlRegionalGeocodes = result.getNzRegionalGeocodes() != null ? new NzlRegionalGeocodes(result.getNzRegionalGeocodes()) : null;
+            this.nzlRegionalGeocodes = result.getNzlRegionalGeocodes() != null ? new NzlRegionalGeocodes(result.getNzlRegionalGeocodes()) : null;
             this.ukLocationComplete = result.getUkLocationComplete() != null ? new UKLocationComplete(result.getUkLocationComplete()) : null;
             this.ukLocationEssential = result.getUkLocationEssential() != null ? new UKLocationEssential(result.getUkLocationEssential()) : null;
             this.gbrGovernment = result.getGbrGovernment() != null ? new GbrGovernment(result.getGbrGovernment()) : null;

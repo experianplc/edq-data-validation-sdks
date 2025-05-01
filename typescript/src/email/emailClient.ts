@@ -2,7 +2,7 @@ import { EDVSError } from "../exceptions/edvsException";
 import { RestApiEmailValidateRequest } from "../server/email/restApiEmailValidateRequest";
 import { RestApiStubImpl } from "../server/restApiStub";
 import { EmailConfiguration } from "./emailConfiguration";
-import { EmailValidateResult, restApiResponseToEmailValidateResult } from "./validate/emailValidateResult";
+import { ValidateResult, restApiResponseToEmailValidateResult } from "./validate/validateResult";
 
 /**
  * Client class for interacting with the email-related APIs.
@@ -30,7 +30,7 @@ export class EmailClient {
      * @return A promise that resolves to the validation result.
      * @throws EDVSError If the API response contains an error.
      */
-    public async validate(email: string): Promise<EmailValidateResult> {
+    public async validate(email: string): Promise<ValidateResult> {
         const headers = this.configuration.getCommonHeaders(false);
         const request: RestApiEmailValidateRequest = {
             email: email

@@ -8,7 +8,7 @@ namespace DVSClient.Server.Address.Suggestions
         [JsonProperty("refinement")]
         public string? Refinement { get; set; }
 
-        public static RestApiSuggestionsRefineRequest Using(Configuration configuration)
+        public static RestApiSuggestionsRefineRequest Using(AddressConfiguration configuration)
         {
             return new RestApiSuggestionsRefineRequest();
         }

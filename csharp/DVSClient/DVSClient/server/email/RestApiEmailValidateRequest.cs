@@ -8,7 +8,7 @@ namespace DVSClient.Server.Email
         [JsonProperty("email")]
         public string? Email { get; set; }
 
-        public static RestApiEmailValidateRequest Using(Configuration emailConfiguration)
+        public static RestApiEmailValidateRequest Using(EmailConfiguration emailConfiguration)
         {
             // Currently no optional attributes. Keeping same structure as Address & Phone requests though.
             var request = new RestApiEmailValidateRequest();

@@ -1,6 +1,6 @@
 import { RestApiAddressLayoutLine } from "../../server/address/layout/restApiAddressLayoutLine";
 import { RestApiGetLayoutLayout } from "../../server/address/layout/restApiGetLayoutLayout";
-import { AddressLayoutStatus, lookupAddressLayoutStatus } from "./addressLayoutStatus";
+import { LayoutStatus, lookupAddressLayoutStatus } from "./layoutStatus";
 import { AppliesTo, restApiResponseToAppliesTo } from "./appliesTo";
 import { getAddressElementFromElementName } from "./elements/addressElement";
 import { LayoutLineFixed } from "./layoutLineFixed";
@@ -12,7 +12,7 @@ export type GetLayoutLayout = {
     comment: string;
     appliesTo: AppliesTo[];
     lines: (LayoutLineFixed | LayoutLineVariable)[];
-    status?: AddressLayoutStatus;
+    status?: LayoutStatus;
     licenseId: string;
 };
 

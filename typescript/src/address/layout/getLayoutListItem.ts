@@ -1,12 +1,12 @@
 import { RestApiGetLayoutsListItem } from "../../server/address/layout/restApiGetLayoutsListItem";
-import { AddressLayoutStatus, lookupAddressLayoutStatus } from "./addressLayoutStatus";
+import { LayoutStatus, lookupAddressLayoutStatus } from "./layoutStatus";
 import { AppliesTo, restApiResponseToAppliesTo } from "./appliesTo";
 
 export type GetLayoutListItem = {
     id: string;
     name: string;
     appliesTo: AppliesTo[];
-    status?: AddressLayoutStatus;
+    status?: LayoutStatus;
 };
 
 export function restApiResponseToGetLayoutListItem(apiItem: RestApiGetLayoutsListItem): GetLayoutListItem {

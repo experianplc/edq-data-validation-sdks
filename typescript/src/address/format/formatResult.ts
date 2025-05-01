@@ -1,5 +1,5 @@
 import { RestApiAddressFormatResponse } from "../../server/address/format/restApiAddressFormatResponse";
-import { Confidence, lookupConfidence } from "../confidence";
+import { AddressConfidence, lookupConfidence } from "../addressConfidence";
 import { AddressComponents, restApiResponseToAddressComponents } from "./addressComponents";
 import { AddressEnrichment, restApiResponseToAddressEncrichment } from "./addressEnrichment";
 import { AddressFormatted, restApiToAddressFormatted } from "./addressFormatted";
@@ -8,7 +8,7 @@ import { FormatAddress, restApiResponseToFormatAddress } from "./formatAddress";
 
 export type FormatResult = {
     globalAddressKey?: string;
-    confidence?: Confidence;
+    confidence?: AddressConfidence;
     address?: FormatAddress;
     addressFormatted?: AddressFormatted;
     components?: AddressComponents;

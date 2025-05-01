@@ -3,10 +3,12 @@ package com.experian.dvs.client.layout;
 import com.experian.dvs.client.ExperianDataValidation;
 import com.experian.dvs.client.Setup;
 import com.experian.dvs.client.address.*;
-import com.experian.dvs.client.address.format.Result;
+import com.experian.dvs.client.address.format.FormatResult;
 import com.experian.dvs.client.address.layout.*;
 import com.experian.dvs.client.address.layout.elements.Aus;
 import com.experian.dvs.client.address.layout.elements.Gbr;
+import com.experian.dvs.client.address.search.SearchResult;
+import com.experian.dvs.client.address.suggestions.format.SuggestionsFormatResult;
 import com.experian.dvs.client.exceptions.EDVSException;
 import com.experian.dvs.client.exceptions.NotFoundException;
 import org.junit.jupiter.api.AfterAll;
@@ -28,6 +30,7 @@ public class AddressLayoutTests {
 
     @BeforeAll
     static void testSetup() {
+        Setup.loadEnv();
         //Some of these tests rely on pre-existing layouts because creating a layout during the tests is not feasible
         //This tests that they exist
         final GetLayoutResult layout1 = getLayout(Setup.EXISTING_TEST_LAYOUT);
@@ -36,13 +39,12 @@ public class AddressLayoutTests {
             createLayout1();
             fail("The layout " + Setup.EXISTING_TEST_LAYOUT + " did not exist. This has now been created but you will need to wait for the creation to complete (can be 10 minutes or so)");
         }
-        if (layout1.getLayout().getStatus() != Status.COMPLETED) {
+        if (layout1.getLayout().getStatus() != LayoutStatus.COMPLETED) {
             fail("The layout " + Setup.EXISTING_TEST_LAYOUT + " is not complete. Please wait for it to complete before running these tests (can be 10 minutes or so)");
         }
 
-        //Clean up any test layout from previous runs (they need to have completed creation before they can be deleted
+        //Clean up any test layout from previous runs (they need to have completed creation before they can be deleted)
         deleteTestLayouts();
-
     }
 
     @AfterAll
@@ -52,11 +54,17 @@ public class AddressLayoutTests {
     }
 
     @Test
+    public void testValidTokenAddressLayout() {
+        assertThat(Setup.VALID_TOKEN_ADDRESS).isNotEmpty();
+        assertThat(Setup.VALID_TOKEN_ADDRESS_WITH_ENRICHMENT).isNotEmpty();
+    }
+
+    @Test
     void layout_Get() {
 
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
+        final LayoutConfiguration configuration = LayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
 
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
         final GetLayoutResult result = client.getLayout(Setup.EXISTING_TEST_LAYOUT);
         assertThat(result.getError()).isNotPresent();
     }
@@ -64,10 +72,10 @@ public class AddressLayoutTests {
     @Test
     void layout_Create() {
 
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration
+        final LayoutConfiguration configuration = LayoutConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .build();
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
 
         final LayoutLineVariable line1 = new LayoutLineVariable("addr_line_1");
         final LayoutLineVariable line2 = new LayoutLineVariable("addr_line_2");
@@ -83,26 +91,26 @@ public class AddressLayoutTests {
         assertThat(createLayoutResult.getError()).isNotPresent();
         //Check if the layout was created
         final GetLayoutResult result = client.getLayout(layoutName);
-        assertThat(result.getLayout().getStatus()).isEqualTo(Status.CREATION_IN_PROGRESS);
+        assertThat(result.getLayout().getStatus()).isEqualTo(LayoutStatus.CREATION_IN_PROGRESS);
     }
 
     @Test
     void layout_Create_WithOptions() {
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration
+        final LayoutConfiguration configuration = LayoutConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .setTransactionId(UUID.randomUUID().toString())
                 .build();
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
         //todo add logic
     }
 
     @Test
     void layout_Delete_DoesNotExist_Throws() {
 
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration
+        final LayoutConfiguration configuration = LayoutConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .build();
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
 
         final String layoutName = "ThisLayoutDoesntExist";
         assertThrows(NotFoundException.class, () -> client.deleteLayout(layoutName));
@@ -112,7 +120,7 @@ public class AddressLayoutTests {
     @Test
     void Format_WithCustomLayout_WithComponents() {
 
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .setTransactionId(UUID.randomUUID().toString())
                 .useDataset(Dataset.GB_ADDRESS)
@@ -120,10 +128,10 @@ public class AddressLayoutTests {
                 .includeComponents()
                 .build();
 
-        final Client client = ExperianDataValidation.getAddressClient(configuration);
-        final com.experian.dvs.client.address.search.Result resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
-        final Result formatResult = client.format(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
-        assertThat(formatResult.getConfidence()).isEqualTo(Confidence.VERIFIED_MATCH);
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final FormatResult formatResult = client.format(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
+        assertThat(formatResult.getConfidence()).isEqualTo(AddressConfidence.VERIFIED_MATCH);
         //assertThat(formatResult.getGlobalAddressKey()).isEqualTo(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
         assertThat(formatResult.getAddressFormatted()).isNotNull();
         assertThat(formatResult.getAddressFormatted().getLayoutName()).isEqualTo(Setup.EXISTING_TEST_LAYOUT);
@@ -138,15 +146,15 @@ public class AddressLayoutTests {
 
     @Test
     public void suggestionsFormatWithCustomLayout() {
-        final Configuration configuration = Configuration
+        final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
                 .setTransactionId(UUID.randomUUID().toString())
                 .useDataset(Dataset.AU_ADDRESS)
                 .setFormatLayoutName(Setup.EXISTING_TEST_LAYOUT)
                 .build();
-        Client client = ExperianDataValidation.getAddressClient(configuration);
+        AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        com.experian.dvs.client.address.suggestions.format.Result searchResult = client.suggestionsFormat("onslow st, perth");
+        SuggestionsFormatResult searchResult = client.suggestionsFormat("onslow st, perth");
 
         assertThat(searchResult.getSuggestions()).isNotEmpty();
 
@@ -156,16 +164,16 @@ public class AddressLayoutTests {
     }
 
     private static GetLayoutResult getLayout(final String layoutName) {
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutConfiguration configuration = LayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
         return client.getLayout(layoutName);
 
     }
 
     private static void createLayout1() {
 
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutConfiguration configuration = LayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
 
         final LayoutLineVariable line1 = new LayoutLineVariable("addr_line_1");
         final LayoutLineVariable line2 = new LayoutLineVariable("addr_line_2");
@@ -188,15 +196,16 @@ public class AddressLayoutTests {
     private static void deleteTestLayouts() {
 
         //Get all layouts starting with the predefined prefix
-        final AddressLayoutConfiguration configuration = AddressLayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
-        final AddressLayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final LayoutConfiguration configuration = LayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
         final GetLayoutListResult layoutsResult = client.getLayouts(Optional.empty(), List.of(), Optional.of(Setup.TEST_LAYOUT_PREFIX));
 
         //Delete them
         for (var layout : layoutsResult.getLayouts()) {
-            if (!layout.getName().equals(Setup.EXISTING_TEST_LAYOUT) && layout.getStatus() == Status.COMPLETED) {
+            if (!layout.getName().equals(Setup.EXISTING_TEST_LAYOUT) && layout.getStatus() == LayoutStatus.COMPLETED) {
                 try {
                     client.deleteLayout(layout.getName());
+                    System.out.println("Deleted layout: " + layout.getName());
                 } catch (EDVSException e) {
                     System.out.println("Failed to delete layout " + layout.getName());
                 }

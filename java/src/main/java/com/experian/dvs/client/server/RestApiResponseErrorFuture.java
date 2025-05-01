@@ -46,7 +46,10 @@ public class RestApiResponseErrorFuture implements Future<Optional<RestApiRespon
     }
 
     private Optional<RestApiResponseError> getOptionalError(final Response response) {
-        if (response.getStatus() != Response.Status.ACCEPTED.getStatusCode()) {
+        if (response.getStatus() == Response.Status.NO_CONTENT.getStatusCode()) {
+            // Successful deletion of a layout
+            return Optional.empty();
+        } else if (response.getStatus() != Response.Status.ACCEPTED.getStatusCode()) {
             final RestApiResponseError error = new RestApiResponseError();
             error.setType(Integer.toString(response.getStatus()));
             error.setTitle(response.getStatusInfo().getReasonPhrase());

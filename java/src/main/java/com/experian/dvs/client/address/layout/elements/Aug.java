@@ -75,7 +75,7 @@ public enum Aug implements AddressElement {
     MESH_BLOCK_CODE_2016("2016MeshBlockCode", "The 11-digit 2016 version of the MeshBlock Code", ""),
     MESH_BLOCK_MATCH_CODE_2016("2016MeshBlockMatchCode", "The code for the level of matching to 2016 Mesh Blocks", ""),
     MESH_BLOCK_MATCH_DESCRIPTION_2016("2016MeshBlockMatchDescription", "The description of the 2016 Mesh Block match level", ""),
-    COMPLEX_ADDRESS_TYPE_CODE("complexAddressTypeCode", "Returns the Address Type", "P"),
+    COMPLEX_ADDRESS_TYPE_CODE("complexAddressTypeCode", "Returns the FormatAddress Type", "P"),
     PRIMARY_ADDRESS_PID("primaryAddressPid", "This element will only be populated if the input address is a secondary address", ""),
     ADDRESS_JOIN_TYPE_CODE("addressJoinTypeCode", "Returns the Join Type Code", ""),
     GNAF_LEGAL_PARCEL_IDENTIFIER("gnafLegalParcelIdentifier", "The Legal Parcel Id field", ""),

@@ -1,6 +1,4 @@
-﻿using DVSClient.Address.Format.Enrichment;
-using DVSClient.Address.Layout.Attributes;
-using DVSClient.Address.Layout.Elements;
+﻿using DVSClient.Address.Layout.Elements;
 using DVSClient.Exceptions;
 using DVSClientTests;
 using NUnit.Framework;
@@ -16,6 +14,8 @@ namespace DVSClient.Address.Layout.Tests
         [OneTimeSetUp]
         public void TestSetup()
         {
+            Setup.LoadEnv();
+
             // Some of these tests rely on pre-existing layouts because creating a layout during the tests is not feasible
             // This tests that they exist
             var testLayout = GetLayout(Setup.ExistingTestLayout);
@@ -26,7 +26,7 @@ namespace DVSClient.Address.Layout.Tests
                 CreateTestLayout();
                 Assert.Fail($"The layout {Setup.ExistingTestLayout} did not exist. This has now been created but you will need to wait for the creation to complete (can be 10 minutes or so)");
             }
-            else if (testLayout?.Layout?.Status != Status.Completed)
+            else if (testLayout?.Layout?.Status != LayoutStatus.Completed)
             {
                 Assert.Fail($"The layout {Setup.ExistingTestLayout} is not complete. Please wait for it to complete before running these tests (can be 10 minutes or so)");
             }
@@ -45,7 +45,7 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Layout_Get()
         {
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var result = client.GetLayout(Setup.ExistingTestLayout);
             Assert.That(result.Error, Is.Null);
@@ -55,7 +55,7 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Layout_Create()
         {
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var line1 = new LayoutLineVariable("addr_line_1");
             var line2 = new LayoutLineVariable("addr_line_2");
@@ -71,7 +71,7 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Layout_Create_WithOptions()
         {
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress)
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(Guid.NewGuid().ToString())
                 .Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
@@ -82,7 +82,7 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Layout_Delete_DoesNotExist_Throws()
         {
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var layoutName = "ThisLayoutDoesntExist";
 
@@ -92,16 +92,16 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Format_WithCustomLayout_WithComponents()
         {
-            var configuration = Address.Configuration
+            var configuration = Address.AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .UseDataset(Dataset.GbAddress)
                 .UseLayout(Setup.ExistingTestLayout)
                 .IncludeComponents()
                 .Build();
-            var client = ExperianDataValidation.GetAddressClient((Address.Configuration)configuration);
+            var client = ExperianDataValidation.GetAddressClient((Address.AddressConfiguration)configuration);
             var searchResultAutoComplete = client.Search(SearchType.Autocomplete, "56 Queens R");
             var formatResult = client.Format(searchResultAutoComplete.Suggestions.First().GlobalAddressKey);
-            Assert.That(formatResult.Confidence, Is.EqualTo(Confidence.VerifiedMatch));
+            Assert.That(formatResult.Confidence, Is.EqualTo(AddressConfidence.VerifiedMatch));
             //Assert.That(formatResult.GlobalAddressKey, Is.EqualTo(searchResultAutoComplete.Suggestions.First().GlobalAddressKey));
             Assert.That(formatResult.AddressFormatted, Is.Not.Null);
             Assert.That(formatResult.AddressFormatted?.LayoutName, Is.EqualTo(Setup.ExistingTestLayout));
@@ -121,7 +121,7 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Suggestions_Format_WithCustomLayout()
         {
-            var configuration = Address.Configuration
+            var configuration = Address.AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .SetTransactionId(Guid.NewGuid().ToString())
                 .UseDataset(Dataset.AuAddress)
@@ -146,14 +146,14 @@ namespace DVSClient.Address.Layout.Tests
 
         private GetLayoutResult GetLayout(string layoutName)
         {
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             return client.GetLayout(layoutName);
         }
 
         private void CreateTestLayout()
         {
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var line1 = new LayoutLineVariable("addr_line_1");
             var line2 = new LayoutLineVariable("addr_line_2");
@@ -168,13 +168,13 @@ namespace DVSClient.Address.Layout.Tests
             Assert.That(createLayoutResult.Error, Is.Null);
             var result = client.GetLayout(layoutName);
             Assert.That(result?.Layout?.Status.HasValue, Is.True);
-            Assert.That(result?.Layout?.Status.Value, Is.EqualTo(Status.CreationInProgress));
+            Assert.That(result?.Layout?.Status, Is.EqualTo(LayoutStatus.CreationInProgress));
         }
 
         private void DeleteTestLayouts()
         {
             // Get all layouts starting with the predefined prefix
-            var configuration = Configuration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             GetLayoutListResult layoutsResult;
 
@@ -191,7 +191,7 @@ namespace DVSClient.Address.Layout.Tests
             // Delete them
             foreach (var layout in layoutsResult.Layouts)
             {
-                if (layout.Status == Status.Completed && layout.Name != Setup.ExistingTestLayout)
+                if (layout.Status == LayoutStatus.Completed && layout.Name != Setup.ExistingTestLayout)
                 {
                     try
                     {

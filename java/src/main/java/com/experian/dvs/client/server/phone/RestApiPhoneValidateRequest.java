@@ -1,7 +1,7 @@
 package com.experian.dvs.client.server.phone;
 
 import com.experian.dvs.client.common.Country;
-import com.experian.dvs.client.phone.Configuration;
+import com.experian.dvs.client.phone.PhoneConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RestApiPhoneValidateRequest {
@@ -21,13 +21,13 @@ public class RestApiPhoneValidateRequest {
     @JsonProperty("supplementary_live_status")
     private RestApiPhoneSupplementaryLiveStatus supplementaryLiveStatus;
 
-    public static RestApiPhoneValidateRequest using(final Configuration configuration) {
+    public static RestApiPhoneValidateRequest using(final PhoneConfiguration configuration) {
         final RestApiPhoneValidateRequest request = new RestApiPhoneValidateRequest();
 
         if (!configuration.getOutputFormat().isEmpty()) {
             request.setOutputFormat(configuration.getOutputFormat());
         }
-        if (configuration.getCacheValueDays() != Configuration.DEFAULT_CACHE_VALUE_DAYS) {
+        if (configuration.getCacheValueDays() != PhoneConfiguration.DEFAULT_CACHE_VALUE_DAYS) {
             request.setCacheValueDays(configuration.getCacheValueDays());
         }
         if (configuration.getGetPortedDate()) {

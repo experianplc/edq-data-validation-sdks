@@ -87,6 +87,10 @@ export class LayoutClient {
                 if (resp.error) {
                     return Promise.reject(EDVSError.using(resp.error));
                 }
+                else
+                {
+                    return Promise.resolve();
+                }
             }
         );
     }

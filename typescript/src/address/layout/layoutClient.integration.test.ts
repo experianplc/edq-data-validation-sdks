@@ -9,7 +9,7 @@ import { AusAddressElements } from './elements/ausAddressElements';
 import { Datasets } from '../dataset';
 import { CreateLayoutResult } from './createLayoutResult';
 import { EDVSError } from '../../exceptions/edvsException';
-import { AddressLayoutStatus } from './addressLayoutStatus';
+import { LayoutStatus } from './layoutStatus';
 import { randomUUID } from 'crypto';
 import { AddressConfiguration } from '../addressConfiguration';
 import { AusRegionalGeocodeAttribute } from './attributes/ausRegionalGeocodeAttribute';
@@ -20,11 +20,10 @@ import { GbrAddressElements } from './elements/gbrAddressElements';
 
 describe('Address client tests', () => {
 
-    
     beforeAll(async () => {
         try {
             const layout = await getLayout(existingTestLayout);
-            if (layout.status !== AddressLayoutStatus.Completed) {
+            if (layout.status !== LayoutStatus.Completed) {
                 expect.fail(`The layout ${existingTestLayout} is not complete. Please wait for it to complete before running these tests (can be 10 minutes or so)`);
             }
         } catch (err: unknown) {
@@ -36,9 +35,11 @@ describe('Address client tests', () => {
                 throw err;
             }
         }
-    });
 
-    afterAll(async () => {
+        await deleteTestLayouts();
+    }); 
+
+    afterAll(async () => { 
         await deleteTestLayouts();
     });
 
@@ -48,25 +49,23 @@ describe('Address client tests', () => {
         const result = await client.getLayout(existingTestLayout);
         expect(result.id.length).toBeGreaterThan(0);
     });
-    
-    
 
     test(`Create Layout`, async () => {
-        const configuration = new LayoutConfiguration(validTokenAddress());
+        const configuration = new LayoutConfiguration(validTokenAddress()); 
         const client = new LayoutClient(configuration);
         const line1: LayoutLineVariable = {name: "addr_line_1"};
         const line2: LayoutLineVariable = {name:"addr_line_2"};
         const line3: LayoutLineFixed = {name: "post_code", elements: [AusAddressElements.PostalCode]};
         const line4: LayoutLineFixed = {name: "country_name", elements: [AusAddressElements.CountryName]};
         const layoutName = getUniqueLayoutName();
-        
+
         const result = await client.createLayout(layoutName, [{datasets: [Datasets.AuAddress]}], [line1, line2], [line3, line4]);
         expect(result.id.length).toBeGreaterThan(0);
         const getResult = await client.getLayout(layoutName);
         expect(getResult).toBeDefined();
         expect(getResult.name).toEqual(layoutName);
     });
-    
+
     test(`Format with custom layout and components`, async () => {
         const addressConfig = new AddressConfiguration(validTokenAddress(),{
             transactionId: randomUUID(),
@@ -83,7 +82,7 @@ describe('Address client tests', () => {
         expect(formatResult.addressFormatted?.layoutName).toEqual(existingTestLayout);
         expect(formatResult.addressFormatted?.notEnoughLines).toBeFalsy();
         expect(formatResult.addressFormatted?.hasTruncatedLines).toBeFalsy();
-        
+
         const addressEntries = Object.entries(formatResult.addressFormatted?.address || {});
         expect(addressEntries.length).toEqual(4);
         const addrLine1 = formatResult.addressFormatted?.address["addr_line_1"];
@@ -98,7 +97,6 @@ describe('Address client tests', () => {
         const countryName = formatResult.addressFormatted?.address["country_name"];
         expect(countryName).toBeDefined();
         expect(countryName?.length).toBeGreaterThan(0);
-                
     });
 
     async function createTestLayout(): Promise<CreateLayoutResult> {
@@ -109,21 +107,20 @@ describe('Address client tests', () => {
         const line3: LayoutLineFixed = {name: "post_code", elements: [AusAddressElements.PostalCode, GbrAddressElements.Postcode]};
         const line4: LayoutLineFixed = {name: "country_name", elements: [AusAddressElements.CountryName, GbrAddressElements.Country]};
         const layoutName = existingTestLayout;
-        
+
         return client.createLayout(layoutName, [{datasets: [Datasets.AuAddress]}, {datasets: [Datasets.GbAddress]}], [line1, line2], [line3, line4]);
+    } 
 
-    }
-    
-
-    async function deleteTestLayouts(): Promise<void> {
+    async function deleteTestLayouts(): Promise<void> { 
         const configuration = new LayoutConfiguration(validTokenAddress());
         const client = new LayoutClient(configuration);
-        const layouts = await client.getLayouts([], testLayoutPrefix);
+        const layouts = await client.getLayouts([], testLayoutPrefix); 
 
         for (const layout of layouts) {
-            if (layout.name !== existingTestLayout && layout.status === AddressLayoutStatus.Completed) {
+            if (layout.name !== existingTestLayout && layout.status === LayoutStatus.Completed) {
                 try {
-                    await client.deleteLayout(layout.name);
+                    await client.deleteLayout(layout.name)
+                    console.info(`Deleted layout: ${layout.name}`);
                 } catch {
                     console.error(`Failed to delete layout: ${layout.name}`);
                 }
@@ -131,7 +128,7 @@ describe('Address client tests', () => {
         }
     }
 
-    function getLayout(layoutName: string): Promise<GetLayoutLayout> {            
+    function getLayout(layoutName: string): Promise<GetLayoutLayout> {
         const configuration = new LayoutConfiguration(validTokenAddress());
         const client = new LayoutClient(configuration);
         return client.getLayout(layoutName);

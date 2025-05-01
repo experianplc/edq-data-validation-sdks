@@ -1,5 +1,6 @@
 package com.experian.dvs.client.common;
 
+import com.experian.dvs.client.address.AddressConfiguration;
 import com.experian.dvs.client.exceptions.InvalidConfigurationException;
 
 import java.net.URI;
@@ -107,7 +108,7 @@ public abstract class Configuration {
         }
         headers.put("Reference-Id", ClientReference.getReference(currentTransactionId, allowsDotInReferenceId));
 
-        if (getTimeoutInSeconds() != com.experian.dvs.client.address.Configuration.DEFAULT_TIMEOUT_SECONDS) {
+        if (getTimeoutInSeconds() != AddressConfiguration.DEFAULT_TIMEOUT_SECONDS) {
             headers.put("Timeout-Seconds", Integer.toString(getTimeoutInSeconds()));
         }
 
