@@ -1,6 +1,6 @@
 package com.experian.dvs.client.server.address.format;
 
-import com.experian.dvs.client.address.Configuration;
+import com.experian.dvs.client.address.AddressConfiguration;
 import com.experian.dvs.client.server.address.validate.RestApiAddressValidateRequest;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +21,7 @@ public class RestApiFormatRequest {
     @JsonProperty("attributes")
     private RestApiFormatAttribute attributes;
 
-    public static RestApiFormatRequest using(final Configuration configuration) {
+    public static RestApiFormatRequest using(final AddressConfiguration configuration) {
         final RestApiFormatRequest request = new RestApiFormatRequest();
 
         request.setLayouts(List.of(configuration.getFormatLayoutName()));

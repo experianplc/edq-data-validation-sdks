@@ -2,6 +2,7 @@
 {
     internal static class Setup
     {
+        
         internal static string ValidTokenAddress = GetEnvironmentVariableOrThrow("DVS_API_VALID_TOKEN_ADDRESS");
         internal static string ValidTokenAddressWithEnrichment = GetEnvironmentVariableOrThrow("DVS_API_VALID_TOKEN_ADDRESS_WITH_ENRICHMENT");
 
@@ -20,9 +21,15 @@
             var value = Environment.GetEnvironmentVariable(variableName);
             if (string.IsNullOrEmpty(value))
             {
-                throw new InvalidOperationException($"The environment variable '{variableName}' is not set or is empty.");
+                throw new InvalidOperationException($"The environment variable '{variableName}' is not set or is empty.\r\n" +
+                    $"You can add a .env file to the project containing the environment variables as key-value pairs.");
             }
             return value;
+        }
+
+        public static void LoadEnv() 
+        {
+            DotNetEnv.Env.TraversePath().Load();
         }
     }
 }

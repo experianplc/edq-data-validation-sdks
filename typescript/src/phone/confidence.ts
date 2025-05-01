@@ -1,4 +1,4 @@
-export enum Confidence {
+export enum PhoneConfidence {
     Verified = "Verified",
     Absent = "Absent",
     TeleserviceNotProvisioned = "Teleservice not provisioned",
@@ -8,10 +8,10 @@ export enum Confidence {
     Dead = "Dead"
 }
 
-export function lookupConfidence(str?: string): Confidence {
+export function lookupConfidence(str?: string): PhoneConfidence {
     if (str) {
-        return Object.keys(Confidence).find(key => Confidence[key as keyof typeof Confidence] === str) as Confidence | Confidence.Unknown;    
+        return Object.keys(PhoneConfidence).find(key => PhoneConfidence[key as keyof typeof PhoneConfidence] === str) as PhoneConfidence | PhoneConfidence.Unknown;    
     } else {
-        return Confidence.Unknown;
+        return PhoneConfidence.Unknown;
     }
 }

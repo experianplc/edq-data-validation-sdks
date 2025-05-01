@@ -6,7 +6,7 @@ namespace DVSClient.Address.Layout.Elements
 
         public static IAddressElement? FromElementName(IEnumerable<AppliesTo> appliesTo, string? elementName)
         {
-            return ElementLibrary.GetAddressElementFromElementName(appliesTo, elementName);
+            return AddressElementLibrary.GetAddressElementFromElementName(appliesTo, elementName);
         }
     }
 }

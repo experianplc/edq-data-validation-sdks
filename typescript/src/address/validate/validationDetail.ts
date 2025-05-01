@@ -1,4 +1,4 @@
-import { RestApiValidationDetail } from "../../server/address/format/restApiValidationDetail";
+import { RestApiValidationDetail } from "../../server/address/validate/restApiValidationDetail";
 
 export type ValidationDetail = {
     buildingFirmNameCorrected: boolean;

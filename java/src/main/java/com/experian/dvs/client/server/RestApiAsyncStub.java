@@ -27,7 +27,7 @@ import java.util.concurrent.Future;
 
 public interface RestApiAsyncStub extends Closeable {
 
-    //Address
+    //FormatAddress
     Future<RestApiAddressSearchResponse> searchV1(RestApiAddressSearchRequest searchRequest, Map<String, Object> headers);
     Future<RestApiAddressFormatResponse> formatV1(String addressKey, RestApiFormatRequest formatRequest, Map<String, Object> headers);
     Future<RestApiAddressValidateResponse> validateV1(RestApiAddressValidateRequest validateRequest, Map<String, Object> headers);
@@ -42,7 +42,7 @@ public interface RestApiAsyncStub extends Closeable {
     Future<RestApiGetLayoutResponse> getLayoutV2(String layoutName, Map<String, Object> headers);
     Future<Optional<RestApiResponseError>> deleteLayoutV2(String layoutName, Map<String, Object> headers);
 
-    // Address Utils
+    // FormatAddress Utils
     Future<RestApiGetDatasetsResponse> getDatasetsV1(String countryIso3, Map<String, Object> headers);
     // TODO: promptsets
 

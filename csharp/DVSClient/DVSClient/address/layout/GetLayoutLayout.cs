@@ -10,7 +10,7 @@ namespace DVSClient.Address.Layout
         internal string Comment { get; }
         internal IEnumerable<AppliesTo> AppliesTo { get; }
         internal IEnumerable<ILayoutLine> Lines { get; }
-        internal Status? Status { get; }
+        internal LayoutStatus? Status { get; }
         internal string LicenseId { get; }
 
         public GetLayoutLayout(RestApiGetLayoutLayout? layout)
@@ -20,7 +20,7 @@ namespace DVSClient.Address.Layout
             Comment = layout?.Comment ?? string.Empty;
             AppliesTo = layout?.AppliesTo != null ? layout.AppliesTo.Select(a => new AppliesTo(a)).ToList() : new List<AppliesTo>();
             Lines = layout?.Lines != null ? layout.Lines.Select(p => GetLayoutLine(AppliesTo, p)).ToList() : new List<ILayoutLine>();
-            Status = layout?.Status?.GetEnumValueFromJsonName<Status>();
+            Status = layout?.Status?.GetEnumValueFromJsonName<LayoutStatus>();
             LicenseId = layout?.LicenseId ?? string.Empty;
         }
 

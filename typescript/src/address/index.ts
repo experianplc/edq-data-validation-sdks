@@ -1,7 +1,7 @@
 import { AddressConfiguration } from './addressConfiguration'; 
 import { AddressClient } from './addressClient';
 import { SearchType } from './searchType';
-import { Confidence } from './confidence';
+import { AddressConfidence } from './addressConfidence';
 import { GlobalGeocodeAttribute } from './layout/attributes/globalGeocodeAttribute';
 import { Accuracy } from './accuracy';
 import { Datasets, Dataset } from './dataset';
@@ -12,6 +12,6 @@ export {
     Datasets,
     Dataset,
     SearchType, 
-    Confidence, 
+    AddressConfidence as Confidence, 
     GlobalGeocodeAttribute, 
     Accuracy}

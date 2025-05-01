@@ -9,7 +9,7 @@ public interface AddressElement {
     String getElementName();
 
     static AddressElement fromElementName(List<AppliesTo> appliesTo, final String elementName) {
-        return ElementLibrary.getAddressElementFromElementName(appliesTo, elementName);
+        return AddressElementLibrary.getAddressElementFromElementName(appliesTo, elementName);
     }
 
 }

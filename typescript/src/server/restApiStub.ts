@@ -21,6 +21,8 @@ import { RestApiGetLayoutListResponse } from "./address/layout/restApiGetLayoutL
 import { RestApiGetLayoutResponse } from "./address/layout/restApiGetLayoutResponse";
 import { RestApiDeleteLayoutResponse } from "./address/layout/restApiDeleteLayoutResponse";
 import { isDevMode } from "../testSetup";
+import { RestApiAddressLookupV2Request } from "./address/lookup/restApiAddressLookupV2Request";
+import { RestApiAddressLookupV2Response } from "./address/lookup/restApiAddressLookupV2Response";
 
 interface RestApiStub {
     // Address utilities
@@ -37,16 +39,20 @@ interface RestApiStub {
     getLayoutV2(name: string, headers: Map<string, object>): Promise<RestApiGetLayoutResponse>
     getLayoutsV2(countryIso3: string, datasets: string[], nameContains: string, headers: Map<string, object>): Promise<RestApiGetLayoutListResponse>
     deleteLayoutV2(layoutName: string, headers: Map<string, object>): Promise<RestApiDeleteLayoutResponse>;
+    lookupV2(request: RestApiAddressLookupV2Request, headers: Map<string, object>): Promise<RestApiAddressLookupV2Response>;
     
 }
 
 export class RestApiStubImpl implements RestApiStub {
     
     private readonly configuration: Configuration;
-    
-    
+        
     constructor(configuration: Configuration) {
         this.configuration = configuration;
+    }
+    lookupV2(request: RestApiAddressLookupV2Request, headers: Map<string, object>): Promise<RestApiAddressLookupV2Response> {
+        const endPoint = `address/lookup/v2`;
+        return this.post<RestApiAddressLookupV2Response>(endPoint, request, headers);
     }
     deleteLayoutV2(layoutName: string, headers: Map<string, object>): Promise<RestApiDeleteLayoutResponse> {
         const endPoint = `address/layouts/v2/${layoutName}`;
@@ -122,7 +128,7 @@ export class RestApiStubImpl implements RestApiStub {
 
     private async fetchImpl<T>(endPoint: string ,method: string, headers: Map<string, object>, parameters: Map<string, string>, body?: string): Promise<T> {
         const response =  await this.executeWithRetry(async () => {
-            
+
             const url = new URL(endPoint, Configuration.serverUri);
             parameters.forEach((value, key) => {
                 url.searchParams.append(key, value);
@@ -164,7 +170,7 @@ export class RestApiStubImpl implements RestApiStub {
                     throw new EDVSError("Request timed out")
                 }
                 throw error;
-            });            
+            });
         });
 
         const error = await this.getOptionalError(response);
@@ -180,14 +186,13 @@ export class RestApiStubImpl implements RestApiStub {
     }
 
     private async get<T>(endPoint: string, headers: Map<string, object>, parameters: Map<string, string>): Promise<T> {
-        return this.fetchImpl(endPoint, 'GET', headers, parameters);        
+        return this.fetchImpl(endPoint, 'GET', headers, parameters);
     }
 
     private async delete<T>(endPoint: string, headers: Map<string, object>, parameters: Map<string, string>): Promise<T> {
-        return this.fetchImpl(endPoint, 'DELETE', headers, parameters);        
+        return this.fetchImpl(endPoint, 'DELETE', headers, parameters);
     }
 
-    
     private async executeWithRetry<T>(fn: () => Promise<Response>): Promise<Response>  {
 
         let attempt = 0;
@@ -198,7 +203,7 @@ export class RestApiStubImpl implements RestApiStub {
                 const response = await fn();
                 if (this.isHandledResponse(response)) {
                     return response;
-                }                
+                }
                 throw new EDVSError(`Server error: ${response.status}`);
             } catch (error) {
                 attempt++;

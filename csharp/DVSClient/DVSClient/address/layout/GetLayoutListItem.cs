@@ -8,14 +8,14 @@ namespace DVSClient.Address.Layout
         internal string Id { get; }
         internal string Name { get; }
         internal IEnumerable<AppliesTo> AppliesTo { get; }
-        internal Status? Status { get; }
+        internal LayoutStatus? Status { get; }
 
         public GetLayoutListItem(RestApiGetLayoutsListItem item)
         {
             Id = item.Id ?? throw new ArgumentNullException(nameof(item.Id));
             Name = item.Name ?? throw new ArgumentNullException(nameof(item.Name));
             AppliesTo = item.AppliesTo != null ? item.AppliesTo.Select(a => new AppliesTo(a)).ToList() : new List<AppliesTo>();
-            Status = item.Status?.GetEnumValueFromJsonName<Status>();
+            Status = item.Status?.GetEnumValueFromJsonName<LayoutStatus>();
         }
     }
 }

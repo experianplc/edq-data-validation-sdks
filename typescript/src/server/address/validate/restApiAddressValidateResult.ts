@@ -1,8 +1,9 @@
 import { RestApiAddressFormatComponents } from "../format/restApiAddressFormatComponents";
 import { RestApiAddressFormatted } from "../format/restApiAddressFormatted";
 import { RestApiFormatAddress } from "../format/restApiFormatAddress";
-import { RestApiValidationDetail } from "../format/restApiValidationDetail";
+import { RestApiValidationDetail } from "./restApiValidationDetail";
 import { RestApiSearchResultSuggestion } from "../search/restApiSearchResultSuggestion";
+import { RestApiAddressValidateMatchInfo } from "./restApiAddressValidateMatchInfo";
 
 export type RestApiAddressValidateResult = {
     validation_detail?: RestApiValidationDetail;
@@ -17,10 +18,5 @@ export type RestApiAddressValidateResult = {
     suggestions?: RestApiSearchResultSuggestion[];
     match_type?: string;
     match_confidence?: string;
-    match_info?: {
-        postcode_action?: string;
-        address_action?: string;
-        generic_info?: string[];
-        aus_info?: string[];
-    };
+    match_info?: RestApiAddressValidateMatchInfo;
 };

@@ -13,8 +13,8 @@ namespace DVSClient.Server.Address.Format
         [JsonProperty("aus_regional_geocodes")]
         public RestApiEnrichmentAusRegionalGeocodes? AusRegionalGeocodes { get; set; }
 
-        [JsonProperty("nz_regional_geocodes")]
-        public RestApiEnrichmentNzlRegionalGeocodes? NzRegionalGeocodes { get; set; }
+        [JsonProperty("nzl_regional_geocodes")]
+        public RestApiEnrichmentNzlRegionalGeocodes? NzlRegionalGeocodes { get; set; }
 
         [JsonProperty("uk_location_complete")]
         public RestApiEnrichmentUKLocationComplete? GbrLocationComplete { get; set; }

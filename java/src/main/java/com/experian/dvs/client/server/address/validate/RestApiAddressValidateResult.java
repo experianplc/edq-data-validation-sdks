@@ -48,7 +48,7 @@ public class RestApiAddressValidateResult {
     private String matchConfidence;
 
     @JsonProperty("match_info")
-    private MatchInfoFlags matchInfo;
+    private RestApiValidateMatchInfoFlags matchInfo;
 
     // Getters and Setters
     public RestApiValidationDetail getValidationDetail() {
@@ -147,60 +147,11 @@ public class RestApiAddressValidateResult {
         this.matchConfidence = matchConfidence;
     }
 
-    public MatchInfoFlags getMatchInfo() {
+    public RestApiValidateMatchInfoFlags getMatchInfo() {
         return matchInfo;
     }
 
-    public void setMatchInfo(MatchInfoFlags matchInfo) {
+    public void setMatchInfo(RestApiValidateMatchInfoFlags matchInfo) {
         this.matchInfo = matchInfo;
-    }
-
-
-    public static class MatchInfoFlags {
-
-        @JsonProperty("postcode_action")
-        private String postcodeAction;
-
-        @JsonProperty("address_action")
-        private String addressAction;
-
-        @JsonProperty("generic_info")
-        private List<String> genericInfo;
-
-        @JsonProperty("aus_info")
-        private List<String> ausInfo;
-
-        // Getters and Setters
-        public String getPostcodeAction() {
-            return postcodeAction;
-        }
-
-        public void setPostcodeAction(String postcodeAction) {
-            this.postcodeAction = postcodeAction;
-        }
-
-        public String getAddressAction() {
-            return addressAction;
-        }
-
-        public void setAddressAction(String addressAction) {
-            this.addressAction = addressAction;
-        }
-
-        public List<String> getGenericInfo() {
-            return genericInfo;
-        }
-
-        public void setGenericInfo(List<String> genericInfo) {
-            this.genericInfo = genericInfo;
-        }
-
-        public List<String> getAusInfo() {
-            return ausInfo;
-        }
-
-        public void setAusInfo(List<String> ausInfo) {
-            this.ausInfo = ausInfo;
-        }
     }
 }

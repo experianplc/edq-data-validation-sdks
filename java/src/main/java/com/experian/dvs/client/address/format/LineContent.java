@@ -13,7 +13,7 @@ public enum LineContent {
     ;
 
     private final String name;
-    //Map of name to Confidence
+    //Map of name to AddressConfidence
     private static final Map<String, LineContent> nameToLineContent = new HashMap<>();
     static {
         for (LineContent lineContent : LineContent.values()) {

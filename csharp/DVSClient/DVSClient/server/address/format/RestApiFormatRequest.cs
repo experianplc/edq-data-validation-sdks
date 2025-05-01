@@ -15,7 +15,7 @@ namespace DVSClient.Server.Address.Format
         [JsonProperty("attributes")]
         public RestApiFormatAttribute? Attributes { get; set; }
 
-        public static RestApiFormatRequest Using(Configuration configuration)
+        public static RestApiFormatRequest Using(AddressConfiguration configuration)
         {
             var request = new RestApiFormatRequest
             {

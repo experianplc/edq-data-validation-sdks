@@ -37,7 +37,7 @@ public class RestApiAddressValidateRequest {
     @JsonProperty("layout_format")
     private String layoutFormat;
 
-    public static RestApiAddressValidateRequest using(final Configuration configuration) {
+    public static RestApiAddressValidateRequest using(final AddressConfiguration configuration) {
 
         final RestApiAddressValidateRequest validateRequest = new RestApiAddressValidateRequest();
         //Country
@@ -49,7 +49,7 @@ public class RestApiAddressValidateRequest {
             validateRequest.setDatasets(configuration.getDatasets().stream().map(Dataset::getDatasetCode).toList());
         }
         //Max suggestions
-        if (configuration.getMaxSuggestions() != Configuration.DEFAULT_MAX_SUGGESTIONS) {
+        if (configuration.getMaxSuggestions() != AddressConfiguration.DEFAULT_MAX_SUGGESTIONS) {
             validateRequest.setMaxSuggestions(configuration.getMaxSuggestions());
         }
         //Layout name
@@ -78,7 +78,7 @@ public class RestApiAddressValidateRequest {
         return validateRequest;
     }
 
-    public static Optional<RestApiFormatAttribute> getFormatAttribute(final Configuration configuration) {
+    public static Optional<RestApiFormatAttribute> getFormatAttribute(final AddressConfiguration configuration) {
 
         final RestApiFormatAttribute attributes = new RestApiFormatAttribute();
         boolean hasAttributes = false;

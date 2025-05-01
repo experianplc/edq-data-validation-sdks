@@ -6,6 +6,7 @@ using DVSClient.Server.Address.Suggestions;
 using DVSClient.Server.Address.Validate;
 using DVSClient.Server.Email;
 using DVSClient.Server.Phone;
+using DVSClient.Server.Address.Lookup;
 
 namespace DVSClient.Server
 {
@@ -18,8 +19,7 @@ namespace DVSClient.Server
         Task<RestApiAddressSearchResponse> SuggestionsStepInV1(string globalAddressKey, IDictionary<string, object> headers);
         Task<RestApiAddressSearchResponse> SuggestionsRefineV1(string key, RestApiSuggestionsRefineRequest refineRequest, IDictionary<string, object> headers);
         Task<RestApiSuggestionsFormatResponse> SuggestionsFormatV1(RestApiSuggestionsFormatRequest formatRequest, IDictionary<string, object> headers);
-
-        // TODO: lookup
+        Task<RestApiAddressLookupV2Response> LookupV2(RestApiAddressLookupV2Request request, IDictionary<string, object> headers);
 
         // Address utilities
         Task<RestApiGetDatasetsResponse> GetDatasetsV1(string countryIso3, IDictionary<string, object> headers);

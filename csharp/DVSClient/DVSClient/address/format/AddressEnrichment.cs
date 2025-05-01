@@ -25,7 +25,7 @@ namespace DVSClient.Address.Format
             Geocodes = result?.Geocodes != null ? new Geocodes(result.Geocodes) : null;
             UsaRegionalGeocodes = result?.UsaRegionalGeocodes != null ? new UsaRegionalGeocodes(result.UsaRegionalGeocodes) : null;
             AusRegionalGeocodes = result?.AusRegionalGeocodes != null ? new AusRegionalGeocodes(result.AusRegionalGeocodes) : null;
-            NzlRegionalGeocodes = result?.NzRegionalGeocodes != null ? new NzlRegionalGeocodes(result.NzRegionalGeocodes) : null;
+            NzlRegionalGeocodes = result?.NzlRegionalGeocodes != null ? new NzlRegionalGeocodes(result.NzlRegionalGeocodes) : null;
             GbrLocationComplete = result?.GbrLocationComplete != null ? new UKLocationComplete(result.GbrLocationComplete) : null;
             GbrLocationEssential = result?.GbrLocationEssential != null ? new UKLocationEssential(result.GbrLocationEssential) : null;
             GbrGovernment = result?.GbrGovernment != null ? new GbrGovernment(result.GbrGovernment) : null;

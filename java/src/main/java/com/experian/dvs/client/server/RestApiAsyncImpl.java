@@ -108,20 +108,17 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
         return post(endPoint, RestApiAddressValidateResponse.class, validateRequest, headers, Map.of());
     }
 
-    public Future<RestApiAddressSearchResponse> suggestionsStepInV1(String global_address_key, Map<String, Object>  headers)
-    {
+    public Future<RestApiAddressSearchResponse> suggestionsStepInV1(String global_address_key, Map<String, Object> headers) {
         final String endPoint = "/address/suggestions/stepin/v1/" + global_address_key;
         return get(endPoint, RestApiAddressSearchResponse.class, headers, Map.of());
     }
 
-    public Future<RestApiAddressSearchResponse> suggestionsRefineV1(String key, RestApiSuggestionsRefineRequest refineRequest, Map<String, Object> headers)
-    {
+    public Future<RestApiAddressSearchResponse> suggestionsRefineV1(String key, RestApiSuggestionsRefineRequest refineRequest, Map<String, Object> headers) {
         final String endPoint = "/address/suggestions/refine/v1/" + key;
         return post(endPoint, RestApiAddressSearchResponse.class, refineRequest, headers, Map.of());
     }
 
-    public Future<RestApiSuggestionsFormatResponse> suggestionsFormatV1(RestApiSuggestionsFormatRequest formatRequest, Map<String, Object> headers)
-    {
+    public Future<RestApiSuggestionsFormatResponse> suggestionsFormatV1(RestApiSuggestionsFormatRequest formatRequest, Map<String, Object> headers) {
         final String endPoint = "/address/suggestions/format/v1/";
         return post(endPoint, RestApiSuggestionsFormatResponse.class, formatRequest, headers, Map.of());
     }
@@ -141,7 +138,7 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
     private <T> RestApiFuture<T> post(final String endPoint, final Class<T> cls, final Object requestObject, final Map<String, Object> headers, final Map<String, Object> parameters) {
         final URI uri = getURI(endPoint, parameters);
         final WebTarget webTarget = this.client.target(uri);
-        final Invocation.Builder request =  webTarget.request(MediaType.APPLICATION_JSON);
+        final Invocation.Builder request = webTarget.request(MediaType.APPLICATION_JSON);
         headers.forEach(request::header);
         return new RestApiFuture<T>(cls, request.async().post(Entity.entity(requestObject, MediaType.APPLICATION_JSON)));
     }
@@ -149,7 +146,7 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
     private <T> RestApiFuture<T> get(final String endPoint, final Class<T> cls, final Map<String, Object> headers, final Map<String, Object> parameters) {
         final URI uri = getURI(endPoint, parameters);
         final WebTarget webTarget = this.client.target(uri);
-        final Invocation.Builder request =  webTarget.request(MediaType.APPLICATION_JSON);
+        final Invocation.Builder request = webTarget.request(MediaType.APPLICATION_JSON);
         headers.forEach(request::header);
         return new RestApiFuture<>(cls, request.async().get());
     }
@@ -158,7 +155,7 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
 
         final URI uri = getURI(endPoint, parameters);
         final WebTarget webTarget = this.client.target(uri);
-        final Invocation.Builder request =  webTarget.request(MediaType.WILDCARD);
+        final Invocation.Builder request = webTarget.request(MediaType.WILDCARD);
         headers.forEach(request::header);
         return new RestApiResponseErrorFuture(request.async().delete());
     }
@@ -177,7 +174,7 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
 
     private ClientConfig getClientConfig() {
         Logger logger = Logger.getLogger(RestApiAsyncStub.class.getName());
-        return  (new ClientConfig())
+        return (new ClientConfig())
                 .connectorProvider(new ApacheConnectorProvider())
                 .property("jersey.config.apache.client.requestConfig", RequestConfig.custom().setCookieSpec("standard").build())
                 .register(new LoggingFeature(logger, Level.INFO, LoggingFeature.Verbosity.PAYLOAD_ANY, 10000));

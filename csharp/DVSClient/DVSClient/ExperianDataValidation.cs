@@ -13,9 +13,9 @@
         /// </summary>
         /// <param name="configuration">The configuration options to be used for each method call</param>
         /// <returns>The created client object</returns>
-        public static Address.Client GetAddressClient(Address.Configuration configuration)
+        public static Address.AddressClient GetAddressClient(Address.AddressConfiguration configuration)
         {
-            return new Address.Client(configuration);
+            return new Address.AddressClient(configuration);
         }
 
         /// <summary>
@@ -24,9 +24,9 @@
         /// </summary>
         /// <param name="configuration">The configuration options to be used for each method call</param>
         /// <returns>The created client object</returns>
-        public static Address.Layout.Client GetAddressLayoutClient(Address.Layout.Configuration configuration)
+        public static Address.Layout.LayoutClient GetAddressLayoutClient(Address.Layout.LayoutConfiguration configuration)
         {
-            return new Address.Layout.Client(configuration);
+            return new Address.Layout.LayoutClient(configuration);
         }
 
         /// <summary>
@@ -34,9 +34,9 @@
         /// </summary>
         /// <param name="configuration">The configuration options to be used for each validation</param>
         /// <returns>The created client object</returns>
-        public static Phone.Client GetPhoneClient(Phone.Configuration configuration)
+        public static Phone.PhoneClient GetPhoneClient(Phone.PhoneConfiguration configuration)
         {
-            return new Phone.Client(configuration);
+            return new Phone.PhoneClient(configuration);
         }
 
         /// <summary>
@@ -44,9 +44,9 @@
         /// </summary>
         /// <param name="configuration">The configuration options to be used for each validation</param>
         /// <returns>The created client object</returns>
-        public static Email.Client GetEmailClient(Email.Configuration configuration)
+        public static Email.EmailClient GetEmailClient(Email.EmailConfiguration configuration)
         {
-            return new Email.Client(configuration);
+            return new Email.EmailClient(configuration);
         }
     }
 }

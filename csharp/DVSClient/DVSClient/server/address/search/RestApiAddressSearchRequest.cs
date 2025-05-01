@@ -23,7 +23,7 @@ namespace DVSClient.Server.Address.Search
         [JsonProperty("options")]
         public IList<RestApiAdditionalOption>? Options { get; set; }
 
-        public static RestApiAddressSearchRequest Using(Configuration configuration)
+        public static RestApiAddressSearchRequest Using(AddressConfiguration configuration)
         {
             var searchRequest = new RestApiAddressSearchRequest();
 
@@ -40,7 +40,7 @@ namespace DVSClient.Server.Address.Search
             }
 
             // Max suggestions
-            if (configuration.MaxSuggestions != Configuration.DefaultMaxSuggestions)
+            if (configuration.MaxSuggestions != AddressConfiguration.DefaultMaxSuggestions)
             {
                 searchRequest.MaxSuggestions = configuration.MaxSuggestions;
             }

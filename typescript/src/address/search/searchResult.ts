@@ -1,13 +1,13 @@
 import { RestApiAddressSearchResponse } from "../../server/address/search/restApiAddressSearchResponse";
-import { Confidence, lookupConfidence } from "../confidence";
-import { restApiResponseToSuggestion, Suggestion } from "./suggestion";
+import { AddressConfidence, lookupConfidence } from "../addressConfidence";
+import { restApiResponseToSuggestion, SearchSuggestion } from "./searchSuggestion";
 
 export type SearchResult = {
     moreResultsAvailable: boolean;
-    confidence: Confidence;
+    confidence: AddressConfidence;
     suggestionsKey: string;
     suggestionsPrompt: string;
-    suggestions: Suggestion[];
+    suggestions: SearchSuggestion[];
 }
 
 export function restApiResponseToSearchResult(response: RestApiAddressSearchResponse): SearchResult {
@@ -24,7 +24,7 @@ export function restApiResponseToSearchResult(response: RestApiAddressSearchResp
     } else {
         return {
             moreResultsAvailable: false,
-            confidence: Confidence.Unknown,
+            confidence: AddressConfidence.Unknown,
             suggestionsKey: "",
             suggestionsPrompt: "",
             suggestions: []

@@ -27,7 +27,7 @@ public class RestApiAddressSearchRequest {
     @JsonProperty("options")
     private List<RestApiAdditionalOption> options;
 
-    public static RestApiAddressSearchRequest using(final Configuration configuration) {
+    public static RestApiAddressSearchRequest using(final AddressConfiguration configuration) {
         RestApiAddressSearchRequest searchRequest = new RestApiAddressSearchRequest();
 
         //Country
@@ -39,7 +39,7 @@ public class RestApiAddressSearchRequest {
             searchRequest.setDatasets(configuration.getDatasets().stream().map(Dataset::getDatasetCode).toList());
         }
         //Max suggestions
-        if (configuration.getMaxSuggestions() != Configuration.DEFAULT_MAX_SUGGESTIONS) {
+        if (configuration.getMaxSuggestions() != AddressConfiguration.DEFAULT_MAX_SUGGESTIONS) {
             searchRequest.setMaxSuggestions(configuration.getMaxSuggestions());
         }
         //Location

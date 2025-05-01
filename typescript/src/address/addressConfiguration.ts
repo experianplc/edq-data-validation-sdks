@@ -4,7 +4,7 @@ import { AusRegionalGeocodeAttribute } from './layout/attributes/ausRegionalGeoc
 import { GlobalGeocodeAttribute } from './layout/attributes/globalGeocodeAttribute';
 import { What3WordsAttribute } from './layout/attributes/what3WordsAttribute';
 import { LayoutFormat } from './layout/layoutFormat';
-import { PremiumLocationInsightAttribute } from './layout/premiumLocationInsightAttribute';
+import { PremiumLocationInsightAttribute } from './layout/attributes/premiumLocationInsightAttribute';
 import { PromptSet } from './promptSet';
 import { GbrLocationEssentialAttribute } from './layout/attributes/gbrLocationEssentialAttribute';
 import { GbrLocationCompleteAttribute } from './layout/attributes/gbrLocationCompleteAttribute';
@@ -14,6 +14,9 @@ import { GbrHealthAttribute } from './layout/attributes/gbrHealthAttribute';
 import { NzlRegionalGeocodeAttribute } from './layout/attributes/nzlRegionalGeocodeAttribute';
 import { UsaRegionalGeocodeAttribute } from './layout/attributes/usaRegionalGeocodeAttribute';
 import { Configuration, ConfigurationOptions } from '../common/configuration';
+import { EDVSError } from '../exceptions/edvsException';
+import { LookupLocality } from './lookup/lookupLocality';
+import { LookupPostalCode } from './lookup/lookupPostalCode';
 
 /**
  * Interface defining the options for configuring the Address client.
@@ -43,6 +46,15 @@ export interface AddressConfigurationOptions extends ConfigurationOptions {
     gbrHealth?: GbrHealthAttribute[];
     nzlRegionalGeocodes?: NzlRegionalGeocodeAttribute[];
     usaRegionalGeocodes?: UsaRegionalGeocodeAttribute[];
+    lookup? : {
+        attributes?: {
+            localityLookup?: LookupLocality[];
+            postalCodeLookup?: LookupPostalCode[];
+        },
+        addAddresses?: boolean,
+        maxAddresses?: number;
+        addFinalAddress?: boolean
+    }
 }
 
 /**
@@ -89,5 +101,22 @@ export class AddressConfiguration extends Configuration {
         }
 
         return result;
+    }
+
+    public validateDatasetCountry() {
+        //Datasets must all be for the same underlying country
+        const datasets = this.options.datasets;
+        if (datasets) {
+            if (datasets.length === 1) {
+                return;
+            } else if (datasets.length > 1) {
+                // Validate that the country code for all datasets is the same as the first one
+                const firstCountryCode = datasets[0].country.iso3Code;
+                const allSameCountry = datasets.every(dataset => dataset.country.iso3Code === firstCountryCode);
+                if (!allSameCountry) {
+                    throw new EDVSError("All datasets must belong to the same country.");
+                }
+            }
+        }
     }
 }

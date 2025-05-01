@@ -20,7 +20,7 @@ namespace DVSClient.Server.Address.Suggestions
         [JsonProperty("layouts")]
         public IEnumerable<string>? Layouts { get; set; }
 
-        public static RestApiSuggestionsFormatRequest Using(Configuration configuration)
+        public static RestApiSuggestionsFormatRequest Using(AddressConfiguration configuration)
         {
             var suggestionsFormat = new RestApiSuggestionsFormatRequest();
 
@@ -37,7 +37,7 @@ namespace DVSClient.Server.Address.Suggestions
             }
 
             // Max suggestions
-            if (configuration.MaxSuggestions != Configuration.DefaultMaxSuggestions)
+            if (configuration.MaxSuggestions != AddressConfiguration.DefaultMaxSuggestions)
             {
                 suggestionsFormat.MaxSuggestions = configuration.MaxSuggestions;
             }

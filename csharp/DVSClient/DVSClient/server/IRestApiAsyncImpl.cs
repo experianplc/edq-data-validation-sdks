@@ -1,16 +1,17 @@
 ﻿using System.Text;
 using System.Web;
 using DVSClient.Common;
-using DVSClient.Exceptions;
 using DVSClient.Server.Address.Datasets;
 using DVSClient.Server.Address.Format;
 using DVSClient.Server.Address.Layout;
 using DVSClient.Server.Address.Search;
 using DVSClient.Server.Address.Suggestions;
 using DVSClient.Server.Address.Validate;
+using DVSClient.Server.Address.Lookup;
 using DVSClient.Server.Email;
 using DVSClient.Server.Phone;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace DVSClient.Server
 {
@@ -117,6 +118,12 @@ namespace DVSClient.Server
             return await PostAsync<RestApiSuggestionsFormatResponse>(endPoint, formatRequest, headers);
         }
 
+        public async Task<RestApiAddressLookupV2Response> LookupV2(RestApiAddressLookupV2Request request, IDictionary<string, object> headers)
+        {
+            var endPoint = "address/lookup/v2";
+            return await PostAsync<RestApiAddressLookupV2Response>(endPoint, request, headers);
+        }
+
         public async Task<RestApiPhoneValidateResponse> ValidatePhoneV2(RestApiPhoneValidateRequest validatePhoneRequest, IDictionary<string, object> headers)
         {
             var endPoint = "phone/validate/v2";
@@ -143,8 +150,18 @@ namespace DVSClient.Server
 
                     if (response.IsSuccessStatusCode)
                     {
-                        return JsonConvert.DeserializeObject<T>(content) 
-                            ?? throw new InvalidOperationException("Deserialization returned null.");
+                        if (response.StatusCode == HttpStatusCode.NoContent)
+                        {
+                            // Successful Delete operation returns 204 - No Content
+                            var noContentResponse = new { };
+                            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(noContentResponse))
+                                   ?? throw new InvalidOperationException("Deserialization returned null.");
+                        }
+                        else
+                        {
+                            return JsonConvert.DeserializeObject<T>(content)
+                                ?? throw new InvalidOperationException("Deserialization returned null.");
+                        }
                     }
 
                     if ((int)response.StatusCode >= 500)
@@ -155,16 +172,14 @@ namespace DVSClient.Server
                     {
                         // Only Get / Delete on missing layout is throwing 404
                         var errorResponse = new { Error = new { Title = response.ReasonPhrase } };
-                        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(errorResponse))
-                               ?? throw new InvalidOperationException("Deserialization returned null.");
+                        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(errorResponse)) ?? throw new InvalidOperationException("Deserialization returned null.");
                     }
                     else if ((int)response.StatusCode >= 400 && (int)response.StatusCode < 500)
                     {
                         // Do not retry on client errors (4xx)
                         if (!string.IsNullOrWhiteSpace(content))
                         {
-                            return JsonConvert.DeserializeObject<T>(content)
-                                   ?? throw new InvalidOperationException("Deserialization returned null.");
+                            return JsonConvert.DeserializeObject<T>(content) ?? throw new InvalidOperationException("Deserialization returned null.");
                         }
                         else
                         {
@@ -250,6 +265,7 @@ namespace DVSClient.Server
                 {
                     query[param.Key] = param.Value;
                 }
+
                 uriBuilder.Query = query.ToString();
                 var request = new HttpRequestMessage(HttpMethod.Delete, uriBuilder.ToString());
                 foreach (var header in headers)
