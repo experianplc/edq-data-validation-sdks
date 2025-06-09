@@ -183,6 +183,7 @@ public enum Dataset {
     GM_ADDRESS_EH("gm-address-eh", Country.GAMBIA, List.of(SearchType.AUTOCOMPLETE, SearchType.LOOKUP_V2), Accuracy.A_MINUS, Accuracy.B_MINUS),
     GE_ADDRESS_ED("ge-address-ed", Country.GEORGIA, List.of(SearchType.SINGLELINE, SearchType.VALIDATE), Accuracy.A, Accuracy.A_PLUS),
     GE_ADDRESS_EH("ge-address-eh", Country.GEORGIA, List.of(SearchType.AUTOCOMPLETE, SearchType.LOOKUP_V2), Accuracy.A, Accuracy.A_PLUS),
+    DE_ADDRESS("de-address", Country.GERMANY, List.of(SearchType.SINGLELINE, SearchType.TYPEDOWN, SearchType.VALIDATE), Accuracy.A, Accuracy.A_PLUS),
     DE_ADDRESS_ED("de-address-ed", Country.GERMANY, List.of(SearchType.SINGLELINE, SearchType.VALIDATE), Accuracy.A, Accuracy.A_PLUS),
     DE_ADDRESS_EH("de-address-eh", Country.GERMANY, List.of(SearchType.AUTOCOMPLETE, SearchType.LOOKUP_V2), Accuracy.A, Accuracy.A_PLUS),
     GH_ADDRESS_ED("gh-address-ed", Country.GHANA, List.of(SearchType.SINGLELINE, SearchType.VALIDATE), Accuracy.B, Accuracy.B_MINUS),
