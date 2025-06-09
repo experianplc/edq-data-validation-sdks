@@ -178,6 +178,7 @@ namespace DVSClient.Address
         public static readonly Dataset GmAddressEh = new Dataset("gm-address-eh", Country.Gambia, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
         public static readonly Dataset GeAddressEd = new Dataset("ge-address-ed", Country.Georgia, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset GeAddressEh = new Dataset("ge-address-eh", Country.Georgia, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset DeAddress = new Dataset("de-address", Country.Germany, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset DeAddressEd = new Dataset("de-address-ed", Country.Germany, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset DeAddressEh = new Dataset("de-address-eh", Country.Germany, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset GhAddressEd = new Dataset("gh-address-ed", Country.Ghana, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
