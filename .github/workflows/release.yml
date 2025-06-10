@@ -1,5 +1,7 @@
 name: release
 
+on: workflow_dispatch
+
 jobs:
   buildDotNet:
     uses: ./.github/workflows/dotnet.yml
