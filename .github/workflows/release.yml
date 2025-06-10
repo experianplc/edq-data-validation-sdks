@@ -1,9 +1,5 @@
 name: release
 
-on:
-  push:
-    branches: [ "main" ]
-
 jobs:
   buildDotNet:
     uses: ./.github/workflows/dotnet.yml
