@@ -7,6 +7,13 @@ The Experian DVS SDKs provide convenient access to the RESTful Experian APIs.
 ![java build status](https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/gradle.yml/badge.svg)
 ![typescript build status](https://github.com/experianplc/edq-data-validation-sdks/actions/workflows/typescript.yml/badge.svg)
 
+## Prerequisites
+
+To use Experian's Data Validation Solution APIs and get a successful response, you'll need:
+
+- A **license** to use the product. Haven't got a license? Talk to your account manager or [contact us](https://docs.experianaperture.io/more/contact-us/) to get it.
+- Your **authentication token**. This confirms you are licensed to use the APIs and authenticates each request you send to the API. Existing customers can view and manage their tokens via the [Self Service Portal](https://docs.experianaperture.io/more/self-service-portal/).
+
 ## API Documentation
 
 For detailed documentation of Experian's Data Validation Solution APIs, visit
@@ -21,7 +28,7 @@ We welcome contributions from the community! Please follow the [fork and pull re
 
 ## Sample usage
 
-The examples below show how your application can easily create and customize address, email, and phone validation requests.
+The examples below show how your application can easily create and customize address, email, and phone validation requests. In the below code snippets replace "YOUR AUTHENTICATION TOKEN" with the value of your token and "YOUR REFERENCE ID" with an identifier that can be used to uniquely identify your transaction within Experian's systems.
 
 - [.NET](#dotnet)
 - [Java](#java)
@@ -158,7 +165,7 @@ const config = new AddressConfiguration(
     {
         transactionId: "YOUR REFERENCE ID",
         datasets: [Datasets.AuAddress],
-        maxSuggestions: 5}
+        maxSuggestions: 5
     }        
 );
 const client = new AddressClient(config);
