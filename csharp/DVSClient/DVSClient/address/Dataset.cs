@@ -136,7 +136,7 @@ namespace DVSClient.Address
         public static readonly Dataset CyAddressEh = new Dataset("cy-address-eh", Country.Cyprus, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset CzAddressEd = new Dataset("cz-address-ed", Country.CzechRepublic, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset CzAddressEh = new Dataset("cz-address-eh", Country.CzechRepublic, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
-        public static readonly Dataset DkAddressEd = new Dataset("dk-address-ed", Country.Denmark, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset DkAddress = new Dataset("dk-address", Country.Denmark, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset DkAddressEh = new Dataset("dk-address-eh", Country.Denmark, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset DjAddressEd = new Dataset("dj-address-ed", Country.Djibouti, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset DjAddressEh = new Dataset("dj-address-eh", Country.Djibouti, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
@@ -164,10 +164,12 @@ namespace DVSClient.Address
         public static readonly Dataset FoAddressEh = new Dataset("fo-address-eh", Country.FaroeIslands, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset FjAddressEd = new Dataset("fj-address-ed", Country.Fiji, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset FjAddressEh = new Dataset("fj-address-eh", Country.Fiji, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
-        public static readonly Dataset FiAddressEd = new Dataset("fi-address-ed", Country.Finland, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset FiAddress = new Dataset("fi-address", Country.Finland, new List<SearchType> { SearchType.Singleline, SearchType.Typedown }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset FiAddressEd = new Dataset("fi-address-ed", Country.Finland, new List<SearchType> { SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset FiAddressEh = new Dataset("fi-address-eh", Country.Finland, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
-        public static readonly Dataset FrAddressEd = new Dataset("fr-address-ed", Country.France, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
-        public static readonly Dataset FrAddressEh = new Dataset("fr-address-eh", Country.France, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset FrAddress = new Dataset("fr-address", Country.France, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset FrAddressHexaline3 = new Dataset("fr-address-hexaline3", Country.France, new List<SearchType> { SearchType.Autocomplete, SearchType.Singleline, SearchType.Typedown }, Accuracy.APlus, Accuracy.APlus);
+        public static readonly Dataset FrAddressStreetLevel = new Dataset("fr-address-streetlevel", Country.France, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.AMinus, Accuracy.APlus);
         public static readonly Dataset GfAddressEd = new Dataset("gf-address-ed", Country.FrenchGuiana, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset GfAddressEh = new Dataset("gf-address-eh", Country.FrenchGuiana, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
         public static readonly Dataset PfAddressEd = new Dataset("pf-address-ed", Country.FrenchPolynesia, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
@@ -261,7 +263,7 @@ namespace DVSClient.Address
         public static readonly Dataset LiAddressEh = new Dataset("li-address-eh", Country.Liechtenstein, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset LtAddressEd = new Dataset("lt-address-ed", Country.Lithuania, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset LtAddressEh = new Dataset("lt-address-eh", Country.Lithuania, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
-        public static readonly Dataset LuAddressEd = new Dataset("lu-address-ed", Country.Luxembourg, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset LuAddress = new Dataset("lu-address", Country.Luxembourg, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset LuAddressEh = new Dataset("lu-address-eh", Country.Luxembourg, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset MoAddressEd = new Dataset("mo-address-ed", Country.Macau, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset MoAddressEh = new Dataset("mo-address-eh", Country.Macau, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
@@ -313,7 +315,7 @@ namespace DVSClient.Address
         public static readonly Dataset NrAddressEh = new Dataset("nr-address-eh", Country.Nauru, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
         public static readonly Dataset NpAddressEd = new Dataset("np-address-ed", Country.Nepal, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset NpAddressEh = new Dataset("np-address-eh", Country.Nepal, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
-        public static readonly Dataset NlAddressEd = new Dataset("nl-address-ed", Country.Netherlands, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset NlAddress = new Dataset("nl-address", Country.Netherlands, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.B, Accuracy.APlus);
         public static readonly Dataset NlAddressEh = new Dataset("nl-address-eh", Country.Netherlands, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset NcAddressEd = new Dataset("nc-address-ed", Country.NewCaledonia, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset NcAddressEh = new Dataset("nc-address-eh", Country.NewCaledonia, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
@@ -331,7 +333,8 @@ namespace DVSClient.Address
         public static readonly Dataset MkAddressEh = new Dataset("mk-address-eh", Country.NorthMacedonia, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.AMinus);
         public static readonly Dataset MpAddressEd = new Dataset("mp-address-ed", Country.NorthernMarianaIslands, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset MpAddressEh = new Dataset("mp-address-eh", Country.NorthernMarianaIslands, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
-        public static readonly Dataset NoAddressEd = new Dataset("no-address-ed", Country.Norway, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset NoAddress = new Dataset("no-address", Country.Norway, new List<SearchType> { SearchType.Singleline, SearchType.Typedown }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset NoAddressEd = new Dataset("no-address-ed", Country.Norway, new List<SearchType> {  SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset NoAddressEh = new Dataset("no-address-eh", Country.Norway, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset OmAddressEd = new Dataset("om-address-ed", Country.Oman, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset OmAddressEh = new Dataset("om-address-eh", Country.Oman, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
@@ -397,8 +400,7 @@ namespace DVSClient.Address
         public static readonly Dataset ScAddressEh = new Dataset("sc-address-eh", Country.Seychelles, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
         public static readonly Dataset SlAddressEd = new Dataset("sl-address-ed", Country.SierraLeone, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset SlAddressEh = new Dataset("sl-address-eh", Country.SierraLeone, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
-        public static readonly Dataset SgAddressEd = new Dataset("sg-address-ed", Country.Singapore, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
-        public static readonly Dataset SgAddressEh = new Dataset("sg-address-eh", Country.Singapore, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset SgAddress = new Dataset("sg-address", Country.Singapore, new List<SearchType> { SearchType.Autocomplete, SearchType.Singleline, SearchType.Typedown, SearchType.Validate, SearchType.LookupV2 }, Accuracy.APlus, Accuracy.APlus);
         public static readonly Dataset SkAddressEd = new Dataset("sk-address-ed", Country.Slovakia, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset SkAddressEh = new Dataset("sk-address-eh", Country.Slovakia, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset SiAddressEd = new Dataset("si-address-ed", Country.Slovenia, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
@@ -413,7 +415,8 @@ namespace DVSClient.Address
         public static readonly Dataset GsAddressEh = new Dataset("gs-address-eh", Country.SouthGeorgiaAndTheSouthSandwichIslands, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
         public static readonly Dataset SsAddressEd = new Dataset("ss-address-ed", Country.SouthSudan, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset SsAddressEh = new Dataset("ss-address-eh", Country.SouthSudan, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
-        public static readonly Dataset EsAddressEd = new Dataset("es-address-ed", Country.Spain, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset EsAddress = new Dataset("es-address", Country.Spain, new List<SearchType> { SearchType.Singleline, SearchType.Typedown }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset EsAddressEd = new Dataset("es-address-ed", Country.Spain, new List<SearchType> { SearchType.Validate }, Accuracy.APlus, Accuracy.APlus);
         public static readonly Dataset EsAddressEh = new Dataset("es-address-eh", Country.Spain, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset LkAddressEd = new Dataset("lk-address-ed", Country.SriLanka, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset LkAddressEh = new Dataset("lk-address-eh", Country.SriLanka, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
@@ -425,9 +428,11 @@ namespace DVSClient.Address
         public static readonly Dataset SjAddressEh = new Dataset("sj-address-eh", Country.SvalbardAndJanMayenIslands, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
         public static readonly Dataset SzAddressEd = new Dataset("sz-address-ed", Country.Swaziland, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset SzAddressEh = new Dataset("sz-address-eh", Country.Swaziland, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
-        public static readonly Dataset SeAddressEd = new Dataset("se-address-ed", Country.Sweden, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset SeAddress = new Dataset("se-address", Country.Sweden, new List<SearchType> { SearchType.Singleline, SearchType.Typedown }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset SeAddressEd = new Dataset("se-address-ed", Country.Sweden, new List<SearchType> { SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset SeAddressEh = new Dataset("se-address-eh", Country.Sweden, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
-        public static readonly Dataset ChAddressEd = new Dataset("ch-address-ed", Country.Switzerland, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset ChAddress = new Dataset("ch-address", Country.Switzerland, new List<SearchType> { SearchType.Singleline, SearchType.Typedown }, Accuracy.A, Accuracy.APlus);
+        public static readonly Dataset ChAddressEd = new Dataset("ch-address-ed", Country.Switzerland, new List<SearchType> { SearchType.Validate }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset ChAddressEh = new Dataset("ch-address-eh", Country.Switzerland, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
         public static readonly Dataset SyAddressEd = new Dataset("sy-address-ed", Country.Syria, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
         public static readonly Dataset SyAddressEh = new Dataset("sy-address-eh", Country.Syria, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
