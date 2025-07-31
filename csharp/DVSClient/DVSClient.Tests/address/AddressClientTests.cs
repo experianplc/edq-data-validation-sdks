@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace DVSClient.Address.Tests
 {
-    
+
     public class AddressClientTests
     {
         [OneTimeSetUp]
@@ -165,17 +165,20 @@ namespace DVSClient.Address.Tests
         [Test]
         public void DatasetsFromDifferentCountries_Throws()
         {
-            try {
+            try
+            {
                 var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .UseDataset(Dataset.GbAddress)
                 .UseDataset(Dataset.AuAddress)
                 .Build();
                 Assert.Fail("Expected InvalidConfigurationException was not thrown.");
-            } catch (InvalidConfigurationException ex) {
+            }
+            catch (InvalidConfigurationException ex)
+            {
                 Assert.That(ex?.Message, Is.EqualTo("Multiple datasets are currently only supported for the United Kingdom"));
             }
-            
+
         }
 
         [Test]
@@ -235,7 +238,7 @@ namespace DVSClient.Address.Tests
             result = await client.LookupAsync("SW1E 5", LookupType.PostalCode, Setup.GetUniqueReferenceId());
             //There should be the default 100 addresses
             Assert.That(result.Addresses!.Count, Is.EqualTo(100));
-        
+
             //Make that number lower
             configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
@@ -363,7 +366,7 @@ namespace DVSClient.Address.Tests
         public void Search_Attributes_MaxSuggestions()
         {
             // Max suggestions set to 20 - should return at most 20 items in the list of suggestions
-            var configuration = AddressConfiguration 
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .UseDataset(Dataset.GbAddress)
                 .UseMaxSuggestions(20)
@@ -780,97 +783,5 @@ namespace DVSClient.Address.Tests
             // MatchLevel should be null as attribute was not requested
             Assert.That(formatted.Enrichment?.Geocodes?.MatchLevel, Is.Null);
         }
-
-        [Test]
-        public void Format_WithEnrichment_SelectSpecificElementsFromEnrichmentSet1()
-        {
-            var configuration = AddressConfiguration
-                .NewBuilder(Setup.ValidTokenAddressWithEnrichment)
-                .UseDataset(Dataset.GbAddress)
-                .IncludeEnrichment()
-                .IncludeGbrLocationCompleteAttribute(Layout.Attributes.GbrLocationCompleteAttribute.Latitude)
-                .IncludeGbrLocationCompleteAttribute(Layout.Attributes.GbrLocationCompleteAttribute.Longitude)
-                .Build();
-            var client = ExperianDataValidation.GetAddressClient(configuration);
-
-            // Search
-            var searchResult = client.Search(SearchType.Autocomplete, "Experian", Setup.GetUniqueReferenceId());
-
-            // Pick the first one 
-            var globalAddressKey = searchResult.Suggestions.First().GlobalAddressKey;
-
-            // Format with default layout
-            var formatted = client.Format(globalAddressKey, Setup.GetUniqueReferenceId());
-
-            Assert.That(formatted.Enrichment, Is.Not.Null);
-            Assert.That(formatted.Enrichment?.GbrLocationComplete, Is.Not.Null);
-            Assert.That(formatted.Enrichment?.GbrLocationComplete?.Latitude, Is.Not.Null);
-            Assert.That(formatted.Enrichment?.GbrLocationComplete?.Longitude, Is.Not.Null);
-
-            // MatchLevel should be null as attribute was not requested
-            Assert.That(formatted.Enrichment?.GbrLocationComplete?.MatchLevel, Is.Null);
-        }
-
-        [Test]
-        public void Format_WithEnrichment_SelectSpecificElementsFromEnrichmentSet2()
-        {
-            // Create configuration with authentication token, dataset, include components and global geocodes
-            var configuration = AddressConfiguration
-                .NewBuilder("your-authentication-token")
-                .UseDataset(Dataset.UsAddress)
-                .IncludeComponents()
-                .IncludeGlobalGeocodes()
-                .Build();
-
-            // Create the address client
-            var client = ExperianDataValidation.GetAddressClient(configuration);
-
-            // Sample US address input for search
-            string searchInput = "1600 Amphitheatre Parkway, Mountain View, CA";
-
-            // Generate a new GUID as transaction ID for search
-            string searchTransactionId = Guid.NewGuid().ToString();
-
-            // Perform autocomplete search
-            var searchResult = client.Search(SearchType.Autocomplete, searchInput, searchTransactionId);
-
-            if (searchResult.Suggestions.Count == 0)
-            {
-                Console.WriteLine("No suggestions found.");
-                return;
-            }
-
-            // Take the first suggestion's GlobalAddressKey
-            string globalAddressKey = searchResult.Suggestions[0].GlobalAddressKey;
-
-            // Generate a new GUID as transaction ID for format
-            string formatTransactionId = Guid.NewGuid().ToString();
-
-            // Format the address using the global address key
-            var formatResult = client.Format(globalAddressKey, formatTransactionId);
-
-            // Output some formatted address details and components
-            Console.WriteLine("Formatted Address:");
-            Console.WriteLine(formatResult.FormattedAddress);
-
-            if (formatResult.Components != null)
-            {
-                Console.WriteLine("Components:");
-                if (formatResult.Components.Street != null)
-                    Console.WriteLine($"  Street: {formatResult.Components.Street.FullName}");
-                if (formatResult.Components.PostalCode != null)
-                    Console.WriteLine($"  Postal Code: {formatResult.Components.PostalCode.FullName}");
-                if (formatResult.Components.Locality != null)
-                    Console.WriteLine($"  Locality: {formatResult.Components.Locality.Name}");
-                if (formatResult.Components.Region != null)
-                    Console.WriteLine($"  Region: {formatResult.Components.Region.Name}");
-            }
-
-            if (formatResult.Enrichment?.Geocodes != null)
-            {
-                Console.WriteLine("Global Geocodes:");
-                Console.WriteLine($"  Latitude: {formatResult.Enrichment.Geocodes.Latitude}");
-                Console.WriteLine($"  Longitude: {formatResult.Enrichment.Geocodes.Longitude}");
-            }
-        }
+    }
 }

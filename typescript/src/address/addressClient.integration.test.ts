@@ -19,40 +19,6 @@ describe('Address client tests', async () => {
         await expect(client.getDatasets(Countries.UnitedKingdom)).rejects.toThrow("The authentication token you've provided is incorrect. Please check the Self Service Portal to find the right token.");
         
     });
-    
-    test(`test`, async () => {
-        // Create configuration object based on tests and requirements
-        const config = new AddressConfiguration('your-authentication-token', {
-            transactionId: uuidv4(),
-            datasets: [Datasets.UsAddress],
-            globalGeocodes: Object.values(GlobalGeocodeAttribute),
-            // Intensity is 'Close' by default, so no need to set it explicitly
-            // Layout name is '', so no need to set it explicitly
-        });
-
-        // Create the client with the configuration
-        const client = new AddressClient(config);
-
-        // Perform a search with the country 'us' and dataset 'us-address'
-        const searchResult = await client.search({
-            searchInput: '1600 Pennsylvania Ave NW',
-            searchType: SearchType.Autocomplete,
-            referenceId: uuidv4(),
-        });
-
-        if (searchResult.suggestions.length === 0) {
-            console.log('No suggestions found');
-            return;
-        }
-
-        // Pick the first suggestion's globalAddressKey
-        const globalAddressKey = searchResult.suggestions[0].globalAddressKey;
-
-        // Format the address using the globalAddressKey and a new transaction ID
-        const formattedAddress = await client.format(globalAddressKey, uuidv4());
-
-        console.log('Formatted Address:', formattedAddress);
-    )};
 
     test(`Reference ID - setting on builder works`, async () => {
         // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
