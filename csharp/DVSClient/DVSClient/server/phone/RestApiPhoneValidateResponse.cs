@@ -2,7 +2,7 @@
 
 namespace DVSClient.Server.Phone
 {
-    public class RestApiPhoneValidateResponse
+    public class RestApiPhoneValidateResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

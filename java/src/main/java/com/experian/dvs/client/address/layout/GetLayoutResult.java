@@ -10,6 +10,7 @@ public class GetLayoutResult {
 
     private final ResponseError error;
     private final GetLayoutLayout layout;
+    private final String referenceId;
 
     public GetLayoutResult(final RestApiGetLayoutResponse response) {
         this.error = response.getError() != null ? new ResponseError(response.getError()) : null;
@@ -19,6 +20,7 @@ public class GetLayoutResult {
         } else {
             this.layout = null;
         }
+        this.referenceId = response.getReferenceId();
     }
 
     public Optional<ResponseError> getError() {
@@ -27,5 +29,9 @@ public class GetLayoutResult {
 
     public GetLayoutLayout getLayout() {
         return layout;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

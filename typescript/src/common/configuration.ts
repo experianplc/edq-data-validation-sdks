@@ -12,6 +12,9 @@ export const defaultMaxDelayInMilliseconds = 15000;
  */
 export interface ConfigurationOptions {
     alternativeToken?: string;
+    /**
+     * @deprecated Set your reference ID as part every API interaction like the Search, Format, or Validate call instead.
+     */
     transactionId?: string;
     apiRequestTimeoutInSeconds?: number;
     httpClientTimeoutInSeconds?: number;
@@ -65,10 +68,11 @@ export abstract class Configuration {
     /**
      * Retrieves common headers for API requests.
      *
+     * @param referenceId            The reference ID for tracking the request.
      * @param allowsDotInReferenceId Indicates whether dots are allowed in the reference ID (default is true).
      * @return A map of headers to include in the API request.
      */
-    public getCommonHeaders(allowsDotInReferenceId: boolean = true): Map<string, object> {
+    public getCommonHeaders(referenceId: string, allowsDotInReferenceId: boolean = true): Map<string, object> {
         const headers = new Map<string, object>();
 
         if (this.options.alternativeToken) {
@@ -77,12 +81,16 @@ export abstract class Configuration {
             headers.set("Auth-Token", this.token as String); // NOSONAR
         }
 
-        let transactionId = this.options.transactionId;
-
-        if (!transactionId) {
-            transactionId = randomUUID();
+        if (!referenceId) {
+            const builderReferenceId = this.options.transactionId
+            if (!builderReferenceId) {
+                referenceId = randomUUID();
+            } else {
+                referenceId = builderReferenceId;
+            }
         }
-        headers.set("Reference-Id", this.getReference(transactionId, allowsDotInReferenceId) as String); // NOSONAR
+
+        headers.set("Reference-Id", this.getReference(referenceId, allowsDotInReferenceId) as String); // NOSONAR
 
         if (this.options.apiRequestTimeoutInSeconds !== defaultHttpClientTimeoutInSeconds) {
             headers.set("Timeout-Seconds", this.options.apiRequestTimeoutInSeconds!.toString() as String); // NOSONAR

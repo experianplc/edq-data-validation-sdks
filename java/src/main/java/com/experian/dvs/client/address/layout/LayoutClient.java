@@ -70,7 +70,26 @@ public class LayoutClient implements Closeable {
                                            final List<LayoutLineFixed> fixedLayoutLines,
                                            final Dataset... appliesToDatasets) {
         final List<AppliesTo> appliesTo = Arrays.stream(appliesToDatasets).map(AppliesTo::new).toList();
-        return createLayout(name, variableLayoutLines, fixedLayoutLines, appliesTo);
+        return createLayout(name, variableLayoutLines, fixedLayoutLines, "", appliesTo);
+    }
+
+    /**
+     * Creates a new address layout with the specified name, variable layout lines, fixed layout lines, and datasets.
+     *
+     * @param name                The name of the layout.
+     * @param variableLayoutLines The variable layout lines for the layout.
+     * @param fixedLayoutLines    The fixed layout lines for the layout.
+     * @param referenceId         The reference ID for tracking the request.
+     * @param appliesToDatasets   The datasets to which the layout applies.
+     * @return The result of the layout creation.
+     */
+    public CreateLayoutResult createLayout(final String name,
+                                           final List<LayoutLineVariable> variableLayoutLines,
+                                           final List<LayoutLineFixed> fixedLayoutLines,
+                                           final String referenceId,
+                                           final Dataset... appliesToDatasets) {
+        final List<AppliesTo> appliesTo = Arrays.stream(appliesToDatasets).map(AppliesTo::new).toList();
+        return createLayout(name, variableLayoutLines, fixedLayoutLines, referenceId, appliesTo);
     }
 
     /**
@@ -86,11 +105,29 @@ public class LayoutClient implements Closeable {
                                            final List<LayoutLineVariable> variableLayoutLines,
                                            final List<LayoutLineFixed> fixedLayoutLines,
                                            final List<AppliesTo> appliesTo) {
+        return createLayout(name, variableLayoutLines, fixedLayoutLines, "", appliesTo);
+    }
+
+    /**
+     * Creates a new address layout with the specified name, variable layout lines, fixed layout lines, and applies-to settings.
+     *
+     * @param name                The name of the layout.
+     * @param variableLayoutLines The variable layout lines for the layout.
+     * @param fixedLayoutLines    The fixed layout lines for the layout.
+     * @param referenceId         The reference ID for tracking the request.
+     * @param appliesTo           The applies-to settings for the layout.
+     * @return The result of the layout creation.
+     */
+    public CreateLayoutResult createLayout(final String name,
+                                           final List<LayoutLineVariable> variableLayoutLines,
+                                           final List<LayoutLineFixed> fixedLayoutLines,
+                                           final String referenceId,
+                                           final List<AppliesTo> appliesTo) {
         final RestApiAddressLayout layout = new RestApiAddressLayout(name, appliesTo, variableLayoutLines, fixedLayoutLines);
         final RestApiCreateLayoutRequest request = RestApiCreateLayoutRequest.using(this.configuration);
         request.setLayout(layout);
 
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         try {
             final RestApiCreateLayoutResponse layoutResponse = this.restApiAsyncStub.createLayoutV2(request, headers).get();
             return new CreateLayoutResult(layoutResponse);
@@ -105,7 +142,17 @@ public class LayoutClient implements Closeable {
      * @param name The name of the layout to delete.
      */
     public void deleteLayout(final String name) {
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        deleteLayout(name, "");
+    }
+
+    /**
+     * Deletes an address layout with the specified name.
+     *
+     * @param name          The name of the layout to delete.
+     * @param referenceId   The reference ID for tracking the request.
+     */
+    public void deleteLayout(final String name, final String referenceId) {
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         try {
             final Optional<RestApiResponseError> error = this.restApiAsyncStub.deleteLayoutV2(name, headers).get();
             if (error.isPresent()) {
@@ -124,7 +171,17 @@ public class LayoutClient implements Closeable {
      * @return The result containing the list of layouts.
      */
     public GetLayoutListResult getLayouts() {
-        return getLayouts(Optional.empty(), List.of(), Optional.empty());
+        return getLayouts("");
+    }
+
+    /**
+     * Retrieves a list of all address layouts.
+     *
+     * @return              The result containing the list of layouts.
+     * @param referenceId   The reference ID for tracking the request.
+     */
+    public GetLayoutListResult getLayouts(final String referenceId) {
+        return getLayouts(Optional.empty(), List.of(), Optional.empty(), referenceId);
     }
 
     /**
@@ -136,7 +193,20 @@ public class LayoutClient implements Closeable {
      * @return The result containing the list of layouts.
      */
     public GetLayoutListResult getLayouts(final Optional<Country> country, final List<Dataset> datasets, final Optional<String> nameContains) {
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        return getLayouts(country, datasets, nameContains, "");
+    }
+
+    /**
+     * Retrieves a list of address layouts based on the specified filters.
+     *
+     * @param country      The country filter for the layouts.
+     * @param datasets     The datasets filter for the layouts.
+     * @param nameContains A filter for layout names containing the specified string.
+     * @param referenceId  The reference ID for tracking the request.
+     * @return The result containing the list of layouts.
+     */
+    public GetLayoutListResult getLayouts(final Optional<Country> country, final List<Dataset> datasets, final Optional<String> nameContains, final String referenceId) {
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         final Optional<String> countryIso3 = country.map(Country::getIso3Code);
         final List<String> datasetsStr = datasets.stream().map(Dataset::getDatasetCode).toList();
 
@@ -155,7 +225,18 @@ public class LayoutClient implements Closeable {
      * @return The result containing the layout details.
      */
     public GetLayoutResult getLayout(final String name) {
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        return getLayout(name, "");
+    }
+
+    /**
+     * Retrieves the details of a specific address layout by name.
+     *
+     * @param name          The name of the layout to retrieve.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The result containing the layout details.
+     */
+    public GetLayoutResult getLayout(final String name, final String referenceId) {
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         try {
             final RestApiGetLayoutResponse layoutResponse = this.restApiAsyncStub.getLayoutV2(name, headers).get();
             return new GetLayoutResult(layoutResponse);

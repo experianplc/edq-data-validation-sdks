@@ -2,11 +2,14 @@ package com.experian.dvs.client;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.UUID;
+
 public class Setup {
     public static String VALID_TOKEN_ADDRESS;
     public static String VALID_TOKEN_PHONE;
     public static String VALID_TOKEN_EMAIL;
     public static String VALID_TOKEN_ADDRESS_WITH_ENRICHMENT;
+    public static String STATIC_REFERENCE_ID = getUniqueReferenceId();
 
     // These tests assume that a layout with the following name already exists for use in these tests
     // We can't create one on the fly because they take a couple of minutes to complete.
@@ -27,5 +30,9 @@ public class Setup {
         VALID_TOKEN_ADDRESS_WITH_ENRICHMENT = dotenv.get("DVS_API_VALID_TOKEN_ADDRESS_WITH_ENRICHMENT");
         VALID_TOKEN_EMAIL = dotenv.get("DVS_API_VALID_TOKEN_EMAIL");
         VALID_TOKEN_PHONE = dotenv.get("DVS_API_VALID_TOKEN_PHONE");
+    }
+
+    public static String getUniqueReferenceId() {
+        return UUID.randomUUID().toString();
     }
 }

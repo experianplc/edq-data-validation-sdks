@@ -12,12 +12,12 @@ public class PhoneResult {
     private final String number;
     private final String validatedPhoneNumber;
     private final String formattedPhoneNumber;
-    private final String phoneType;
+    private final PhoneType phoneType;
     private final PhoneConfidence confidence;
     private final String portedDate;
     private final String disposableNumber;
     private final Metadata metadata;
-
+    private final String referenceId;
 
     public PhoneResult(final RestApiPhoneValidateResponse response) {
 
@@ -26,7 +26,7 @@ public class PhoneResult {
             this.number = Objects.toString(result.getNumber(), "");
             this.validatedPhoneNumber = Objects.toString(result.getValidatedPhoneNumber(), "");
             this.formattedPhoneNumber = Objects.toString(result.getFormattedPhoneNumber(), "");
-            this.phoneType = Objects.toString(result.getPhoneType(), "");
+            this.phoneType = result.getPhoneType() != null ? PhoneType.fromValue(result.getPhoneType()): PhoneType.UNKNOWN;
             this.confidence = result.getConfidence() != null ? PhoneConfidence.fromValue(result.getConfidence()): PhoneConfidence.UNKNOWN;
             this.portedDate = Objects.toString(result.getPortedDate(), "");
             this.disposableNumber = Objects.toString(result.getDisposableNumber(), "");
@@ -34,7 +34,7 @@ public class PhoneResult {
             this.number = "";
             this.validatedPhoneNumber = "";
             this.formattedPhoneNumber = "";
-            this.phoneType = "";
+            this.phoneType = PhoneType.UNKNOWN;
             this.confidence = PhoneConfidence.UNKNOWN;
             this.portedDate = "";
             this.disposableNumber = "";
@@ -47,6 +47,7 @@ public class PhoneResult {
             this.metadata = null;
         }
 
+        this.referenceId = response.getReferenceId();
     }
 
     public String getNumber() {
@@ -61,7 +62,7 @@ public class PhoneResult {
         return formattedPhoneNumber;
     }
 
-    public String getPhoneType() {
+    public PhoneType getPhoneType() {
         return phoneType;
     }
 
@@ -79,5 +80,9 @@ public class PhoneResult {
 
     public Metadata getMetadata() {
         return metadata;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

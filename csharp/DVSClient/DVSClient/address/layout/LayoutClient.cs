@@ -34,7 +34,7 @@ namespace DVSClient.Address.Layout
         /// <summary>
         /// Retrieves the configuration used by the client.
         /// </summary>
-        /// <returns>The <see cref="Common.Configuration"/> object used by the client.</returns>
+        /// <returns>The <see cref="Configuration"/> object used by the client.</returns>
         public LayoutConfiguration GetConfiguration()
         {
             return _configuration;
@@ -58,26 +58,31 @@ namespace DVSClient.Address.Layout
             IEnumerable<LayoutLineFixed> fixedLayoutLines,
             params Dataset[] appliesToDatasets)
         {
-            IEnumerable<AppliesTo> appliesTo = appliesToDatasets.Select(dataset => new AppliesTo(dataset)).ToList();
-            return CreateLayout(name, variableLayoutLines, fixedLayoutLines, appliesTo);
+            return CreateLayout(name, variableLayoutLines, fixedLayoutLines, string.Empty, appliesToDatasets);
         }
 
-        private CreateLayoutResult CreateLayout(string name, IEnumerable<LayoutLineVariable> variableLayoutLines, IEnumerable<LayoutLineFixed> fixedLayoutLines, IEnumerable<AppliesTo> appliesTo)
+        /// <summary>
+        /// Creates a new address layout.
+        /// </summary>
+        /// <param name="name">The name of the layout to create.</param>
+        /// <param name="variableLayoutLines">A list of variable layout lines.</param>
+        /// <param name="fixedLayoutLines">A list of fixed layout lines.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <param name="appliesToDatasets">The datasets to which the layout applies.</param>
+        /// <returns>A <see cref="CreateLayoutResult"/> object containing the result of the creation operation.</returns>
+        /// <exception cref="RestApiInterruptionOrExecutionException">Thrown if the API call is interrupted or fails.</exception>
+        /// <remarks>
+        /// Use this method to create a new address layout with the specified lines and datasets.
+        /// </remarks>
+        public CreateLayoutResult CreateLayout(
+            string name,
+            IEnumerable<LayoutLineVariable> variableLayoutLines,
+            IEnumerable<LayoutLineFixed> fixedLayoutLines,
+            string referenceId,
+            params Dataset[] appliesToDatasets)
         {
-            var layout = new RestApiAddressLayout(name, appliesTo, variableLayoutLines, fixedLayoutLines);
-            var request = RestApiCreateLayoutRequest.Using(_configuration);
-            request.Layout = layout;
-            var headers = _configuration.GetCommonHeaders();
-
-            try
-            {
-                var layoutResponse = _restApiAsyncStub.CreateLayoutV2(request, headers).GetAwaiter().GetResult();
-                return new CreateLayoutResult(layoutResponse);
-            }
-            catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
-            {
-                throw new RestApiInterruptionOrExecutionException(ex);
-            }
+            IEnumerable<AppliesTo> appliesTo = appliesToDatasets.Select(dataset => new AppliesTo(dataset)).ToList();
+            return CreateLayoutImpl(name, variableLayoutLines, fixedLayoutLines, referenceId,  appliesTo);
         }
 
         /// <summary>
@@ -91,7 +96,22 @@ namespace DVSClient.Address.Layout
         /// </remarks>
         public void DeleteLayout(string name)
         {
-            var headers = _configuration.GetCommonHeaders();
+            DeleteLayout(name, string.Empty);
+        }
+
+        /// <summary>
+        /// Deletes an address layout by its name.
+        /// </summary>
+        /// <param name="name">The name of the layout to delete.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <exception cref="RestApiInterruptionOrExecutionException">Thrown if the API call is interrupted or fails.</exception>
+        /// <exception cref="EDVSException">Thrown if the layout does not exist or deletion fails.</exception>
+        /// <remarks>
+        /// Use this method to delete a specific address layout by its name.
+        /// </remarks>
+        public void DeleteLayout(string name, string referenceId)
+        {
+            var headers = _configuration.GetCommonHeaders(referenceId);
 
             try
             {
@@ -117,7 +137,20 @@ namespace DVSClient.Address.Layout
         /// </remarks>
         public GetLayoutListResult GetLayouts()
         {
-            return GetLayouts(null, new List<Dataset>(), string.Empty);
+            return GetLayouts(null, new List<Dataset>(), string.Empty, string.Empty);
+        }
+
+        /// <summary>
+        /// Retrieves a list of address layouts.
+        /// </summary>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A <see cref="GetLayoutListResult"/> object containing the list of layouts.</returns>
+        /// <remarks>
+        /// Use this method to retrieve all available address layouts.
+        /// </remarks>
+        public GetLayoutListResult GetLayouts(string referenceId)
+        {
+            return GetLayouts(null, new List<Dataset>(), string.Empty, referenceId);
         }
 
         /// <summary>
@@ -132,7 +165,23 @@ namespace DVSClient.Address.Layout
         /// </remarks>
         public GetLayoutListResult GetLayouts(Country? country, List<Dataset> datasets, string nameContains)
         {
-            var headers = _configuration.GetCommonHeaders();
+            return GetLayouts(country, datasets, nameContains);
+        }
+
+        /// <summary>
+        /// Retrieves a list of address layouts based on filters.
+        /// </summary>
+        /// <param name="country">The country to filter layouts by (optional).</param>
+        /// <param name="datasets">A list of datasets to filter layouts by (optional).</param>
+        /// <param name="nameContains">A string to filter layouts by name (optional).</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A <see cref="GetLayoutListResult"/> object containing the filtered list of layouts.</returns>
+        /// <remarks>
+        /// Use this method to retrieve a list of address layouts based on specific filters.
+        /// </remarks>
+        public GetLayoutListResult GetLayouts(Country? country, List<Dataset> datasets, string nameContains, string referenceId)
+        {
+            var headers = _configuration.GetCommonHeaders(referenceId);
 
             var countryIso3 = string.Empty;
             if (country != null)
@@ -164,12 +213,45 @@ namespace DVSClient.Address.Layout
         /// </remarks>
         public GetLayoutResult GetLayout(string name)
         {
-            var headers = _configuration.GetCommonHeaders();
+            return GetLayout(name, string.Empty);
+        }
+
+        /// <summary>
+        /// Retrieves an address layout by its name.
+        /// </summary>
+        /// <param name="name">The name of the layout to retrieve.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A <see cref="GetLayoutResult"/> object containing the layout details.</returns>
+        /// <exception cref="RestApiInterruptionOrExecutionException">Thrown if the API call is interrupted or fails.</exception>
+        /// <remarks>
+        /// Use this method to retrieve details of a specific address layout by its name.
+        /// </remarks>
+        public GetLayoutResult GetLayout(string name, string referenceId)
+        {
+            var headers = _configuration.GetCommonHeaders(referenceId);
 
             try
             {
                 var layoutResponse = _restApiAsyncStub.GetLayoutV2(name, headers).GetAwaiter().GetResult();
                 return new GetLayoutResult(layoutResponse);
+            }
+            catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
+            {
+                throw new RestApiInterruptionOrExecutionException(ex);
+            }
+        }
+
+        private CreateLayoutResult CreateLayoutImpl(string name, IEnumerable<LayoutLineVariable> variableLayoutLines, IEnumerable<LayoutLineFixed> fixedLayoutLines, string referenceId, IEnumerable<AppliesTo> appliesTo)
+        {
+            var layout = new RestApiAddressLayout(name, appliesTo, variableLayoutLines, fixedLayoutLines);
+            var request = RestApiCreateLayoutRequest.Using(_configuration);
+            request.Layout = layout;
+            var headers = _configuration.GetCommonHeaders(referenceId);
+
+            try
+            {
+                var layoutResponse = _restApiAsyncStub.CreateLayoutV2(request, headers).GetAwaiter().GetResult();
+                return new CreateLayoutResult(layoutResponse);
             }
             catch (AggregateException ex) when (ex.InnerException is TaskCanceledException)
             {

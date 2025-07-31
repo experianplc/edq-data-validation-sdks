@@ -10,6 +10,7 @@ namespace DVSClient.Address.Search
         public string SuggestionsKey { get; }
         public string SuggestionsPrompt { get; }
         public IEnumerable<SearchSuggestion> Suggestions { get; } = new List<SearchSuggestion>();
+        public string? ReferenceId { get; }
 
         public SearchResult(RestApiAddressSearchResponse response)
         {
@@ -30,6 +31,8 @@ namespace DVSClient.Address.Search
                 SuggestionsPrompt = string.Empty;
                 Suggestions = new List<SearchSuggestion>();
             }
+
+            ReferenceId = response.ReferenceId;
         }
     }
 }

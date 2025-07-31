@@ -1,4 +1,4 @@
-using DVSClient.address.lookup;
+using DVSClient.Address.Lookup;
 using DVSClient.Common;
 using DVSClient.Exceptions;
 using Newtonsoft.Json;
@@ -29,8 +29,6 @@ namespace DVSClient.Server.Address.Lookup
         [JsonProperty("layouts")]
         public IEnumerable<string>? Layouts { get; set; }
 
-
-
         public static RestApiAddressLookupV2Request Using(string value, LookupType lookupType, AddressConfiguration configuration)
         {
             if (!configuration.Datasets.Any()) 
@@ -43,7 +41,7 @@ namespace DVSClient.Server.Address.Lookup
             //Key
             var key = new RestApiAddressLookupV2RequestKey();
             key.Value = value;
-            key.Type = lookupType.GetJsonNameFromEnum<LookupType>();
+            key.Type = lookupType.GetJsonNameFromEnum();
             result.Key = key;
 
             result.CountryIso = configuration.Datasets.ElementAt(0).Country.Iso3Code;
@@ -57,13 +55,11 @@ namespace DVSClient.Server.Address.Lookup
             {
                 result.MaxSuggestions = configuration.MaxSuggestions;
             }
-            if (configuration.FormatLayoutName.Length > 0) {
-                result.Layouts = new List<string> { configuration.FormatLayoutName };
+            if (configuration.LayoutName.Length > 0) {
+                result.Layouts = new List<string> { configuration.LayoutName };
             }
-            
-            return result;
 
+            return result;
         }
     }
-
 }

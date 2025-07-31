@@ -1,7 +1,7 @@
 using DVSClient.Exceptions;
 using DVSClient.Server.Address.Lookup;
 
-namespace DVSClient.address.lookup
+namespace DVSClient.Address.Lookup
 {
     public class LookupResultFuture
     {
@@ -21,7 +21,7 @@ namespace DVSClient.address.lookup
                 {
                     throw EDVSException.Using(response.Error);
                 }
-                return new LookupResult(response.Result == null ? new RestApiAddressLookupV2Result() : response.Result);
+                return new LookupResult(response == null ? new RestApiAddressLookupV2Response() : response);
             }
             catch (Exception e) when (e is TaskCanceledException || e is OperationCanceledException)
             {
@@ -41,7 +41,7 @@ namespace DVSClient.address.lookup
                 {
                     throw EDVSException.Using(response.Error);
                 }
-                return new LookupResult(response.Result == null ? new RestApiAddressLookupV2Result() : response.Result);
+                return new LookupResult(response == null ? new RestApiAddressLookupV2Response() : response);
             }
             catch (Exception e) when (e is TaskCanceledException || e is OperationCanceledException || e is TimeoutException)
             {

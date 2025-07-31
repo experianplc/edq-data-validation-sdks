@@ -39,8 +39,8 @@ public class RestApiSuggestionsFormatRequest {
             formatRequest.setMaxSuggestions(configuration.getMaxSuggestions());
         }
         //Layout name
-        if (!configuration.getFormatLayoutName().isEmpty()) {
-            formatRequest.setLayouts(List.of(configuration.getFormatLayoutName()));
+        if (!configuration.getLayoutName().isEmpty()) {
+            formatRequest.setLayouts(List.of(configuration.getLayoutName()));
         }
         return formatRequest;
     }

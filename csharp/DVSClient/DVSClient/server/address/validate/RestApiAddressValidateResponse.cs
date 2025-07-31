@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace DVSClient.Server.Address.Validate
 {
-    public class RestApiAddressValidateResponse
+    public class RestApiAddressValidateResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

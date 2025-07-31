@@ -1,6 +1,6 @@
-using DVSClient.address.lookup;
 using DVSClient.Address.Format;
 using DVSClient.Address.Layout.Attributes;
+using DVSClient.Address.Lookup;
 using DVSClient.Common;
 using DVSClient.Exceptions;
 
@@ -38,7 +38,7 @@ namespace DVSClient.Address
         internal bool Metadata { get; }
         internal bool Enrichment { get; }
         internal bool ExtraMatchInfo { get; }
-        internal string FormatLayoutName { get; }
+        internal string LayoutName { get; }
         internal LayoutFormat? LayoutFormat { get; }
         internal IEnumerable<GlobalGeocodeAttribute> GlobalGeocodes { get; }
         internal IEnumerable<PremiumLocationInsightAttribute> PremiumLocationInsights { get; }
@@ -68,9 +68,7 @@ namespace DVSClient.Address
                 return null;
             }
             return Datasets.ElementAt(0).Country;
-        }
-
- 
+        } 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AddressConfiguration"/> class using the specified builder.
@@ -89,7 +87,7 @@ namespace DVSClient.Address
             this.Metadata = builder.Metadata;
             this.Enrichment = builder.Enrichment;
             this.ExtraMatchInfo = builder.ExtraMatchInfo;
-            this.FormatLayoutName = builder.FormatLayoutName;
+            this.LayoutName = builder.LayoutName;
             this.LayoutFormat = builder.LayoutFormat;
             this.GlobalGeocodes = builder.GlobalGeocodes.ToList();
             this.PremiumLocationInsights = builder.PremiumLocationInsights.ToList();
@@ -135,7 +133,7 @@ namespace DVSClient.Address
             internal bool Metadata { get; set; }
             internal bool Enrichment { get; private set; }
             internal bool ExtraMatchInfo { get; private set; }
-            internal string FormatLayoutName { get; private set; } = DefaultLayoutName;
+            internal string LayoutName { get; private set; } = DefaultLayoutName;
             internal LayoutFormat LayoutFormat { get; private set; } = DefaultLayoutFormat;
             internal IList<GlobalGeocodeAttribute> GlobalGeocodes { get; private set; } = new List<GlobalGeocodeAttribute>();
             internal IList<PremiumLocationInsightAttribute> PremiumLocationInsights { get; private set; } = new List<PremiumLocationInsightAttribute>();
@@ -228,13 +226,14 @@ namespace DVSClient.Address
             }
 
             /// <summary>
-            /// Sets a custom transaction ID for API requests.
+            /// Sets a custom reference ID for API requests.
             /// </summary>
-            /// <param name="transactionId">The transaction ID to use.</param>
+            /// <param name="referenceId">The reference ID for tracking the request.</param>
             /// <returns>The current <see cref="AddressBuilder"/> instance for method chaining.</returns>
-            public new AddressBuilder SetTransactionId(string transactionId)
+            [Obsolete("Set your reference ID as part every API interaction like the Search, Format, or Validate call instead.")]
+            public new AddressBuilder SetTransactionId(string referenceId)
             {
-                base.SetTransactionId(transactionId);
+                base.SetTransactionId(referenceId);
                 return this;
             }
 
@@ -347,9 +346,9 @@ namespace DVSClient.Address
             /// </summary>
             /// <param name="layoutName">The layout name to use.</param>
             /// <returns>The current <see cref="AddressBuilder"/> instance for method chaining.</returns>
-            public AddressBuilder UseLayout(string layoutName)
+            public AddressBuilder UseLayoutName(string layoutName)
             {
-                this.FormatLayoutName = layoutName;
+                this.LayoutName = layoutName;
                 return this;
             }
 

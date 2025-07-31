@@ -16,7 +16,7 @@ namespace DVSClient.Common
         public const int DefaultMaxDelayInMilliseconds = 15000;
 
         private readonly string _token;
-        private readonly string _transactionId;
+        private readonly string _referenceId;
         private readonly bool _useXAppAuthentication;
         private readonly int _apiRequestTimeoutInSeconds;
         private readonly int _httpClientTimeoutInSeconds;
@@ -32,7 +32,7 @@ namespace DVSClient.Common
         {
             _token = builder.Token;
             _useXAppAuthentication = builder.UseXAppAuthentication;
-            _transactionId = builder.TransactionId;
+            _referenceId = builder.ReferenceId;
             _apiRequestTimeoutInSeconds = builder.ApiRequestTimeoutInSeconds;
             _httpClientTimeoutInSeconds = builder.HttpClientTimeoutInSeconds;
             _maxRetries = builder.MaxRetries;
@@ -59,10 +59,11 @@ namespace DVSClient.Common
         public Uri GetServerUri() => ServerUri;
 
         /// <summary>
-        /// Gets the transaction ID used for tracking API requests.
+        /// Gets the reference ID used for tracking API requests.
         /// </summary>
-        /// <returns>The transaction ID as a string.</returns>
-        public string GetTransactionId() => _transactionId;
+        /// <returns>The reference ID as a string.</returns>
+        [Obsolete("Retrieve your reference ID from every API call instead.")]
+        public string GetTransactionId() => _referenceId;
 
         /// <summary>
         /// Gets the timeout for API requests in seconds.
@@ -101,8 +102,9 @@ namespace DVSClient.Common
         /// A boolean flag indicating whether dots (.) are allowed in the "Reference-Id" header.
         /// If set to <c>false</c>, dots in the version string will be replaced with hyphens (-).
         /// </param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
         /// <returns>A dictionary containing common headers for API requests.</returns>
-        public Dictionary<string, object> GetCommonHeaders(bool allowsDotInReferenceId = true)
+        public Dictionary<string, object> GetCommonHeaders(string referenceId, bool allowsDotInReferenceId = true)
         {
             var headers = new Dictionary<string, object>();
 
@@ -115,13 +117,16 @@ namespace DVSClient.Common
                 headers["Auth-Token"] = GetToken();
             }
 
-            var transactionId = GetTransactionId();
-
-            if (string.IsNullOrEmpty(transactionId))
+            if (string.IsNullOrEmpty(referenceId))
             {
-                transactionId = CreateTransactionId();
+                // If no reference ID is provided, use the obsolete one from the builder or create a new one.
+                referenceId = GetTransactionId();
+                if (string.IsNullOrEmpty(referenceId))
+                {
+                    referenceId = CreateUniqueId();
+                }
             }
-            headers["Reference-Id"] = ClientReference.GetReference(transactionId, allowsDotInReferenceId);
+            headers["Reference-Id"] = ClientReference.GetReference(referenceId, allowsDotInReferenceId);
 
             if (GetApiRequestTimeoutInSeconds() != DefaultHttpClientTimeoutInSeconds)
             {
@@ -132,10 +137,10 @@ namespace DVSClient.Common
         }
 
         /// <summary>
-        /// Creates a new unique transaction ID.
+        /// Creates a new unique ID.
         /// </summary>
-        /// <returns>A new transaction ID as a string.</returns>
-        private string CreateTransactionId()
+        /// <returns>A new unique ID as a string.</returns>
+        private string CreateUniqueId()
         {
             return Guid.NewGuid().ToString();
         }
@@ -147,7 +152,7 @@ namespace DVSClient.Common
         {
             internal string Token { get; }
             internal bool UseXAppAuthentication { get; private set; } = false;
-            internal string TransactionId { get; private set; } = string.Empty;
+            internal string ReferenceId { get; private set; } = string.Empty;
             internal int ApiRequestTimeoutInSeconds { get; private set; } = DefaultApiRequestTimeoutInSeconds;
             internal int HttpClientTimeoutInSeconds { get; private set; } = DefaultHttpClientTimeoutInSeconds;
             internal int MaxRetries { get; private set; } = DefaultRetries;
@@ -242,13 +247,14 @@ namespace DVSClient.Common
             }
 
             /// <summary>
-            /// Sets a custom transaction ID for API requests.
+            /// Sets a custom reference ID for API requests.
             /// </summary>
-            /// <param name="transactionId">The transaction ID to use.</param>
+            /// <param name="referenceId">The reference ID to use.</param>
             /// <returns>The current Builder instance for method chaining.</returns>
-            protected Builder SetTransactionId(string transactionId)
+            [Obsolete("Set your reference ID as part every API interaction like the Search, Format, or Validate call instead.")]
+            protected Builder SetTransactionId(string referenceId)
             {
-                TransactionId = transactionId;
+                ReferenceId = referenceId;
                 return this;
             }
         }

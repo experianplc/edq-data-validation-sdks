@@ -54,8 +54,8 @@ export function getLookupRequestFromConfig(config: AddressConfiguration): RestAp
             request.attributes.postal_code_lookup = lookupAttributes.postalCodeLookup;
         }        
     }
-    if (config.options.formatLayoutName) {
-        request.layouts = [config.options.formatLayoutName];
+    if (config.options.layoutName) {
+        request.layouts = [config.options.layoutName];
     }
 
 

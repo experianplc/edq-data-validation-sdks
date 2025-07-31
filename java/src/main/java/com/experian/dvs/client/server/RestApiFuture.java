@@ -7,7 +7,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class RestApiFuture<T> implements Future<T> {
+public class RestApiFuture<T extends RestApiResponse> implements Future<T> {
 
     private final Class<T> clazz;
     private final Future<Response> responseFuture;
@@ -34,15 +34,30 @@ public class RestApiFuture<T> implements Future<T> {
 
     @Override
     public T get() throws InterruptedException, ExecutionException {
-        try (final Response response = this.responseFuture.get()) {
-            return response.readEntity(this.clazz);
+        try (final Response apiResponse = this.responseFuture.get()) {
+            T response = apiResponse.readEntity(this.clazz);
+            response.setReferenceId(getRefIdFromHeaderValue(apiResponse.getHeaderString("Reference-Id")));
+            return response;
         }
     }
 
     @Override
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        try (final Response response = this.responseFuture.get(timeout, unit)) {
-            return response.readEntity(this.clazz);
+        try (final Response apiResponse = this.responseFuture.get(timeout, unit)) {
+            T response = apiResponse.readEntity(this.clazz);
+            response.setReferenceId(getRefIdFromHeaderValue(apiResponse.getHeaderString("Reference-Id")));
+            return response;
         }
+    }
+
+    private String getRefIdFromHeaderValue(String referenceId)
+    {
+        final String pattern = "/transaction:";
+        if (referenceId.contains(pattern))
+        {
+            referenceId = referenceId.substring(referenceId.lastIndexOf(pattern)+ pattern.length());
+        }
+
+        return referenceId;
     }
 }

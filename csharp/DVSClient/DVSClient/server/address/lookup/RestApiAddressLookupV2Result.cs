@@ -18,6 +18,5 @@ namespace DVSClient.Server.Address.Lookup
         public IEnumerable<RestApiAddressLookupSuggestionV2>? Addresses { get; set; }
         [JsonProperty("addresses_formatted")]
         public IEnumerable<RestApiAddressLookupV2ResultAddressFormatted>? AddressesFormatted { get; set; }        
-
     }
 }

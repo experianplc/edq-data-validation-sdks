@@ -1,11 +1,12 @@
 package com.experian.dvs.client.server.address.dataset;
 
+import com.experian.dvs.client.server.RestApiResponse;
 import com.experian.dvs.client.server.RestApiResponseError;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class RestApiGetDatasetsResponse {
+public class RestApiGetDatasetsResponse extends RestApiResponse {
 
     @JsonProperty("error")
     private RestApiResponseError error;

@@ -11,7 +11,7 @@ namespace DVSClient.Address.Validate
         public string GlobalAddressKey { get; }
         public bool? MoreResultsAvailable { get; }
         public AddressConfidence? Confidence { get; }
-        public Format.FormatAddress? Address { get; }
+        public FormatAddress? Address { get; }
         public AddressFormatted? AddressFormatted { get; }
         public IEnumerable<SearchSuggestion> Suggestions { get; } = new List<SearchSuggestion>();
         public AddressComponents? Components { get; }
@@ -19,10 +19,10 @@ namespace DVSClient.Address.Validate
         public string SuggestionsKey { get; }
         public ValidateMatchType? MatchType { get; }
         public ValidateMatchConfidence? MatchConfidence { get; }
-        //public MatchInfo MatchInfo { get; }
         public AddressMetadata? Metadata { get; }
         public AddressEnrichment? Enrichment { get; }
         public ValidateMatchInfo? MatchInfo { get; }
+        public string? ReferenceId { get; }
 
         public ValidateResult(RestApiAddressValidateResponse response)
         {
@@ -36,7 +36,7 @@ namespace DVSClient.Address.Validate
                 GlobalAddressKey = result.GlobalAddressKey ?? string.Empty;
                 MoreResultsAvailable = result.MoreResultsAvailable;
                 Confidence = result.Confidence?.GetEnumValueFromJsonName<AddressConfidence>();
-                Address = result.Address != null ? new Format.FormatAddress(result.Address) : null;
+                Address = result.Address != null ? new FormatAddress(result.Address) : null;
                 AddressFormatted = result.AddressesFormatted != null && result.AddressesFormatted.Any()
                     ? new AddressFormatted(result.AddressesFormatted.ElementAt(0))
                     : null;
@@ -67,6 +67,7 @@ namespace DVSClient.Address.Validate
 
             Metadata = metadata != null ? new AddressMetadata(metadata) : null;
             Enrichment = enrichment != null ? new AddressEnrichment(enrichment) : null;
+            ReferenceId = response.ReferenceId;
         }
     }
 }

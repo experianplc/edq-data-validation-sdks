@@ -1,10 +1,9 @@
-package com.experian.dvs.client.layout;
+package com.experian.dvs.client.address.layout;
 
 import com.experian.dvs.client.ExperianDataValidation;
 import com.experian.dvs.client.Setup;
 import com.experian.dvs.client.address.*;
 import com.experian.dvs.client.address.format.FormatResult;
-import com.experian.dvs.client.address.layout.*;
 import com.experian.dvs.client.address.layout.elements.Aus;
 import com.experian.dvs.client.address.layout.elements.Gbr;
 import com.experian.dvs.client.address.search.SearchResult;
@@ -65,7 +64,7 @@ public class AddressLayoutTests {
         final LayoutConfiguration configuration = LayoutConfiguration.newBuilder(Setup.VALID_TOKEN_ADDRESS).build();
 
         final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
-        final GetLayoutResult result = client.getLayout(Setup.EXISTING_TEST_LAYOUT);
+        final GetLayoutResult result = client.getLayout(Setup.EXISTING_TEST_LAYOUT, Setup.getUniqueReferenceId());
         assertThat(result.getError()).isNotPresent();
     }
 
@@ -86,11 +85,12 @@ public class AddressLayoutTests {
         final CreateLayoutResult createLayoutResult = client.createLayout(layoutName,
                 List.of(line1, line2),
                 List.of(line3, line4),
+                Setup.getUniqueReferenceId(),
                 Dataset.AU_ADDRESS);
 
         assertThat(createLayoutResult.getError()).isNotPresent();
         //Check if the layout was created
-        final GetLayoutResult result = client.getLayout(layoutName);
+        final GetLayoutResult result = client.getLayout(layoutName, Setup.getUniqueReferenceId());
         assertThat(result.getLayout().getStatus()).isEqualTo(LayoutStatus.CREATION_IN_PROGRESS);
     }
 
@@ -98,7 +98,6 @@ public class AddressLayoutTests {
     void layout_Create_WithOptions() {
         final LayoutConfiguration configuration = LayoutConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
-                .setTransactionId(UUID.randomUUID().toString())
                 .build();
         final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
         //todo add logic
@@ -113,7 +112,7 @@ public class AddressLayoutTests {
         final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
 
         final String layoutName = "ThisLayoutDoesntExist";
-        assertThrows(NotFoundException.class, () -> client.deleteLayout(layoutName));
+        assertThrows(NotFoundException.class, () -> client.deleteLayout(layoutName, Setup.getUniqueReferenceId()));
 
     }
 
@@ -122,15 +121,14 @@ public class AddressLayoutTests {
 
         final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
-                .setTransactionId(UUID.randomUUID().toString())
                 .useDataset(Dataset.GB_ADDRESS)
-                .setFormatLayoutName(Setup.EXISTING_TEST_LAYOUT)
+                .useLayoutName(Setup.EXISTING_TEST_LAYOUT)
                 .includeComponents()
                 .build();
 
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
-        final FormatResult formatResult = client.format(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R", Setup.getUniqueReferenceId());
+        final FormatResult formatResult = client.format(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey(), Setup.getUniqueReferenceId());
         assertThat(formatResult.getConfidence()).isEqualTo(AddressConfidence.VERIFIED_MATCH);
         //assertThat(formatResult.getGlobalAddressKey()).isEqualTo(resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey());
         assertThat(formatResult.getAddressFormatted()).isNotNull();
@@ -148,19 +146,83 @@ public class AddressLayoutTests {
     public void suggestionsFormatWithCustomLayout() {
         final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
-                .setTransactionId(UUID.randomUUID().toString())
                 .useDataset(Dataset.AU_ADDRESS)
-                .setFormatLayoutName(Setup.EXISTING_TEST_LAYOUT)
+                .useLayoutName(Setup.EXISTING_TEST_LAYOUT)
                 .build();
         AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        SuggestionsFormatResult searchResult = client.suggestionsFormat("onslow st, perth");
+        SuggestionsFormatResult searchResult = client.suggestionsFormat("onslow st, perth", Setup.getUniqueReferenceId());
 
         assertThat(searchResult.getSuggestions()).isNotEmpty();
 
         // When using a custom layout the address objects should all be empty
         assertThat(searchResult.getSuggestions()).allMatch(suggestion -> suggestion.getAddress() == null);
         assertThat(searchResult.getSuggestions()).allMatch(suggestion -> suggestion.getAddressFormatted() != null);
+    }
+
+    @Test
+    void referenceId_OnBuilderStillWorks() {
+        // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
+        final LayoutConfiguration configuration = LayoutConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId("specialRefId")
+                .build();
+
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final GetLayoutResult result = client.getLayout(Setup.EXISTING_TEST_LAYOUT);
+        assertThat(result.getReferenceId()).isEqualTo("specialRefId");
+    }
+
+    @Test
+    void referenceId_OnMethodTakesPrecedence() {
+        // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
+        // Setting the reference ID on the method should take precedence
+        final LayoutConfiguration configuration = LayoutConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId(Setup.getUniqueReferenceId())
+                .build();
+
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final GetLayoutResult result = client.getLayout(Setup.EXISTING_TEST_LAYOUT, "specialRefId");
+        assertThat(result.getReferenceId()).isEqualTo("specialRefId");
+    }
+
+    @Test
+    void referenceId_NotValueSpecified_UsesRandomValue() {
+        final LayoutConfiguration configuration = LayoutConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .build();
+
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+        final GetLayoutResult result = client.getLayout(Setup.EXISTING_TEST_LAYOUT);
+        assertThat(result.getReferenceId()).isNotEmpty();
+    }
+
+    @Test
+    void referenceId_OnMethod() {
+        final LayoutConfiguration configuration = LayoutConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .build();
+
+        final LayoutClient client = ExperianDataValidation.getAddressLayoutClient(configuration);
+
+        final LayoutLineVariable line1 = new LayoutLineVariable("addr_line_1");
+        final LayoutLineVariable line2 = new LayoutLineVariable("addr_line_2");
+        final LayoutLineFixed line3 = new LayoutLineFixed("post_code", List.of(Aus.POSTAL_CODE, Gbr.POSTCODE));
+        final LayoutLineFixed line4 = new LayoutLineFixed("country_name", List.of(Aus.COUNTRY_NAME, Gbr.COUNTRY));
+
+        final CreateLayoutResult createLayoutResult = client.createLayout(Setup.EXISTING_TEST_LAYOUT,
+                List.of(line1, line2),
+                List.of(line3, line4),
+                Setup.STATIC_REFERENCE_ID,
+                Dataset.GB_ADDRESS);
+        assertThat(createLayoutResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        final GetLayoutResult getLayoutResult = client.getLayout(Setup.EXISTING_TEST_LAYOUT, Setup.STATIC_REFERENCE_ID);
+        assertThat(getLayoutResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        final GetLayoutListResult getLayoutsResult = client.getLayouts(Setup.STATIC_REFERENCE_ID);
+        assertThat(getLayoutsResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
     }
 
     private static GetLayoutResult getLayout(final String layoutName) {

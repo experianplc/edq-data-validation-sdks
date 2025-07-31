@@ -3,5 +3,6 @@ import { GetLayoutListItem } from "./getLayoutListItem";
 
 export type GetLayoutListResult = {
     error?: ResponseError;
-    layouts: GetLayoutListItem[];
+    layouts?: GetLayoutListItem[];
+    referenceId?: string;
 };

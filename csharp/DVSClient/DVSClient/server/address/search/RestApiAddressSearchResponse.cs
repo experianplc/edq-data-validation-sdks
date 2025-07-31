@@ -2,7 +2,7 @@
 
 namespace DVSClient.Server.Address.Search
 {
-    public class RestApiAddressSearchResponse
+    public class RestApiAddressSearchResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

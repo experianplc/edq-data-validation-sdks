@@ -19,6 +19,7 @@ public class FormatResult {
 
     private final AddressMetadata metadata;
     private final AddressEnrichment addressEnrichment;
+    private final String referenceId;
 
     public FormatResult(final RestApiAddressFormatResponse response) {
 
@@ -43,6 +44,7 @@ public class FormatResult {
 
         this.metadata = apiMetadata != null ? new AddressMetadata(apiMetadata) : null;
         this.addressEnrichment = apiEnrichment != null ? new AddressEnrichment(apiEnrichment) : null;
+        this.referenceId = response.getReferenceId();
     }
 
     public String getGlobalAddressKey() {
@@ -71,5 +73,9 @@ public class FormatResult {
 
     public Optional<AddressComponents> getComponents() {
         return Optional.ofNullable(components);
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

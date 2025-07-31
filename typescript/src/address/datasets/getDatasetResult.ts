@@ -6,6 +6,7 @@ import { AddressDataset, restApiAddressDatasetResult2AddressDataset } from "./ad
 export type GetDatasetResult = {
     error?: ResponseError;
     result?: AddressDataset[];
+    referenceId?: string;
 }
 
 export function restApiGetDatasetsResponseToResult(response: RestApiGetDatasetsResponse): Promise<GetDatasetResult> {
@@ -16,5 +17,7 @@ export function restApiGetDatasetsResponseToResult(response: RestApiGetDatasetsR
     if (response.result) {
         result.result = response.result.map(res => restApiAddressDatasetResult2AddressDataset(res));
     }
+
+    result.referenceId = response.referenceId;
     return Promise.resolve(result);
 }

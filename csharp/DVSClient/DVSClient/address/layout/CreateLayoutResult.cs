@@ -7,11 +7,13 @@ namespace DVSClient.Address.Layout
     {
         public ResponseError? Error { get; }
         public string Id { get; }
+        public string? ReferenceId { get; }
 
         public CreateLayoutResult(RestApiCreateLayoutResponse response)
         {
             Error = response.Error != null ? new ResponseError(response.Error) : null;
             Id = response.Result?.Id ?? string.Empty;
+            ReferenceId = response.ReferenceId;
         }
     }
 }

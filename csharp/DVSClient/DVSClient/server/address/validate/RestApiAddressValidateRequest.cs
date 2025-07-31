@@ -1,4 +1,3 @@
-using DVSClient.Address.Layout.Attributes;
 using DVSClient.Common;
 using DVSClient.Server.Address.Format;
 using DVSClient.Server.Address.Search;
@@ -55,9 +54,9 @@ namespace DVSClient.Server.Address.Validate
             }
 
             // Layout name
-            if (!string.IsNullOrEmpty(configuration.FormatLayoutName))
+            if (!string.IsNullOrEmpty(configuration.LayoutName))
             {
-                validateRequest.Layouts = new List<string> { configuration.FormatLayoutName };
+                validateRequest.Layouts = new List<string> { configuration.LayoutName };
             }
 
             // Layout format
@@ -66,7 +65,7 @@ namespace DVSClient.Server.Address.Validate
                 validateRequest.LayoutFormat = configuration.LayoutFormat.Value.ToString();
             }
 
-            if (configuration.FormatLayoutName != null)
+            if (configuration.LayoutName != null)
             {
                 validateRequest.AddOption("flatten", true.ToString());
             }
@@ -96,57 +95,57 @@ namespace DVSClient.Server.Address.Validate
 
             if (configuration.GlobalGeocodes != null && configuration.GlobalGeocodes.Any())
             {
-                attributes.Geocodes = configuration.GlobalGeocodes.Select(attr => attr.GetJsonNameFromEnum<GlobalGeocodeAttribute>());
+                attributes.Geocodes = configuration.GlobalGeocodes.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.PremiumLocationInsights != null && configuration.PremiumLocationInsights.Any())
             {
-                attributes.PremiumLocationInsight = (IEnumerable<string?>?)configuration.PremiumLocationInsights.Select(attr => attr.GetJsonNameFromEnum<PremiumLocationInsightAttribute>());
+                attributes.PremiumLocationInsight = (IEnumerable<string?>?)configuration.PremiumLocationInsights.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.What3Words != null && configuration.What3Words.Any())
             {
-                attributes.What3words = (IEnumerable<string?>?)configuration.What3Words.Select(attr => attr.GetJsonNameFromEnum<What3WordsAttribute>());
+                attributes.What3words = (IEnumerable<string?>?)configuration.What3Words.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.GbrLocationComplete != null && configuration.GbrLocationComplete.Any())
             {
-                attributes.GbrLocationComplete = (IEnumerable<string?>?)configuration.GbrLocationComplete.Select(attr => attr.GetJsonNameFromEnum<GbrLocationCompleteAttribute>());
+                attributes.GbrLocationComplete = (IEnumerable<string?>?)configuration.GbrLocationComplete.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.GbrLocationEssential != null && configuration.GbrLocationEssential.Any())
             {
-                attributes.GbrLocationEssential = (IEnumerable<string?>?)configuration.GbrLocationEssential.Select(attr => attr.GetJsonNameFromEnum<GbrLocationEssentialAttribute>());
+                attributes.GbrLocationEssential = (IEnumerable<string?>?)configuration.GbrLocationEssential.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.GbrGovernment != null && configuration.GbrGovernment.Any())
             {
-                attributes.GbrGovernment = (IEnumerable<string?>?)configuration.GbrGovernment.Select(attr => attr.GetJsonNameFromEnum<GbrGovernmentAttribute>());
+                attributes.GbrGovernment = (IEnumerable<string?>?)configuration.GbrGovernment.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.GbrHealth != null && configuration.GbrHealth.Any())
             {
-                attributes.GbrHealth = (IEnumerable<string?>?)configuration.GbrHealth.Select(attr => attr.GetJsonNameFromEnum<GbrHealthAttribute>());
+                attributes.GbrHealth = (IEnumerable<string?>?)configuration.GbrHealth.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.GbrBusiness != null && configuration.GbrBusiness.Any())
             {
-                attributes.GbrBusiness = (IEnumerable<string?>?)configuration.GbrBusiness.Select(attr => attr.GetJsonNameFromEnum<GbrBusinessAttribute>());
+                attributes.GbrBusiness = (IEnumerable<string?>?)configuration.GbrBusiness.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.UsaRegionalGeocodes != null && configuration.UsaRegionalGeocodes.Any())
             {
-                attributes.UsaRegionalGeocodes = (IEnumerable<string?>?)configuration.UsaRegionalGeocodes.Select(attr => attr.GetJsonNameFromEnum<UsaRegionalGeocodeAttribute>());
+                attributes.UsaRegionalGeocodes = (IEnumerable<string?>?)configuration.UsaRegionalGeocodes.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.AusRegionalGeocodes != null && configuration.AusRegionalGeocodes.Any())
             {
-                attributes.AusRegionalGeocodes = (IEnumerable<string?>?)configuration.AusRegionalGeocodes.Select(attr => attr.GetJsonNameFromEnum<AusRegionalGeocodeAttribute>());
+                attributes.AusRegionalGeocodes = (IEnumerable<string?>?)configuration.AusRegionalGeocodes.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             if (configuration.NzlRegionalGeocodes != null && configuration.NzlRegionalGeocodes.Any())
             {
-                attributes.NzlRegionalGeocodes = (IEnumerable<string?>?)configuration.NzlRegionalGeocodes.Select(attr => attr.GetJsonNameFromEnum<NzlRegionalGeocodeAttribute>());
+                attributes.NzlRegionalGeocodes = (IEnumerable<string?>?)configuration.NzlRegionalGeocodes.Select(attr => attr.GetJsonNameFromEnum());
             }
 
             return attributes;

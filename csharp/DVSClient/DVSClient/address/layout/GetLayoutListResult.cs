@@ -7,11 +7,13 @@ namespace DVSClient.Address.Layout
     {
         public ResponseError? Error { get; }
         public IEnumerable<GetLayoutListItem> Layouts { get; }
+        public string? ReferenceId { get; }
 
         public GetLayoutListResult(RestApiGetLayoutListResponse response)
         {
             Error = response.Error != null ? new ResponseError(response.Error) :null;
             Layouts = response.Result != null ? response.Result.Select(item => new GetLayoutListItem(item)).ToList() : new List<GetLayoutListItem>();
+            ReferenceId = response.ReferenceId;
         }
     }
 }

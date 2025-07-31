@@ -10,7 +10,7 @@ export type RestApiFormatRequest = {
 
 export function getFormatRequestFromConfig(config: AddressConfiguration): RestApiFormatRequest {
     const request: RestApiFormatRequest = {
-        layouts: [config.options.formatLayoutName!],
+        layouts: [config.options.layoutName!],
         layout_format: config.options.layoutFormat!
     };
     const attributes = getFormatAttribute(config);

@@ -12,6 +12,7 @@ namespace DVSClient.Address.Format
         public AddressComponents? Components { get; }
         public AddressMetadata? Metadata { get; }
         public AddressEnrichment? Enrichment { get; }
+        public string? ReferenceId { get; }
 
         public FormatResult()
         {
@@ -42,6 +43,7 @@ namespace DVSClient.Address.Format
 
             Metadata = apiMetadata != null ? new AddressMetadata(apiMetadata) : null;
             Enrichment = apiEnrichment != null ? new AddressEnrichment(apiEnrichment) : null;
+            ReferenceId = response.ReferenceId;
         }
     }
 }

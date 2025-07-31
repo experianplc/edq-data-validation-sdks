@@ -29,14 +29,14 @@ export function getAddressValidateRequestFromConfig(config: AddressConfiguration
         request.max_suggestions = config.options.maxSuggestions;
     }
     //Layout name
-    if (config.options.formatLayoutName && config.options.formatLayoutName.length > 0) {
-        request.layouts = [config.options.formatLayoutName];
+    if (config.options.layoutName && config.options.layoutName.length > 0) {
+        request.layouts = [config.options.layoutName];
     }
     //Layout format
     if (config.options.layoutFormat && config.options.layoutFormat.length > 0) {
         request.layout_format = config.options.layoutFormat;
     }
-    if (config.options.formatLayoutName) {
+    if (config.options.layoutName) {
         request.options!.push({ name: "flatten", value: "true" });
     }
     if (config.options.searchIntensity) {

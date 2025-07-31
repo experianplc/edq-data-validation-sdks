@@ -10,10 +10,12 @@ public class GetLayoutListResult {
 
     private final ResponseError error;
     private final List<GetLayoutListItem> layouts;
+    private final String referenceId;
 
     public GetLayoutListResult(final RestApiGetLayoutListResponse response) {
         this.error = response.getError() != null ? new ResponseError(response.getError()) : null;
         this.layouts = response.getResult() != null ? response.getResult().stream().map(GetLayoutListItem::new).toList() : List.of();
+        this.referenceId = response.getReferenceId();
     }
 
     public Optional<ResponseError> getError() {
@@ -22,5 +24,9 @@ public class GetLayoutListResult {
 
     public List<GetLayoutListItem> getLayouts() {
         return layouts;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace DVSClient.Server.Address.Suggestions
 {
-    public class RestApiSuggestionsFormatResponse
+    public class RestApiSuggestionsFormatResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

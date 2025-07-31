@@ -17,10 +17,10 @@ namespace DVSClient.Address.Search
             try
             {
                 var apiSearchResponse = await _apiFuture;
-                var optError = apiSearchResponse.Error;
-                if (optError != null)
+                var error = apiSearchResponse.Error;
+                if (error != null)
                 {
-                    throw EDVSException.Using(optError);
+                    throw EDVSException.Using(error);
                 }
                 return new SearchResult(apiSearchResponse);
             }

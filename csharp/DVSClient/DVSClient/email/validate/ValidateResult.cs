@@ -10,6 +10,7 @@ namespace DVSClient.Email.Validate
         public IEnumerable<string> DidYouMean { get; }
         public VerboseOutput? VerboseOutput { get; }
         public DomainType? DomainType { get; }
+        public string? ReferenceId { get; }
 
         public ValidateResult(RestApiEmailValidateResponse apiResponse)
         {
@@ -38,6 +39,8 @@ namespace DVSClient.Email.Validate
             {
                 DomainType = default;
             }
+
+            ReferenceId = apiResponse.ReferenceId;
         }
     }
 }

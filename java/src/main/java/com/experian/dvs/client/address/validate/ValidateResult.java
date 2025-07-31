@@ -29,6 +29,7 @@ public class ValidateResult {
     private final ValidateMatchConfidence matchConfidence;
     private final ValidateMatchType matchType;
     private final ValidateMatchInfo matchInfo;
+    private final String referenceId;
 
     public ValidateResult(RestApiAddressValidateResponse response) {
         final RestApiAddressValidateResult apiResult = response.getResult();
@@ -68,6 +69,7 @@ public class ValidateResult {
 
         this.metadata = apiMetadata != null ? new AddressMetadata(apiMetadata) : null;
         this.enrichment = apiEnrichment != null ? new AddressEnrichment(apiEnrichment) : null;
+        this.referenceId = response.getReferenceId();
     }
 
     public ValidationDetail getValidationDetail() {
@@ -123,4 +125,6 @@ public class ValidateResult {
     public ValidateMatchConfidence getMatchConfidence() { return matchConfidence; }
 
     public Optional<ValidateMatchInfo> getMatchInfo() { return Optional.ofNullable(matchInfo); }
+
+    public String getReferenceId() { return referenceId; }
 }

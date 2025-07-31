@@ -1,9 +1,6 @@
-package com.experian.dvs.client.layout.elements;
+package com.experian.dvs.client.address.layout.elements;
 
 import com.experian.dvs.client.address.Dataset;
-import com.experian.dvs.client.address.layout.elements.AddressElement;
-import com.experian.dvs.client.address.layout.elements.Aus;
-import com.experian.dvs.client.address.layout.elements.AddressElementLibrary;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

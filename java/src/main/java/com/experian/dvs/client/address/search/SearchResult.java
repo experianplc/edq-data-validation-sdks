@@ -14,7 +14,7 @@ public class SearchResult {
     private final String suggestionsKey;
     private final String suggestionsPrompt;
     private final List<SearchSuggestion> suggestions;
-
+    private final String referenceId;
 
     public SearchResult(final RestApiAddressSearchResponse response) {
         final RestApiAddressSearchResult apiResult = response.getResult();
@@ -32,6 +32,8 @@ public class SearchResult {
             this.suggestionsPrompt = "";
             this.suggestions = List.of();
         }
+
+        this.referenceId = response.getReferenceId();
     }
 
     public boolean isMoreResultsAvailable() {
@@ -52,5 +54,9 @@ public class SearchResult {
 
     public List<SearchSuggestion> getSuggestions() {
         return suggestions;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

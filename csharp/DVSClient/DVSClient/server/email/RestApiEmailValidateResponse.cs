@@ -2,7 +2,7 @@
 
 namespace DVSClient.Server.Email
 {
-    public class RestApiEmailValidateResponse
+    public class RestApiEmailValidateResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

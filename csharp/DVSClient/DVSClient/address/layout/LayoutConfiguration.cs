@@ -48,16 +48,17 @@ namespace DVSClient.Address.Layout
             }
 
             /// <summary>
-            /// Sets a custom transaction ID for API requests.
+            /// Sets a custom reference ID for API requests.
             /// </summary>
-            /// <param name="transactionId">The transaction ID to use.</param>
+            /// <param name="referenceId">The reference ID for tracking the request.</param>
             /// <returns>The current <see cref="LayoutBuilder"/> instance for method chaining.</returns>
             /// <remarks>
-            /// Use this method to set a unique transaction ID for tracking API requests.
+            /// Use this method to set a unique reference ID for tracking API requests.
             /// </remarks>
-            public new LayoutBuilder SetTransactionId(string transactionId)
+            [Obsolete("Set your reference ID as part every API interaction like the creating or deleting a layout call instead.")]
+            public new LayoutBuilder SetTransactionId(string referenceId)
             {
-                base.SetTransactionId(transactionId);
+                base.SetTransactionId(referenceId);
                 return this;
             }
         }

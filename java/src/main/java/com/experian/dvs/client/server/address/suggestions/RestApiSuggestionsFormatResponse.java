@@ -1,9 +1,10 @@
 package com.experian.dvs.client.server.address.suggestions;
 
+import com.experian.dvs.client.server.RestApiResponse;
 import com.experian.dvs.client.server.RestApiResponseError;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RestApiSuggestionsFormatResponse {
+public class RestApiSuggestionsFormatResponse extends RestApiResponse {
     @JsonProperty("error")
     private RestApiResponseError error;
 

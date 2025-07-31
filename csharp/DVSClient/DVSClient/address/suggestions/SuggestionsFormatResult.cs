@@ -8,6 +8,7 @@ namespace DVSClient.Address.Suggestions
         public bool MoreResultsAvailable { get; }
         public AddressConfidence? Confidence { get; }
         public IEnumerable<SuggestionsFormatSuggestion> Suggestions { get; }
+        public string? ReferenceId { get; }
 
         public SuggestionsFormatResult(RestApiSuggestionsFormatResponse response)
         {
@@ -24,6 +25,8 @@ namespace DVSClient.Address.Suggestions
                 Confidence = null;
                 Suggestions = new List<SuggestionsFormatSuggestion>();
             }
+
+            ReferenceId = response.ReferenceId;
         }
     }
 }

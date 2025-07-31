@@ -133,11 +133,13 @@ public class PhoneConfiguration extends com.experian.dvs.client.common.Configura
         /**
          * Sets a custom transaction ID for API requests.
          *
-         * @param transactionId The transaction ID to use.
+         * @param referenceId The transaction ID to use.
          * @return The current {@link PhoneBuilder} instance for method chaining.
+         * @deprecated Set your reference ID as part every API interaction like the Validate call instead.
          */
-        public PhoneBuilder setTransactionId(String transactionId) {
-            super.setTransactionId(transactionId);
+        @Deprecated(since="1.1.10", forRemoval=true)
+        public PhoneBuilder setTransactionId(String referenceId) {
+            super.setTransactionId(referenceId);
             return this;
         }
 

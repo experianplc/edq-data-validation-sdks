@@ -53,11 +53,13 @@ public class LayoutConfiguration extends Configuration {
         /**
          * Sets a custom transaction ID for API requests.
          *
-         * @param transactionId The transaction ID to use.
+         * @param referenceId The transaction ID to use.
          * @return The current {@link LayoutBuilder} instance for method chaining.
+         * @deprecated Set your reference ID as part every API interaction like the creating or deleting a layout call instead.
          */
-        public LayoutBuilder setTransactionId(String transactionId) {
-            super.setTransactionId(transactionId);
+        @Deprecated(since="1.1.10", forRemoval=true)
+        public LayoutBuilder setTransactionId(String referenceId) {
+            super.setTransactionId(referenceId);
             return this;
         }
     }

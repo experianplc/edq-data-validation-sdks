@@ -1,7 +1,6 @@
-using DVSClient.Address.Lookup;
 using DVSClient.Server.Address.Lookup;
 
-namespace DVSClient.address.lookup
+namespace DVSClient.Address.Lookup
 {
     public class LookupSuggestion
     {
