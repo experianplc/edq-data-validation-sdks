@@ -124,4 +124,41 @@ This is the Experian Software Development Kit Licence Agreement.
 
 
 
+This is the Experian Software Development Kit Contributor Licence Agreement.
+
+This Contributor Licence Agreement (**Agreement**) sets out the intellectual property license granted by You when You submit Contributions to Experian. It does not change your rights to use Your Contributions for any other purpose.
+
+By submitting a Contribution (defined below), You hereby accept and agree to the following terms and conditions for Your present and future Contributions submitted to Experian. Except for the license granted herein to Experian and recipients of software distributed by Experian, You reserve all right, title, and interest in and to Your Contributions.
+
+1. Definitions.
+
+    **You** (or **Your**) means the copyright owner or a person authorised by the copyright owner that is making this Agreement with Experian. A reference to a person includes an individual or legal entity. A legal entity includes a corporation or other body corporate, partnership, trust, joint venture, unincorporated body, government agency or other entity, For legal entities, the entity making a Contribution and all other entities that control, are controlled by, or are under common control with that entity are considered to be a single Contributor. For the purposes of this definition, "control" means (i) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding shares, or (iii) beneficial ownership of such entity.
+
+    **Contribution** means any original work of authorship, including any modifications or additions to an existing work and any comments and documentation, that is intentionally submitted by You to Experian for inclusion in, or documentation of, any software development kit that is owned or managed by Experian (the **Work**). For the purposes of this definition, "submitted" means any form of electronic, verbal, or written communication sent to Experian or its representatives, including but not limited to communication on electronic mailing lists, source code control systems, and issue tracking systems that are managed by, or on behalf of, Experian for the purpose of discussing and improving the Work, but excluding communication that is conspicuously marked or otherwise designated in writing by You as "Not a Contribution". 
+
+    **Employer** has the meaning in clause 4.
+
+    **Experian** means Experian Marketing Solutions, LLC d/b/a Experian Data Quality, except if You are making a Contribution on behalf of Your Employer under a Customer Agreement, then Experian means the Experian contracting entity under that Customer Agreement. **Customer Agreement** means the agreement between Experian and Your Employer. 
+
+1. **Grant of Copyright License**. Subject to the terms and conditions of this Agreement, You hereby grant to Experian and to recipients of software distributed by Experian a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare derivative works of, publicly display, publicly perform, sublicense, and distribute Your Contributions and such derivative works to third parties.
+
+1. **Grant of Patent License**. Subject to the terms and conditions of this Agreement, You hereby grant to Experian and to recipients of software distributed by Experian a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer or dispose the Work, where such licence applies only to those patent claims licensable by You that are necessarily infringed by Your Contribution(s) alone or by combination of Your Contribution(s) with the Work to which such Contribution(s) was submitted. If any entity institutes patent litigation against You or any other entity (including a cross-claim or counterclaim in a lawsuit) alleging that Your Contribution, or the Work to which You have contributed, constitutes direct or contributory patent infringement, then any patent licences granted to that entity under this Agreement for that Contribution or Work shall terminate as of the date such litigation is filed.
+
+1. You represent and warrant that You are legally entitled to grant the above licence. If Your employer(s) or any person for whom You are acting on behalf of (Employer), has rights to intellectual property that You create in the course of Your work that includes Your Contributions, You represent that You have received permission to make Contributions on behalf of that Employer, that Your Employer has waived such rights before You make this Agreement or submit a Contribution, and You have the necessary authority to bind the Employer to the rights and obligations under this Agreement. In that case, You in this Agreement will refer to You and the Employer collectively. If You change your Employer, You agree to make a new Agreement and secure permission from the new Employer before submitting Your Contributions.
+
+1. You represent that each of Your Contributions is Your original creation (see section 7 for submissions on behalf of others). You represent that Your Contribution submissions include complete details of any third-party licence or other restriction (including, but not limited to, related patents and trademarks) of which You are personally aware and which are associated with any part of Your Contributions.
+
+1. You are not expected to provide support for Your Contributions, except to the extent You choose to do so. Unless required by applicable law or agreed to in writing, You provide Your Contributions on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND EXCEPT FOR THE WARRANTY STATED IN SECTION 4, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON- INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE.
+
+1. Should You wish to submit work that is not Your original creation, You may submit it separately to Experian, if You identify the complete details of its source and You retain all licence and copyright information or other restriction (including, but not limited to, related patents, trademarks, and licence agreements) in the materials as You received them of which You are personally aware, and conspicuously marking the work as "Submitted on behalf of a third-party: [named here]".
+
+1. You agree to notify Experian of any facts or circumstances of which You later become aware that would make Your representations in this Agreement inaccurate in any respect.
+
+1. You acknowledge and agree that a Contribution is included or not included in the Work at the sole discretion of Experian and that Your Contribution may be retained indefinitely.
+
+1. You will indemnify, defend and hold harmless Experian and its officers, directors, and employees and affiliates from and against any and all any third-party claim, damage, loss, liability, cost or expense, including reasonable attorneys’ fees, to the extent caused by Your violation of this Agreement.
+
+1. This Agreement is governed by the laws of California, United States without regard to its conflict of laws provisions and the parties consent to the exclusive jurisdiction and venue for Federal and State claims in Orange County, United States for any legal matter arising from this Agreement, except where You make Contributions on behalf of Your Employer with a Customer Agreement with us, then the governing law is that of the Customer Agreement.
+
+1. This Agreement constitutes the whole legal agreement between You and Experian solely in relation to the submission of Contributions to Experian and supersedes any and all prior written agreements relating to the Agreement’s subject matter. This Agreement may be assigned by Experian.
 
