@@ -171,7 +171,7 @@ public enum Dataset {
     FI_ADDRESS_ED("fi-address-ed", Country.FINLAND, List.of(SearchType.VALIDATE), Accuracy.A, Accuracy.A_PLUS),
     FI_ADDRESS_EH("fi-address-eh", Country.FINLAND, List.of(SearchType.AUTOCOMPLETE, SearchType.LOOKUP_V2), Accuracy.A, Accuracy.A_PLUS),
     FR_ADDRESS("fr-address", Country.FRANCE, List.of(SearchType.SINGLELINE, SearchType.TYPEDOWN, SearchType.VALIDATE), Accuracy.A, Accuracy.A_PLUS),
-    FR_ADDRESS_HEXALINE3("fr-address-hexaline3", Country.FRANCE, List.of(SearchType.AUTOCOMPLETE, SearchType.SINGLELINE, SearchType.TYPEDOWN), Accuracy.A_PLUS, Accuracy.A_PLUS),
+    FR_ADDRESS_HEXALINE3("fr-additional-hexaline3", Country.FRANCE, List.of(SearchType.AUTOCOMPLETE, SearchType.SINGLELINE, SearchType.TYPEDOWN), Accuracy.A_PLUS, Accuracy.A_PLUS),
     FR_ADDRESS_STREETLEVEL("fr-address-streetlevel", Country.FRANCE, List.of(SearchType.SINGLELINE, SearchType.TYPEDOWN, SearchType.VALIDATE), Accuracy.A_MINUS, Accuracy.A_PLUS),
     GF_ADDRESS_ED("gf-address-ed", Country.FRENCH_GUIANA, List.of(SearchType.SINGLELINE, SearchType.VALIDATE), Accuracy.B, Accuracy.B_MINUS),
     GF_ADDRESS_EH("gf-address-eh", Country.FRENCH_GUIANA, List.of(SearchType.AUTOCOMPLETE, SearchType.LOOKUP_V2), Accuracy.A_MINUS, Accuracy.B_MINUS),

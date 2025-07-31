@@ -650,7 +650,7 @@ namespace DVSClient.Address
             FoAddressEd = new Dataset("fo-address-ed", Country.FaroeIslands, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
             FoAddressEh = new Dataset("fo-address-eh", Country.FaroeIslands, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.A, Accuracy.APlus);
             FrAddress = new Dataset("fr-address", Country.France, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.A, Accuracy.APlus);
-            FrAddressHexaline3 = new Dataset("fr-address-hexaline3", Country.France, new List<SearchType> { SearchType.Autocomplete, SearchType.Singleline, SearchType.Typedown }, Accuracy.APlus, Accuracy.APlus);
+            FrAddressHexaline3 = new Dataset("fr-additional-hexaline3", Country.France, new List<SearchType> { SearchType.Autocomplete, SearchType.Singleline, SearchType.Typedown }, Accuracy.APlus, Accuracy.APlus);
             FrAddressStreetLevel = new Dataset("fr-address-streetlevel", Country.France, new List<SearchType> { SearchType.Singleline, SearchType.Typedown, SearchType.Validate }, Accuracy.AMinus, Accuracy.APlus);
             GaAddressEd = new Dataset("ga-address-ed", Country.Gabon, new List<SearchType> { SearchType.Singleline, SearchType.Validate }, Accuracy.B, Accuracy.BMinus);
             GaAddressEh = new Dataset("ga-address-eh", Country.Gabon, new List<SearchType> { SearchType.Autocomplete, SearchType.LookupV2 }, Accuracy.AMinus, Accuracy.BMinus);
@@ -1006,7 +1006,10 @@ namespace DVSClient.Address
             AddressAccuracy = addressAccuracy;
             GeocodeAccuracy = geocodeAccuracy;
 
-            datasetMap.Add(datasetCode, this);
+            if (!datasetMap.TryAdd(datasetCode, this))
+            {
+                throw new ArgumentException($"Dataset with code '{datasetCode}' already exists.", nameof(datasetCode));
+            }
         }
 
         public static Dataset FromCode(string? datasetCode)
