@@ -136,7 +136,7 @@ namespace DVSClient.Server
             return await PostAsync<RestApiEmailValidateResponse>(endPoint, validateEmailRequest, headers);
         }
 
-        private async Task<T> ExecuteWithRetryAsync<T>(Func<Task<HttpResponseMessage>> operation)
+        private async Task<T> ExecuteWithRetryAsync<T>(Func<Task<HttpResponseMessage>> operation) where T : RestApiResponse
         {
             int attempt = 0;
             int delay = _configuration.GetInitialDelayInMilliseconds();
@@ -148,19 +148,21 @@ namespace DVSClient.Server
                     var response = await operation();
                     var content = await response.Content.ReadAsStringAsync();
 
+                    // init to 204 - no content response
+                    var noContentResponse = new { };
+                    T result = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(noContentResponse))
+                                   ?? throw new InvalidOperationException("Deserialization returned null.");
+
                     if (response.IsSuccessStatusCode)
                     {
                         if (response.StatusCode == HttpStatusCode.NoContent)
                         {
                             // Successful Delete operation returns 204 - No Content
-                            var noContentResponse = new { };
-                            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(noContentResponse))
-                                   ?? throw new InvalidOperationException("Deserialization returned null.");
+                            return result;
                         }
                         else
                         {
-                            return JsonConvert.DeserializeObject<T>(content)
-                                ?? throw new InvalidOperationException("Deserialization returned null.");
+                            result = JsonConvert.DeserializeObject<T>(content) ?? throw new InvalidOperationException("Deserialization returned null.");
                         }
                     }
 
@@ -172,21 +174,25 @@ namespace DVSClient.Server
                     {
                         // Only Get / Delete on missing layout is throwing 404
                         var errorResponse = new { Error = new { Title = response.ReasonPhrase } };
-                        return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(errorResponse)) ?? throw new InvalidOperationException("Deserialization returned null.");
+                        result = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(errorResponse)) ?? throw new InvalidOperationException("Deserialization returned null.");
                     }
                     else if ((int)response.StatusCode >= 400 && (int)response.StatusCode < 500)
                     {
                         // Do not retry on client errors (4xx)
                         if (!string.IsNullOrWhiteSpace(content))
                         {
-                            return JsonConvert.DeserializeObject<T>(content) ?? throw new InvalidOperationException("Deserialization returned null.");
+                            result = JsonConvert.DeserializeObject<T>(content) ?? throw new InvalidOperationException("Deserialization returned null.");
                         }
                         else
                         {
-                            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(new { Error = new { Title = response.ReasonPhrase } }))
+                            result = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(new { Error = new { Title = response.ReasonPhrase } }))
                                    ?? throw new InvalidOperationException("Deserialization returned null.");
                         }
                     }
+
+                    result.ReferenceId = GetRefIdFromHeaderValue(response.Headers.GetValues("Reference-Id").FirstOrDefault(string.Empty));
+
+                    return result;
                 }
                 catch (HttpRequestException)
                 {
@@ -204,7 +210,18 @@ namespace DVSClient.Server
             throw new Exception("Max retry attempts exceeded.");
         }
 
-        private async Task<T> PostAsync<T>(string endPoint, object requestObject, IDictionary<string, object> headers)
+        private string GetRefIdFromHeaderValue(string referenceId)
+        {
+            string pattern = "/transaction:";
+            if (referenceId.Contains(pattern))
+            {
+                referenceId = referenceId.Substring(referenceId.LastIndexOf(pattern) + pattern.Length);
+            }
+
+            return referenceId;
+        }
+
+        private async Task<T> PostAsync<T>(string endPoint, object requestObject, IDictionary<string, object> headers) where T : RestApiResponse
         {
             return await ExecuteWithRetryAsync<T>(async () =>
             {
@@ -220,12 +237,12 @@ namespace DVSClient.Server
             });
         }
 
-        private async Task<T> GetAsync<T>(string endPoint, IDictionary<string, object> headers)
+        private async Task<T> GetAsync<T>(string endPoint, IDictionary<string, object> headers) where T : RestApiResponse
         {
             return await GetAsync<T>(endPoint, headers, new Dictionary<string, string>());
         }
 
-        private async Task<T> GetAsync<T>(string endPoint, IDictionary<string, object> headers, IDictionary<string, string> parameters)
+        private async Task<T> GetAsync<T>(string endPoint, IDictionary<string, object> headers, IDictionary<string, string> parameters) where T : RestApiResponse
         {
             return await ExecuteWithRetryAsync<T>(async () =>
             {
@@ -250,7 +267,7 @@ namespace DVSClient.Server
             });
         }
 
-        private async Task<T> DeleteAsync<T>(string endPoint, IDictionary<string, object> headers, IDictionary<string, string> parameters)
+        private async Task<T> DeleteAsync<T>(string endPoint, IDictionary<string, object> headers, IDictionary<string, string> parameters) where T : RestApiResponse
         {
             return await ExecuteWithRetryAsync<T>(async () =>
             {

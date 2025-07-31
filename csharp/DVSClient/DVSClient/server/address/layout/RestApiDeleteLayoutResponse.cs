@@ -2,7 +2,7 @@
 
 namespace DVSClient.Server.Address.Layout
 {
-    public class RestApiGetLayoutResponse
+    public class RestApiGetLayoutResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

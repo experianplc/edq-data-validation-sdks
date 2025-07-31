@@ -7,11 +7,13 @@ namespace DVSClient.Address.Datasets
     {
         public ResponseError? Error { get; }
         public IEnumerable<AddressDataset>? Result { get; }
+        public string? ReferenceId { get; }
 
         public GetDatasetsResult(RestApiGetDatasetsResponse response)
         {
             Error = response.Error != null ? new ResponseError(response.Error) : null;
             Result = response.Result != null ? response.Result.Select(r => new AddressDataset(r)).ToList() : null;
+            ReferenceId = response.ReferenceId;
         }
     }
 }

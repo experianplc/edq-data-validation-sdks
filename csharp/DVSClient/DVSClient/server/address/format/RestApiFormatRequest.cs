@@ -19,7 +19,7 @@ namespace DVSClient.Server.Address.Format
         {
             var request = new RestApiFormatRequest
             {
-                Layouts = new List<string> { configuration.FormatLayoutName },
+                Layouts = new List<string> { configuration.LayoutName },
                 LayoutFormat = configuration.LayoutFormat.ToString()
             };
 

@@ -1,9 +1,10 @@
 package com.experian.dvs.client.server.phone;
 
+import com.experian.dvs.client.server.RestApiResponse;
 import com.experian.dvs.client.server.RestApiResponseError;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RestApiPhoneValidateResponse {
+public class RestApiPhoneValidateResponse extends RestApiResponse {
 
     @JsonProperty("error")
     private RestApiResponseError error;

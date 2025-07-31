@@ -24,7 +24,7 @@ public class RestApiFormatRequest {
     public static RestApiFormatRequest using(final AddressConfiguration configuration) {
         final RestApiFormatRequest request = new RestApiFormatRequest();
 
-        request.setLayouts(List.of(configuration.getFormatLayoutName()));
+        request.setLayouts(List.of(configuration.getLayoutName()));
         request.setLayoutFormat(configuration.getLayoutFormat().getValue());
 
         final Optional<RestApiFormatAttribute> attributes = RestApiAddressValidateRequest.getFormatAttribute(configuration);

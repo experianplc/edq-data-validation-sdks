@@ -1,6 +1,6 @@
-using DVSClient.address.lookup;
 using DVSClient.Address.Datasets;
 using DVSClient.Address.Format;
+using DVSClient.Address.Lookup;
 using DVSClient.Address.Search;
 using DVSClient.Address.Suggestions;
 using DVSClient.Address.Validate;
@@ -17,7 +17,7 @@ namespace DVSClient.Address
 {
     public class AddressClient : IDisposable
     {
-        private readonly Address.AddressConfiguration _configuration;
+        private readonly AddressConfiguration _configuration;
         private readonly IRestApiAsyncStub _restApiAsyncStub;
 
         /// <summary>
@@ -45,9 +45,20 @@ namespace DVSClient.Address
         /// <returns>A result containing the datasets for the specified country.</returns>
         public GetDatasetsResult GetDatasets(Country country)
         {
+            return GetDatasets(country, string.Empty);
+        }
+
+        /// <summary>
+        /// Retrieves datasets for the specified country.
+        /// </summary>
+        /// <param name="country">The country for which datasets are requested.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A result containing the datasets for the specified country.</returns>
+        public GetDatasetsResult GetDatasets(Country country, string referenceId)
+        {
             try
             {
-                return GetDatasetsAsync(country).GetAwaiter().GetResult();
+                return GetDatasetsAsync(country, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -55,17 +66,29 @@ namespace DVSClient.Address
             }
         }
 
-        /**
-        * Looks up an address based on a key.
-        * @param value The key being used to perform the lookup
-        * @param lookupType The type of lookup that you wish to perform.
-        * @returns A promise that resolves to the result containing the found addresses / suggestions.
-        */
+        /// <summary>
+        /// Looks up an address based on a key.
+        /// </summary>
+        /// <param name="value">The key being used to perform the lookup.</param>
+        /// <param name="lookupType">The type of lookup that you wish to perform.</param>
+        /// <returns>The result containing the found addresses or suggestions.</returns>
         public LookupResult Lookup(String value, LookupType lookupType)
+        {
+            return Lookup(value, lookupType);
+        }
+
+        /// <summary>
+        /// Looks up an address based on a key.
+        /// </summary>
+        /// <param name="value">The key being used to perform the lookup.</param>
+        /// <param name="lookupType">The type of lookup that you wish to perform.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The result containing the found addresses or suggestions.</returns>
+        public LookupResult Lookup(String value, LookupType lookupType, string referenceId)
         {
             try
             {
-                return LookupAsync(value, lookupType).GetAwaiter().GetResult();
+                return LookupAsync(value, lookupType, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -80,14 +103,18 @@ namespace DVSClient.Address
         /// <returns>The search result.</returns>
         public SearchResult Search(string searchInput)
         {
-            try
-            {
-                return SearchAsync(searchInput).GetAwaiter().GetResult();
-            }
-            catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
-            {
-                throw new RestApiInterruptionOrExecutionException(e);
-            }
+            return Search(SearchType.Autocomplete, searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Performs a search using the specified input.
+        /// </summary>
+        /// <param name="searchInput">The search input string.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The search result.</returns>
+        public SearchResult Search(string searchInput, string referenceId)
+        {
+            return Search(SearchType.Autocomplete, searchInput, referenceId);
         }
 
         /// <summary>
@@ -98,9 +125,21 @@ namespace DVSClient.Address
         /// <returns>The search result.</returns>
         public SearchResult Search(SearchType searchType, string searchInput)
         {
+            return Search(searchType, searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Performs a search using the specified search type and input.
+        /// </summary>
+        /// <param name="searchType">The type of search to perform.</param>
+        /// <param name="searchInput">The search input string.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The search result.</returns>
+        public SearchResult Search(SearchType searchType, string searchInput, string referenceId)
+        {
             try
             {
-                return SearchAsync(searchType, searchInput).GetAwaiter().GetResult();
+                return SearchAsync(searchType, searchInput, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -115,9 +154,20 @@ namespace DVSClient.Address
         /// <returns>The formatted address result.</returns>
         public FormatResult Format(string addressKey)
         {
+            return Format(addressKey, string.Empty);
+        }
+
+        /// <summary>
+        /// Formats an address using the specified address key.
+        /// </summary>
+        /// <param name="addressKey">The key of the address to format.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The formatted address result.</returns>
+        public FormatResult Format(string addressKey, string referenceId)
+        {
             try
             {
-                return FormatAsync(addressKey).GetAwaiter().GetResult();
+                return FormatAsync(addressKey, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -132,9 +182,20 @@ namespace DVSClient.Address
         /// <returns>The validation result.</returns>
         public ValidateResult Validate(string searchInput)
         {
+            return Validate(searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Validates an address using the specified input string.
+        /// </summary>
+        /// <param name="searchInput">The address input string to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The validation result.</returns>
+        public ValidateResult Validate(string searchInput, string referenceId)
+        {
             try
             {
-                return ValidateAsync(searchInput).GetAwaiter().GetResult();
+                return ValidateAsync(searchInput, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -149,9 +210,20 @@ namespace DVSClient.Address
         /// <returns>The validation result.</returns>
         public ValidateResult Validate(List<string> addressLines)
         {
+            return Validate(addressLines, string.Empty);
+        }
+
+        /// <summary>
+        /// Validates an address using the specified list of address lines.
+        /// </summary>
+        /// <param name="addressLines">The list of address lines to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The validation result.</returns>
+        public ValidateResult Validate(List<string> addressLines, string referenceId)
+        {
             try
             {
-                return ValidateAsync(addressLines).GetAwaiter().GetResult();
+                return ValidateAsync(addressLines, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -166,9 +238,20 @@ namespace DVSClient.Address
         /// <returns>The search result after stepping into the suggestion.</returns>
         public SearchResult SuggestionsStepIn(string globalAddressKey)
         {
+            return SuggestionsStepIn(globalAddressKey, string.Empty);
+        }
+
+        /// <summary>
+        /// Steps into a suggestion using the specified global address key.
+        /// </summary>
+        /// <param name="globalAddressKey">The global address key for the suggestion.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The search result after stepping into the suggestion.</returns>
+        public SearchResult SuggestionsStepIn(string globalAddressKey, string referenceId)
+        {
             try
             {
-                return SuggestionsStepInAsync(globalAddressKey).GetAwaiter().GetResult();
+                return SuggestionsStepInAsync(globalAddressKey, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -184,9 +267,21 @@ namespace DVSClient.Address
         /// <returns>The search result after refining the suggestion.</returns>
         public SearchResult SuggestionsRefine(string key, string refinement)
         {
+            return SuggestionsRefine(key, refinement, string.Empty);
+        }
+
+        /// <summary>
+        /// Refines a suggestion using the specified key and refinement string.
+        /// </summary>
+        /// <param name="key">The key of the suggestion to refine.</param>
+        /// <param name="refinement">The refinement string.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The search result after refining the suggestion.</returns>
+        public SearchResult SuggestionsRefine(string key, string refinement, string referenceId)
+        {
             try
             {
-                return SuggestionsRefineAsync(key, refinement).GetAwaiter().GetResult();
+                return SuggestionsRefineAsync(key, refinement, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -201,9 +296,20 @@ namespace DVSClient.Address
         /// <returns>The formatted suggestions result.</returns>
         public SuggestionsFormatResult SuggestionsFormat(string searchInput)
         {
+            return SuggestionsFormat(searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Formats suggestions based on the specified search input.
+        /// </summary>
+        /// <param name="searchInput">The search input string for formatting suggestions.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>The formatted suggestions result.</returns>
+        public SuggestionsFormatResult SuggestionsFormat(string searchInput, string referenceId)
+        {
             try
             {
-                return SuggestionsFormatAsync(searchInput).GetAwaiter().GetResult();
+                return SuggestionsFormatAsync(searchInput, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -218,20 +324,43 @@ namespace DVSClient.Address
         /// <returns>A task representing the asynchronous operation, containing the datasets result.</returns>
         public Task<GetDatasetsResult> GetDatasetsAsync(Country country)
         {
-            var headers = _configuration.GetCommonHeaders();
+            return GetDatasetsAsync(country, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously retrieves datasets for the specified country.
+        /// </summary>
+        /// <param name="country">The country for which datasets are requested.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the datasets result.</returns>
+        public Task<GetDatasetsResult> GetDatasetsAsync(Country country, string referenceId)
+        {
+            var headers = _configuration.GetCommonHeaders(referenceId);
             var datasetsResponse = _restApiAsyncStub.GetDatasetsV1(country.Iso3Code, headers);
             return new GetDatasetsResultFuture(datasetsResponse).GetAsync();
         }
 
-        /**
-        * Asynchronously looks up an address based on a key.
-        * @param value The key being used to perform the lookup
-        * @param lookupType The type of lookup that you wish to perform.
-        * @returns A promise that resolves to the result containing the found addresses / suggestions.
-        */
-        public Task<LookupResult> LookupAsync(String value, LookupType lookupType)
+        /// <summary>
+        /// Asynchronously looks up an address based on a key.
+        /// </summary>
+        /// <param name="value">The key being used to perform the lookup.</param>
+        /// <param name="lookupType">The type of lookup that you wish to perform.</param>
+        /// <returns>A task that resolves to the result containing the found addresses or suggestions.</returns>
+        public Task<LookupResult> LookupAsync(string value, LookupType lookupType)
         {
-            var headers = _configuration.GetCommonHeaders();
+            return LookupAsync(value, lookupType, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously looks up an address based on a key.
+        /// </summary>
+        /// <param name="value">The key being used to perform the lookup.</param>
+        /// <param name="lookupType">The type of lookup that you wish to perform.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task that resolves to the result containing the found addresses or suggestions.</returns>
+        public Task<LookupResult> LookupAsync(string value, LookupType lookupType, string referenceId)
+        {
+            var headers = _configuration.GetCommonHeaders(referenceId);
             if (_configuration.LookupAddAddresses) 
             {
                 headers.Add("Add-Addresses", "true");
@@ -251,11 +380,22 @@ namespace DVSClient.Address
         /// </summary>
         /// <param name="globalAddressKey">The global address key for the suggestion.</param>
         /// <returns>A task representing the asynchronous operation, containing the search result after stepping into the suggestion.</returns>
-        public Task<Search.SearchResult> SuggestionsStepInAsync(string globalAddressKey)
+        public Task<SearchResult> SuggestionsStepInAsync(string globalAddressKey)
         {
-            var headers = _configuration.GetCommonHeaders();
+            return SuggestionsStepInAsync(globalAddressKey, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously steps into a suggestion using the specified global address key.
+        /// </summary>
+        /// <param name="globalAddressKey">The global address key for the suggestion.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result after stepping into the suggestion.</returns>
+        public Task<SearchResult> SuggestionsStepInAsync(string globalAddressKey, string referenceId)
+        {
+            var headers = _configuration.GetCommonHeaders(referenceId);
             var stepInResponse = _restApiAsyncStub.SuggestionsStepInV1(globalAddressKey, headers);
-            return new Search.SearchResultFuture(stepInResponse).GetAsync();
+            return new SearchResultFuture(stepInResponse).GetAsync();
         }
 
         /// <summary>
@@ -264,13 +404,25 @@ namespace DVSClient.Address
         /// <param name="key">The key of the suggestion to refine.</param>
         /// <param name="refinement">The refinement string.</param>
         /// <returns>A task representing the asynchronous operation, containing the search result after refining the suggestion.</returns>
-        public Task<Search.SearchResult> SuggestionsRefineAsync(string key, string refinement)
+        public Task<SearchResult> SuggestionsRefineAsync(string key, string refinement)
+        {
+            return SuggestionsRefineAsync(key, refinement, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously refines a suggestion using the specified key and refinement string.
+        /// </summary>
+        /// <param name="key">The key of the suggestion to refine.</param>
+        /// <param name="refinement">The refinement string.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result after refining the suggestion.</returns>
+        public Task<SearchResult> SuggestionsRefineAsync(string key, string refinement, string referenceId)
         {
             var request = RestApiSuggestionsRefineRequest.Using(_configuration);
             request.Refinement = refinement;
-            var headers = _configuration.GetCommonHeaders();
+            var headers = _configuration.GetCommonHeaders(referenceId);
             var refineResponse = _restApiAsyncStub.SuggestionsRefineV1(key, request, headers);
-            return new Search.SearchResultFuture(refineResponse).GetAsync();
+            return new SearchResultFuture(refineResponse).GetAsync();
         }
 
         /// <summary>
@@ -278,13 +430,24 @@ namespace DVSClient.Address
         /// </summary>
         /// <param name="searchInput">The search input string for formatting suggestions.</param>
         /// <returns>A task representing the asynchronous operation, containing the formatted suggestions result.</returns>
-        public Task<Suggestions.SuggestionsFormatResult> SuggestionsFormatAsync(string searchInput)
+        public Task<SuggestionsFormatResult> SuggestionsFormatAsync(string searchInput)
+        {
+            return SuggestionsFormatAsync(searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously formats suggestions based on the specified search input.
+        /// </summary>
+        /// <param name="searchInput">The search input string for formatting suggestions.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the formatted suggestions result.</returns>
+        public Task<SuggestionsFormatResult> SuggestionsFormatAsync(string searchInput, string referenceId)
         {
             var request = RestApiSuggestionsFormatRequest.Using(_configuration);
             request.Address = new Server.Address.Address(searchInput);
-            var headers = _configuration.GetCommonHeaders();
+            var headers = _configuration.GetCommonHeaders(referenceId);
             var suggestionsFormatResponse = _restApiAsyncStub.SuggestionsFormatV1(request, headers);
-            return new Suggestions.SuggestionsFormatResultFuture(suggestionsFormatResponse).GetAsync();
+            return new SuggestionsFormatResultFuture(suggestionsFormatResponse).GetAsync();
         }
 
         /// <summary>
@@ -292,9 +455,20 @@ namespace DVSClient.Address
         /// </summary>
         /// <param name="searchInput">The search input string.</param>
         /// <returns>A task representing the asynchronous operation, containing the search result.</returns>
-        public Task<Search.SearchResult> SearchAsync(string searchInput)
+        public Task<SearchResult> SearchAsync(string searchInput)
         {
-            return SearchAsync(SearchType.Autocomplete, searchInput);
+            return SearchImplAsync(SearchType.Autocomplete, searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously performs a search using the specified input.
+        /// </summary>
+        /// <param name="searchInput">The search input string.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result.</returns>
+        public Task<SearchResult> SearchAsync(string searchInput, string referenceId)
+        {
+            return SearchImplAsync(SearchType.Autocomplete, searchInput, referenceId);
         }
 
         /// <summary>
@@ -303,9 +477,21 @@ namespace DVSClient.Address
         /// <param name="searchType">The type of search to perform.</param>
         /// <param name="searchInput">The search input string.</param>
         /// <returns>A task representing the asynchronous operation, containing the search result.</returns>
-        public Task<Search.SearchResult> SearchAsync(SearchType searchType, string searchInput)
+        public Task<SearchResult> SearchAsync(SearchType searchType, string searchInput)
         {
-            return PerformSearchWithSearchTypeAsync(searchType, searchInput);
+            return SearchImplAsync(searchType, searchInput, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously performs a search using the specified search type and input.
+        /// </summary>
+        /// <param name="searchType">The type of search to perform.</param>
+        /// <param name="searchInput">The search input string.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the search result.</returns>
+        public Task<SearchResult> SearchAsync(SearchType searchType, string searchInput, string referenceId)
+        {
+            return SearchImplAsync(searchType, searchInput, referenceId);
         }
 
         /// <summary>
@@ -313,12 +499,23 @@ namespace DVSClient.Address
         /// </summary>
         /// <param name="addressKey">The key of the address to format.</param>
         /// <returns>A task representing the asynchronous operation, containing the formatted address result.</returns>
-        public Task<Format.FormatResult> FormatAsync(string addressKey)
+        public Task<FormatResult> FormatAsync(string addressKey)
+        {
+           return FormatAsync(addressKey, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously formats an address using the specified address key.
+        /// </summary>
+        /// <param name="addressKey">The key of the address to format.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the formatted address result.</returns>
+        public Task<FormatResult> FormatAsync(string addressKey, string referenceId)
         {
             var request = RestApiFormatRequest.Using(_configuration);
-            var headers = GetFormatRequestHeaders();
+            var headers = GetFormatRequestHeaders(referenceId);
             var formatResponse = _restApiAsyncStub.FormatV1(addressKey, request, headers);
-            return new Format.FormatResultFuture(formatResponse).GetAsync();
+            return new FormatResultFuture(formatResponse).GetAsync();
         }
 
         /// <summary>
@@ -326,9 +523,20 @@ namespace DVSClient.Address
         /// </summary>
         /// <param name="address">The address input string to validate.</param>
         /// <returns>A task representing the asynchronous operation, containing the validation result.</returns>
-        public Task<Validate.ValidateResult> ValidateAsync(string address)
+        public Task<ValidateResult> ValidateAsync(string address)
         {
-            return ValidateAsync(new List<string> { address });
+            return ValidateImplAsync(new List<string> { address }, string.Empty);
+        }
+
+        /// <summary>
+        /// Asynchronously validates an address using the specified input string.
+        /// </summary>
+        /// <param name="address">The address input string to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the validation result.</returns>
+        public Task<ValidateResult> ValidateAsync(string address, string referenceId)
+        {
+            return ValidateImplAsync(new List<string> { address }, referenceId);
         }
 
         /// <summary>
@@ -336,16 +544,27 @@ namespace DVSClient.Address
         /// </summary>
         /// <param name="addressLines">The list of address lines to validate.</param>
         /// <returns>A task representing the asynchronous operation, containing the validation result.</returns>
-        public Task<Validate.ValidateResult> ValidateAsync(List<string> addressLines)
+        public Task<ValidateResult> ValidateAsync(List<string> addressLines)
         {
-            return ValidateImplAsync(addressLines);
+            return ValidateImplAsync(addressLines, string.Empty);
         }
 
-        private Task<Validate.ValidateResult> ValidateImplAsync(List<string> addressLines)
+        /// <summary>
+        /// Asynchronously validates an address using the specified list of address lines.
+        /// </summary>
+        /// <param name="addressLines">The list of address lines to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A task representing the asynchronous operation, containing the validation result.</returns>
+        public Task<ValidateResult> ValidateAsync(List<string> addressLines, string referenceId)
+        {
+            return ValidateImplAsync(addressLines, referenceId);
+        }
+
+        private Task<ValidateResult> ValidateImplAsync(List<string> addressLines, string referenceId)
         {
             var request = RestApiAddressValidateRequest.Using(_configuration);
             request.Address = new Server.Address.Address(addressLines);
-            var headers = _configuration.GetCommonHeaders();
+            var headers = _configuration.GetCommonHeaders(referenceId);
 
             if (_configuration.Components)
             {
@@ -365,10 +584,10 @@ namespace DVSClient.Address
             }
 
             var response = _restApiAsyncStub.ValidateV1(request, headers);
-            return new Validate.ValidateResultFuture(response).GetAsync();
+            return new ValidateResultFuture(response).GetAsync();
         }
 
-        private Task<Search.SearchResult> PerformSearchWithSearchTypeAsync(SearchType searchType, string searchInput)
+        private Task<SearchResult> SearchImplAsync(SearchType searchType, string searchInput, string referenceId)
         {
             ValidateDatasetsSearchTypeCombination(_configuration.Datasets, searchType);
             var request = RestApiAddressSearchRequest.Using(_configuration);
@@ -379,19 +598,19 @@ namespace DVSClient.Address
                 request.AddOption("search_type", searchType.ToString());
             }
 
-            var headers = GetSearchRequestHeaders();
+            var headers = GetSearchRequestHeaders(referenceId);
             return GetSearchResultAsync(request, headers);
         }
 
-        private Task<Search.SearchResult> GetSearchResultAsync(RestApiAddressSearchRequest searchRequest, Dictionary<string, object> headers)
+        private Task<SearchResult> GetSearchResultAsync(RestApiAddressSearchRequest searchRequest, Dictionary<string, object> headers)
         {
             var searchResponse = _restApiAsyncStub.SearchV1(searchRequest, headers);
-            return new Search.SearchResultFuture(searchResponse).GetAsync();
+            return new SearchResultFuture(searchResponse).GetAsync();
         }
 
-        private Dictionary<string, object> GetSearchRequestHeaders()
+        private Dictionary<string, object> GetSearchRequestHeaders(string referenceId)
         {
-            var headers = _configuration.GetCommonHeaders();
+            var headers = _configuration.GetCommonHeaders(referenceId);
 
             if (_configuration.Transliterate)
             {
@@ -419,9 +638,9 @@ namespace DVSClient.Address
             throw new EDVSException("Unsupported dataset / search type combination.");
         }
 
-        private Dictionary<string, object> GetFormatRequestHeaders()
+        private Dictionary<string, object> GetFormatRequestHeaders(string referenceId)
         {
-            var headers = _configuration.GetCommonHeaders();
+            var headers = _configuration.GetCommonHeaders(referenceId);
 
             if (_configuration.Components)
             {

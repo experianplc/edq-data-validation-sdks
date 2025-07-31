@@ -11,6 +11,7 @@ export type ValidateResult = {
     didYouMean?: string[];
     verboseOutput?: VerboseOutput;
     domainType?: DomainType;
+    referenceId?: string;
 };
 
 export function restApiResponseToEmailValidateResult(response: RestApiEmailValidateResponse): ValidateResult {
@@ -32,6 +33,8 @@ export function restApiResponseToEmailValidateResult(response: RestApiEmailValid
     if (apiMetadata?.domain_detail?.type) {
         result.domainType = apiMetadata.domain_detail.type = lookupDomainType(apiMetadata.domain_detail.type);
     }
+
+    result.referenceId = response.referenceId;
 
     return result;
 

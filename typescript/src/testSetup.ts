@@ -1,10 +1,11 @@
+import { randomUUID } from 'crypto';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 export const existingTestLayout = "DVSSDK_Typescript_TestLayout";
 export const testLayoutPrefix = "DVSSDK_Typescript_";
-
+export const staticReferenceId = GenerateUniqueReferenceId();
 
 export function validTokenAddress(): string {
     const token = process.env.DVS_API_VALID_TOKEN_ADDRESS;
@@ -42,4 +43,9 @@ export function isDevMode(): boolean {
     const devMode = process.env.DVS_API_DEV_MODE;
     return devMode === "true";
     
+}
+
+export function GenerateUniqueReferenceId(): string {
+    const token = randomUUID();
+    return token;
 }

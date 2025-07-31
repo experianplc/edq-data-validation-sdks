@@ -31,6 +31,4 @@ public enum PhoneConfidence {
     PhoneConfidence(String value) {
         this.value = value;
     }
-
-
 }

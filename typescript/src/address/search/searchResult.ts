@@ -8,6 +8,7 @@ export type SearchResult = {
     suggestionsKey: string;
     suggestionsPrompt: string;
     suggestions: SearchSuggestion[];
+    referenceId?: string;
 }
 
 export function restApiResponseToSearchResult(response: RestApiAddressSearchResponse): SearchResult {
@@ -19,7 +20,8 @@ export function restApiResponseToSearchResult(response: RestApiAddressSearchResp
             confidence: lookupConfidence(apiResult.confidence),
             suggestionsKey: apiResult.suggestions_key??"",
             suggestionsPrompt: apiResult.suggestions_prompt??"",
-            suggestions: apiResult.suggestions?.map(suggestion => restApiResponseToSuggestion(suggestion)) ?? []
+            suggestions: apiResult.suggestions?.map(suggestion => restApiResponseToSuggestion(suggestion)) ?? [],
+            referenceId: response.referenceId,
         }
     } else {
         return {
@@ -27,7 +29,8 @@ export function restApiResponseToSearchResult(response: RestApiAddressSearchResp
             confidence: AddressConfidence.Unknown,
             suggestionsKey: "",
             suggestionsPrompt: "",
-            suggestions: []
+            suggestions: [],
+            referenceId: response.referenceId
         }
     }
 }

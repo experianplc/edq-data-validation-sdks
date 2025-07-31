@@ -1,6 +1,6 @@
 using DVSClient.Common;
 
-namespace DVSClient.address.lookup
+namespace DVSClient.Address.Lookup
 {
     public enum LookupType
     {

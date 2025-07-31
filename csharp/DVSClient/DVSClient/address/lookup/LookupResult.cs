@@ -1,8 +1,7 @@
-using DVSClient.Address;
 using DVSClient.Common;
 using DVSClient.Server.Address.Lookup;
 
-namespace DVSClient.address.lookup
+namespace DVSClient.Address.Lookup
 {
     public class LookupResult
     {
@@ -13,17 +12,33 @@ namespace DVSClient.address.lookup
         public IEnumerable<LookupSuggestion>? Suggestions { get; }
         public IEnumerable<LookupAddressSuggestionV2>? Addresses { get; }
         public IEnumerable<LookupV2ResultAddressFormatted>? AddressesFormatted { get; }
-    
-        public LookupResult(RestApiAddressLookupV2Result response) 
-        {
-            MoreResultsAvailable = response.MoreResultsAvailable;
-            Confidence = response.Confidence?.GetEnumValueFromJsonName<AddressConfidence>();
-            SuggestionsKey = response.SuggestionsKey;
-            SuggestionsPrompt = response.SuggestionsPrompt;
-            Suggestions = response.Suggestions?.Select(s => new LookupSuggestion(s)).ToList();
-            Addresses = response.Addresses?.Select(a => new LookupAddressSuggestionV2(a)).ToList();
-            AddressesFormatted = response.AddressesFormatted?.Select(a => new LookupV2ResultAddressFormatted(a)).ToList();
+        public string? ReferenceId { get; }
 
+        public LookupResult(RestApiAddressLookupV2Response response) 
+        {
+            var apiResult = response.Result;
+            if (apiResult != null)
+            {
+                MoreResultsAvailable = apiResult.MoreResultsAvailable;
+                Confidence = apiResult.Confidence?.GetEnumValueFromJsonName<AddressConfidence>();
+                SuggestionsKey = apiResult.SuggestionsKey;
+                SuggestionsPrompt = apiResult.SuggestionsPrompt;
+                Suggestions = apiResult.Suggestions?.Select(s => new LookupSuggestion(s)).ToList();
+                Addresses = apiResult.Addresses?.Select(a => new LookupAddressSuggestionV2(a)).ToList();
+                AddressesFormatted = apiResult.AddressesFormatted?.Select(a => new LookupV2ResultAddressFormatted(a)).ToList();
+            }
+            else
+            {
+                MoreResultsAvailable = false;
+                Confidence = null;
+                SuggestionsKey = string.Empty;
+                SuggestionsPrompt = string.Empty;
+                Suggestions = new List<LookupSuggestion>();
+                Addresses = new List<LookupAddressSuggestionV2>();
+                AddressesFormatted = new List<LookupV2ResultAddressFormatted>();
+            }
+
+            ReferenceId = response.ReferenceId;
         }
     }
 }

@@ -11,8 +11,31 @@ import { RestApiCreateLayoutRequest } from "../../server/address/layout/restApiC
 import { EDVSError } from "../../exceptions/edvsException";
 import { Country } from "../../common/country";
 import { Dataset } from "../dataset";
-import { GetLayoutListItem, restApiResponseToGetLayoutListItem } from "./getLayoutListItem";
+import { GetLayoutListItem, restApiResponseToGetLayoutListItem, restApiResponseToGetLayoutListResult } from "./getLayoutListItem";
 import { GetLayoutLayout, restApiResponseToGetLayoutLayout } from "./getLayoutLayout";
+import { GetLayoutListResult } from "./getLayoutListResult";
+
+/**
+ * Interface defining the options for retrieving layouts.
+ */
+interface GetLayoutsOptions {
+    /**
+     * The datasets to filter the layouts by. (optional)
+     */
+    datasets?: Dataset[];
+    /**
+     * A string to filter layouts by name. (optional)
+     */
+    nameContains?: string;
+    /**
+     * The country to filter layouts by. (optional)
+     */
+    country?: Country;
+    /**
+     * The reference ID for tracking the request. (optional)
+     */
+    referenceId?: string;
+}
 
 /**
  * Client class for interacting with the layout-related APIs.
@@ -35,10 +58,11 @@ export class LayoutClient {
     /**
      * Creates a new layout with the specified name, applies-to rules, variable layout lines, and fixed layout lines.
      *
-     * @param name               The name of the layout to create.
-     * @param appliesTo          The rules defining where the layout applies.
-     * @param variableLayoutLines The variable layout lines to include in the layout.
-     * @param fixedLayoutLines    The fixed layout lines to include in the layout.
+     * @param name                  The name of the layout to create.
+     * @param appliesTo             The rules defining where the layout applies.
+     * @param variableLayoutLines   The variable layout lines to include in the layout.
+     * @param fixedLayoutLines      The fixed layout lines to include in the layout.
+     * @param referenceId           The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the result of the layout creation.
      * @throws EDVSError If the API response contains an error.
      */
@@ -46,7 +70,8 @@ export class LayoutClient {
         name: string,
         appliesTo: AppliesTo[],
         variableLayoutLines: LayoutLineVariable[],
-        fixedLayoutLines: LayoutLineFixed[]
+        fixedLayoutLines: LayoutLineFixed[],
+        referenceId?: string
     ): Promise<CreateLayoutResult> {
         const apiLayout: RestApiAddressLayout = {
             name: name,
@@ -62,7 +87,8 @@ export class LayoutClient {
             layout: apiLayout
         };
 
-        const headers = this.configuration.getCommonHeaders();
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         return this.restApiStub.createLayoutV2(request, headers).then(
             resp => {
                 if (resp.error) {
@@ -76,12 +102,14 @@ export class LayoutClient {
     /**
      * Deletes a layout with the specified name.
      *
-     * @param name The name of the layout to delete.
+     * @param name          The name of the layout to delete.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves when the layout is successfully deleted.
      * @throws EDVSError If the API response contains an error.
      */
-    public async deleteLayout(name: string): Promise<void> {
-        const headers = this.configuration.getCommonHeaders();
+    public async deleteLayout(name: string, referenceId?: string): Promise<void> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         return this.restApiStub.deleteLayoutV2(name, headers).then(
             resp => {
                 if (resp.error) {
@@ -103,49 +131,96 @@ export class LayoutClient {
      * @param country      The country to filter layouts by (optional).
      * @return A promise that resolves to a list of layout items.
      * @throws EDVSError If the API response contains an error.
+     * @deprecated This method signature will be removed. Use {@link getLayouts(options: GetLayoutsOptions)} instead.
      */
-    public async getLayouts(datasets: Dataset[], nameContains: string, country?: Country): Promise<GetLayoutListItem[]> {
-        const headers = this.configuration.getCommonHeaders();
-        const countryCode = country ? country.iso3Code : "";
-        const datasetCodes = datasets.map(ds => ds.datasetCode);
+    public async getLayouts(
+        datasets: Dataset[],
+        nameContains: string,
+        country?: Country
+    ): Promise<GetLayoutListItem[]>;
 
-        return this.restApiStub.getLayoutsV2(countryCode, datasetCodes, nameContains, headers).then(
-            resp => {
-                if (resp.error) {
-                    return Promise.reject(EDVSError.using(resp.error));
-                } else if (resp.result) {
-                    return Promise.resolve(resp.result.map(res => restApiResponseToGetLayoutListItem(res)));
-                } else {
-                    return Promise.reject(new EDVSError("Invalid response"));
-                }
+    /**
+     * Retrieves a list of layouts that match the specified criteria.
+     *
+     * @param options The options for retrieving layouts.
+     * @return A promise that resolves to a result containing a list of layouts.
+     * @throws EDVSError If the API response contains an error.
+     */
+    public async getLayouts(
+        options: GetLayoutsOptions
+    ): Promise<GetLayoutListResult>;
+
+    public async getLayouts(
+        datasetsOrOptions: Dataset[] | GetLayoutsOptions,
+        nameContains?: string,
+        country?: Country
+    ): Promise<GetLayoutListItem[] | GetLayoutListResult> {
+        let params : GetLayoutsOptions;
+        if (Array.isArray(datasetsOrOptions)) {
+            // keep for backwards compatibility
+            params = {
+                datasets: datasetsOrOptions,
+                nameContains: nameContains ?? "",
+                country: country ?? undefined,
+                referenceId: "",
             }
-        ).catch(error => {
-            if (error instanceof EDVSError && error.message === "Not Found") {
-                return [];
-            }
-            throw error;
-        });
+        } else {
+            params = datasetsOrOptions;
+        }
+
+        return this.getLayoutsImpl(params);
     }
 
     /**
      * Retrieves the details of a specific layout by its name.
      *
-     * @param name The name of the layout to retrieve.
+     * @param name          The name of the layout to retrieve.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the layout details.
      * @throws EDVSError If the API response contains an error.
      */
-    public async getLayout(name: string): Promise<GetLayoutLayout> {
-        const headers = this.configuration.getCommonHeaders();
+    public async getLayout(name: string, referenceId?: string): Promise<GetLayoutLayout> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         return this.restApiStub.getLayoutV2(name, headers).then(
             resp => {
                 if (resp.error) {
                     return Promise.reject(EDVSError.using(resp.error));
                 } else if (resp.result?.layout) {
-                    return Promise.resolve(restApiResponseToGetLayoutLayout(resp.result.layout));
+                    return Promise.resolve(restApiResponseToGetLayoutLayout(resp.result?.layout, resp.referenceId));
                 } else {
                     return Promise.reject(new EDVSError("Invalid response"));
                 }
             }
         );
+    }
+
+    private async getLayoutsImpl(params: GetLayoutsOptions): Promise<GetLayoutListItem[] | GetLayoutListResult> {
+        const { datasets, nameContains, country, referenceId } = params;
+
+        const countryCode = country?.iso3Code ?? "";
+        const datasetCodes = datasets?.map(ds => ds.datasetCode) ?? [];
+        const layoutNameContains = nameContains ?? "";
+        const headers = this.configuration.getCommonHeaders(referenceId ?? "");
+
+        try {
+            const resp = await this.restApiStub.getLayoutsV2(countryCode, datasetCodes, layoutNameContains, headers);
+
+            if (resp.error) throw EDVSError.using(resp.error);
+            if (!resp.result) throw new EDVSError("Invalid response");
+
+            if (referenceId === undefined || referenceId === "") {
+                // Deprecated behavior
+                return resp.result.map(res => restApiResponseToGetLayoutListItem(res));
+            } else {
+                // New behavior
+                return restApiResponseToGetLayoutListResult(resp);
+            }
+        } catch (error) {
+            if (error instanceof EDVSError && error.message === "Not Found") {
+                return referenceId === undefined ? [] : { layouts: [], referenceId: referenceId };
+            }
+            throw error;
+        }
     }
 }

@@ -33,7 +33,7 @@ export interface AddressConfigurationOptions extends ConfigurationOptions {
     includeMetadata?: boolean;
     includeEnrichment?: boolean;
     includeExtraMatchInfo?: boolean;
-    formatLayoutName?: string;
+    layoutName?: string;
     layoutFormat?: LayoutFormat;
     globalGeocodes?: GlobalGeocodeAttribute[];
     premiumLocationInsights?: PremiumLocationInsightAttribute[];
@@ -65,7 +65,7 @@ export class AddressConfiguration extends Configuration {
 
     public static readonly defaultMaxSuggestions = 7;
     public static readonly defaultLayoutName = "default";
-    public static readonly defaultLaoutFormat = LayoutFormat.Default;
+    public static readonly defaultLayoutFormat = LayoutFormat.Default;
     public options: AddressConfigurationOptions = {};
 
     /**
@@ -94,10 +94,10 @@ export class AddressConfiguration extends Configuration {
             result.maxSuggestions = AddressConfiguration.defaultMaxSuggestions;
         }
         if (!result.layoutFormat) {
-            result.layoutFormat = AddressConfiguration.defaultLaoutFormat;
+            result.layoutFormat = AddressConfiguration.defaultLayoutFormat;
         }
-        if (!result.formatLayoutName) {
-            result.formatLayoutName = AddressConfiguration.defaultLayoutName;
+        if (!result.layoutName) {
+            result.layoutName = AddressConfiguration.defaultLayoutName;
         }
 
         return result;

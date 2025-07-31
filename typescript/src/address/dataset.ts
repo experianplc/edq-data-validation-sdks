@@ -77,9 +77,7 @@ export namespace Datasets {
     export const ClAddressEh: Dataset = { datasetCode: "cl-address-eh", country: Countries.Chile, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
     export const CnAddressEd: Dataset = { datasetCode: "cn-address-ed", country: Countries.China, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
     export const CnAddressEh: Dataset = { datasetCode: "cn-address-eh", country: Countries.China, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
-    export const CxAddressEd: Dataset = { datasetCode: "cx-address-ed", country: Countries.ChristmasIsland, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.B, geocodeAccuracy: Accuracy.BMinus};    
     export const CxAddressEh: Dataset = { datasetCode: "cx-address-eh", country: Countries.ChristmasIsland, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.AMinus, geocodeAccuracy: Accuracy.BMinus};
-    export const CcAddressEd: Dataset = { datasetCode: "cc-address-ed", country: Countries.CocosIsland, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.B, geocodeAccuracy: Accuracy.BMinus};        
     export const CcAddressEh: Dataset = { datasetCode: "cc-address-eh", country: Countries.CocosIsland, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.AMinus, geocodeAccuracy: Accuracy.BMinus}; 
     export const CoAddressEd: Dataset = { datasetCode: "co-address-ed", country: Countries.Colombia, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
     export const CoAddressEh: Dataset = { datasetCode: "co-address-eh", country: Countries.Colombia, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
@@ -192,8 +190,9 @@ export namespace Datasets {
     export const ItAddressEh: Dataset = { datasetCode: "it-address-eh", country: Countries.Italy, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
     export const JmAddressEd: Dataset = { datasetCode: "jm-address-ed", country: Countries.Jamaica, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.B, geocodeAccuracy: Accuracy.BMinus};
     export const JmAddressEh: Dataset = { datasetCode: "jm-address-eh", country: Countries.Jamaica, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.AMinus, geocodeAccuracy: Accuracy.BMinus};     
-    export const JpAddressEd: Dataset = { datasetCode: "jp-address-ed", country: Countries.Japan, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
-    export const JpAddressEh: Dataset = { datasetCode: "jp-address-eh", country: Countries.Japan, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
+    export const JpAddress: Dataset = { datasetCode: "jp-address", country: Countries.Japan, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.A};
+    export const JpAddressEd: Dataset = { datasetCode: "jp-address-ed", country: Countries.Japan, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.AMinus, geocodeAccuracy: Accuracy.B};
+    export const JpAddressEa: Dataset = { datasetCode: "jp-address-ea", country: Countries.Japan, searchTypes: [SearchType.LookupV2] , addressAccuracy: Accuracy.AMinus, geocodeAccuracy: Accuracy.A};
     export const JoAddressEd: Dataset = { datasetCode: "jo-address-ed", country: Countries.Jordan, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
     export const JoAddressEh: Dataset = { datasetCode: "jo-address-eh", country: Countries.Jordan, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
     export const KzAddressEd: Dataset = { datasetCode: "kz-address-ed", country: Countries.Kazakhstan, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.A, geocodeAccuracy: Accuracy.APlus};
@@ -460,7 +459,6 @@ export namespace Datasets {
     export const ZwAddressEd: Dataset = { datasetCode: "zw-address-ed", country: Countries.Zimbabwe, searchTypes: [SearchType.Singleline, SearchType.Validate] , addressAccuracy: Accuracy.B, geocodeAccuracy: Accuracy.BMinus};
     export const ZwAddressEh: Dataset = { datasetCode: "zw-address-eh", country: Countries.Zimbabwe, searchTypes: [SearchType.Autocomplete, SearchType.LookupV2] , addressAccuracy: Accuracy.AMinus, geocodeAccuracy: Accuracy.BMinus};    
 
-
     const datasetMap: Map<string, Dataset> = new Map<string, Dataset>();
     {
         const datasets = Object.values(Datasets)
@@ -468,7 +466,6 @@ export namespace Datasets {
         for (const dataset of datasets) {
             datasetMap.set(dataset.datasetCode, dataset);
         }
-
     }
 
     export function fromCode(code: string): Dataset {

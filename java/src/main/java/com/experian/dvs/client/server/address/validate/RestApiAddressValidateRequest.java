@@ -53,8 +53,8 @@ public class RestApiAddressValidateRequest {
             validateRequest.setMaxSuggestions(configuration.getMaxSuggestions());
         }
         //Layout name
-        if (!configuration.getFormatLayoutName().isEmpty()) {
-            validateRequest.setLayouts(List.of(configuration.getFormatLayoutName()));
+        if (!configuration.getLayoutName().isEmpty()) {
+            validateRequest.setLayouts(List.of(configuration.getLayoutName()));
         }
         //Layout format
         if (configuration.getLayoutFormat() != null) {

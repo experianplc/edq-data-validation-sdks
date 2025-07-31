@@ -135,7 +135,7 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
         return post(endPoint, RestApiEmailValidateResponse.class, validateEmailRequest, headers, Map.of());
     }
 
-    private <T> RestApiFuture<T> post(final String endPoint, final Class<T> cls, final Object requestObject, final Map<String, Object> headers, final Map<String, Object> parameters) {
+    private <T extends RestApiResponse> RestApiFuture<T> post(final String endPoint, final Class<T> cls, final Object requestObject, final Map<String, Object> headers, final Map<String, Object> parameters) {
         final URI uri = getURI(endPoint, parameters);
         final WebTarget webTarget = this.client.target(uri);
         final Invocation.Builder request = webTarget.request(MediaType.APPLICATION_JSON);
@@ -143,7 +143,7 @@ public class RestApiAsyncImpl implements RestApiAsyncStub {
         return new RestApiFuture<T>(cls, request.async().post(Entity.entity(requestObject, MediaType.APPLICATION_JSON)));
     }
 
-    private <T> RestApiFuture<T> get(final String endPoint, final Class<T> cls, final Map<String, Object> headers, final Map<String, Object> parameters) {
+    private <T extends RestApiResponse> RestApiFuture<T> get(final String endPoint, final Class<T> cls, final Map<String, Object> headers, final Map<String, Object> parameters) {
         final URI uri = getURI(endPoint, parameters);
         final WebTarget webTarget = this.client.target(uri);
         final Invocation.Builder request = webTarget.request(MediaType.APPLICATION_JSON);

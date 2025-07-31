@@ -12,7 +12,8 @@ export type LookupResult = {
     suggestionsPrompt?: string,
     suggestions?: LookupSuggestion[],
     addresses?: LookupAddressSuggestionV2[],
-    addressesFormatted?: LookupV2ResultAddressFormatted[]
+    addressesFormatted?: LookupV2ResultAddressFormatted[],
+    referenceId?: string,
 }
 
 export function restApiResponseToLookupResult(response: RestApiAddressLookupV2Response): LookupResult {
@@ -41,9 +42,12 @@ export function restApiResponseToLookupResult(response: RestApiAddressLookupV2Re
         if (apiResult.addresses_formatted) {
             result.addressesFormatted = apiResult.addresses_formatted.map( af => restApiResponseToLookupAddressFormatted(af));
         }
+        result.referenceId = response.referenceId;
         return result;
     } else {
-        return {moreResultsAvailable: false}
+        return {
+            moreResultsAvailable: false,
+            referenceId: response.referenceId,
+        }
     }
-
 }

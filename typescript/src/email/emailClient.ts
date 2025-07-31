@@ -26,12 +26,14 @@ export class EmailClient {
     /**
      * Validates an email address asynchronously.
      *
-     * @param email The email address to validate.
+     * @param email         The email address to validate.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the validation result.
      * @throws EDVSError If the API response contains an error.
      */
-    public async validate(email: string): Promise<ValidateResult> {
-        const headers = this.configuration.getCommonHeaders(false);
+    public async validate(email: string, referenceId?: string): Promise<ValidateResult> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId, false);
         const request: RestApiEmailValidateRequest = {
             email: email
         };

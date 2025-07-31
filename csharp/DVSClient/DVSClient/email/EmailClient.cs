@@ -43,9 +43,25 @@ namespace DVSClient.Email
         /// </remarks>
         public ValidateResult Validate(string email)
         {
+            return Validate(email, string.Empty);
+        }
+
+        /// <summary>
+        /// Validates an email address synchronously.
+        /// </summary>
+        /// <param name="email">The email address to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A <see cref="ValidateResult"/> object containing validation details.</returns>
+        /// <exception cref="RestApiInterruptionOrExecutionException">Thrown if the API call is interrupted or fails.</exception>
+        /// <remarks>
+        /// This method blocks the calling thread until the validation is complete. 
+        /// Use this method if you need a synchronous operation.
+        /// </remarks>
+        public ValidateResult Validate(string email, string referenceId)
+        {
             try
             {
-                return ValidateAsync(email).GetAwaiter().GetResult();
+                return ValidateImplAsync(email, referenceId).GetAwaiter().GetResult();
             }
             catch (Exception e) when (e is TaskCanceledException || e is AggregateException)
             {
@@ -63,23 +79,38 @@ namespace DVSClient.Email
         /// </remarks>
         public Task<ValidateResult> ValidateAsync(string email)
         {
-            return ValidateImplAsync(email);
+            return ValidateImplAsync(email, string.Empty);
+        }
+
+        /// <summary>
+        /// Validates an email address asynchronously.
+        /// </summary>
+        /// <param name="email">The email address to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
+        /// <returns>A <see cref="Task{Result}"/> that resolves to a <see cref="ValidateResult"/> object containing validation details.</returns>
+        /// <remarks>
+        /// Use this method for non-blocking operations. It allows you to perform other tasks while waiting for the validation to complete.
+        /// </remarks>
+        public Task<ValidateResult> ValidateAsync(string email, string referenceId)
+        {
+            return ValidateImplAsync(email, referenceId);
         }
 
         /// <summary>
         /// Internal implementation for validating an email address asynchronously.
         /// </summary>
         /// <param name="email">The email address to validate.</param>
+        /// <param name="referenceId">The reference ID for tracking the request.</param>
         /// <returns>A <see cref="Task{Result}"/> that resolves to a <see cref="ValidateResult"/> object containing validation details.</returns>
         /// <remarks>
         /// This method is used internally by both synchronous and asynchronous validation methods.
         /// </remarks>
-        private Task<ValidateResult> ValidateImplAsync(string email)
+        private Task<ValidateResult> ValidateImplAsync(string email, string referenceId)
         {
             var request = RestApiEmailValidateRequest.Using(_configuration);
             request.Email = email;
 
-            var headers = _configuration.GetCommonHeaders(allowsDotInReferenceId: false);
+            var headers = _configuration.GetCommonHeaders(referenceId, allowsDotInReferenceId: false);
 
             if (_configuration.Metadata.HasValue && _configuration.Metadata.Value)
             {

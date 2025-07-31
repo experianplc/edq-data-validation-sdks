@@ -13,6 +13,7 @@ namespace DVSClient.Phone.Validate
         public string PortedDate { get; }
         public string DisposableNumber { get; }
         public Metadata? Metadata { get; }
+        public string? ReferenceId { get; }
 
         public ValidateResult(RestApiPhoneValidateResponse response)
         {
@@ -40,6 +41,7 @@ namespace DVSClient.Phone.Validate
 
             var metadataFromApi = response.Metadata;
             Metadata = metadataFromApi != null ? new Metadata(metadataFromApi) : null;
+            ReferenceId = response.ReferenceId;
         }
     }
 }

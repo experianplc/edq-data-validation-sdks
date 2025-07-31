@@ -1,11 +1,12 @@
 package com.experian.dvs.client.server.address.format;
 
+import com.experian.dvs.client.server.RestApiResponse;
 import com.experian.dvs.client.server.RestApiResponseError;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RestApiAddressFormatResponse {
+public class RestApiAddressFormatResponse extends RestApiResponse {
 
     @JsonProperty("error")
     private RestApiResponseError error;

@@ -51,8 +51,20 @@ public class EmailClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public ValidateResult validate(final String email) {
+        return validate(email, "");
+    }
+
+    /**
+     * Validates an email address synchronously.
+     *
+     * @param email         The email address to validate.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The validation result.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public ValidateResult validate(final String email, final String referenceId) {
         try {
-            return this.validateAsync(email).get();
+            return this.validateAsync(email, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -65,13 +77,24 @@ public class EmailClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<ValidateResult> validateAsync(final String email) {
-        return validateImpl(email);
+        return validateImpl(email, "");
     }
 
-    private Future<ValidateResult> validateImpl(final String email) {
+    /**
+     * Validates an email address asynchronously.
+     *
+     * @param email         The email address to validate.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<ValidateResult> validateAsync(final String email, final String referenceId) {
+        return validateImpl(email, referenceId);
+    }
+
+    private Future<ValidateResult> validateImpl(final String email, final String referenceId) {
         RestApiEmailValidateRequest request = RestApiEmailValidateRequest.using(configuration);
         request.setEmail(email);
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
 
         final Future<RestApiEmailValidateResponse> response = this.restApiAsyncStub.validateEmailV2(request, headers);
         return new ValidateResultFuture(response);

@@ -16,6 +16,9 @@
         // Any layouts created during the tests will be prefixed with this (so that we identify them to clean them up)
         internal static string TestLayoutPrefix = "DVSSDK_CSharp_";
 
+        // Create a unique reference ID
+        internal static string StaticReferenceId = GetUniqueReferenceId();
+
         private static string GetEnvironmentVariableOrThrow(string variableName)
         {
             var value = Environment.GetEnvironmentVariable(variableName);
@@ -30,6 +33,10 @@
         public static void LoadEnv() 
         {
             DotNetEnv.Env.TraversePath().Load();
+        }
+        public static string GetUniqueReferenceId()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

@@ -71,8 +71,20 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public GetDatasetsResult getDatasets(final Country country) {
+        return this.getDatasets(country, "");
+    }
+
+    /**
+     * Retrieves the datasets available for the specified country.
+     *
+     * @param country       The country for which to retrieve datasets.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The result containing the list of datasets.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public GetDatasetsResult getDatasets(final Country country, final String referenceId) {
         try {
-            return this.getDatasetsAsync(country).get();
+            return this.getDatasetsAsync(country, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -88,11 +100,21 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public SearchResult search(final String searchInput) {
-        try {
-            return this.searchAsync(searchInput).get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RestApiInterruptionOrExecutionException(e);
-        }
+        return search(SearchType.AUTOCOMPLETE, searchInput, "");
+    }
+
+    /**
+     * Searches for addresses using the supplied search input.
+     * This uses the default 'autocomplete' method of searching, where it is expected
+     * that this function is called on each character that the end user is entering.
+     *
+     * @param searchInput   The search input to use (i.e., what the end user has currently typed in).
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The search result containing a list of suggested addresses.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public SearchResult search(final String searchInput, final String referenceId) {
+        return search(SearchType.AUTOCOMPLETE, searchInput, referenceId);
     }
 
     /**
@@ -104,8 +126,21 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public SearchResult search(SearchType searchType, final String searchInput) {
+        return search(searchType, searchInput, "");
+    }
+
+    /**
+     * Searches for addresses using the specified search type and input.
+     *
+     * @param searchType    The type of search to perform (e.g., autocomplete, singleline).
+     * @param searchInput   The search input to use.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The search result containing a list of suggested addresses.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public SearchResult search(SearchType searchType, final String searchInput, final String referenceId) {
         try {
-            return this.searchAsync(searchType, searchInput).get();
+            return this.searchAsync(searchType, searchInput, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -119,8 +154,20 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public FormatResult format(final String addressKey) {
+        return format(addressKey, "");
+    }
+
+    /**
+     * Formats an address using the specified address key.
+     *
+     * @param addressKey    The key of the address to format.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The formatted address result.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public FormatResult format(final String addressKey, final String referenceId) {
         try {
-            return this.formatAsync(addressKey).get();
+            return this.formatAsync(addressKey, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -134,8 +181,20 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public ValidateResult validate(final String searchInput) {
+        return validate(searchInput, "");
+    }
+
+    /**
+     * Validates an address using the supplied search input.
+     *
+     * @param searchInput   The search input to validate.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The validation result.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public ValidateResult validate(final String searchInput, final String referenceId) {
         try {
-            return this.validateAsync(searchInput).get();
+            return this.validateAsync(searchInput, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -149,8 +208,20 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public ValidateResult validate(final List<String> addressLines) {
+        return validate(addressLines, "");
+    }
+
+    /**
+     * Validates an address using the supplied address lines.
+     *
+     * @param addressLines  The address lines to validate.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The validation result.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public ValidateResult validate(final List<String> addressLines, final String referenceId) {
         try {
-            return this.validateAsync(addressLines).get();
+            return this.validateAsync(addressLines, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -164,8 +235,20 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public SearchResult suggestionsStepIn(final String globalAddressKey) {
+        return suggestionsStepIn(globalAddressKey, "");
+    }
+
+    /**
+     * Steps into a suggestion using the specified global address key.
+     *
+     * @param globalAddressKey  The global address key to step into.
+     * @param referenceId       The reference ID for tracking the request.
+     * @return The search result containing refined suggestions.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public SearchResult suggestionsStepIn(final String globalAddressKey, final String referenceId) {
         try {
-            return this.suggestionsStepInAsync(globalAddressKey).get();
+            return this.suggestionsStepInAsync(globalAddressKey, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -180,8 +263,21 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public SearchResult suggestionsRefine(final String key, final String refinement) {
+        return suggestionsRefine(key, refinement, "");
+    }
+
+    /**
+     * Refines a suggestion using the specified key and refinement input.
+     *
+     * @param key           The key of the suggestion to refine.
+     * @param refinement    The refinement input to use.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The search result containing refined suggestions.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public SearchResult suggestionsRefine(final String key, final String refinement, final String referenceId) {
         try {
-            return this.suggestionsRefineAsync(key, refinement).get();
+            return this.suggestionsRefineAsync(key, refinement, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -195,8 +291,20 @@ public class AddressClient implements Closeable {
      * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
      */
     public SuggestionsFormatResult suggestionsFormat(final String searchInput) {
+        return suggestionsFormat(searchInput, "");
+    }
+
+    /**
+     * Formats suggestions using the supplied search input.
+     *
+     * @param searchInput   The search input to format.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return The formatted suggestions result.
+     * @throws RestApiInterruptionOrExecutionException If the operation is interrupted or fails.
+     */
+    public SuggestionsFormatResult suggestionsFormat(final String searchInput, final String referenceId) {
         try {
-            return this.suggestionsFormatAsync(searchInput).get();
+            return this.suggestionsFormatAsync(searchInput, referenceId).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RestApiInterruptionOrExecutionException(e);
         }
@@ -209,7 +317,18 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<GetDatasetsResult> getDatasetsAsync(final Country country) {
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        return getDatasetsAsync(country, "");
+    }
+
+    /**
+     * Retrieves the datasets available for the specified country asynchronously.
+     *
+     * @param country       The country for which to retrieve datasets.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<GetDatasetsResult> getDatasetsAsync(final Country country, final String referenceId) {
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         final Future<RestApiGetDatasetsResponse> datasetsResponse = this.restApiAsyncStub.getDatasetsV1(country.getIso3Code(), headers);
         return new GetDatasetsResultFuture(datasetsResponse);
     }
@@ -221,7 +340,18 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<SearchResult> searchAsync(final String searchInput) {
-        return searchAsync(SearchType.AUTOCOMPLETE, searchInput);
+        return performSearchWithSearchType(SearchType.AUTOCOMPLETE, searchInput, "");
+    }
+
+    /**
+     * Searches for addresses asynchronously using the supplied search input.
+     *
+     * @param searchInput   The search input to use.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<SearchResult> searchAsync(final String searchInput, final String referenceId) {
+        return performSearchWithSearchType(SearchType.AUTOCOMPLETE, searchInput, referenceId);
     }
 
     /**
@@ -232,7 +362,19 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<SearchResult> searchAsync(SearchType searchType, final String searchInput) {
-        return performSearchWithSearchType(searchType, searchInput);
+        return performSearchWithSearchType(searchType, searchInput, "");
+    }
+
+    /**
+     * Searches for addresses asynchronously using the specified search type and input.
+     *
+     * @param searchType    The type of search to perform.
+     * @param searchInput   The search input to use.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<SearchResult> searchAsync(SearchType searchType, final String searchInput, final String referenceId) {
+        return performSearchWithSearchType(searchType, searchInput, referenceId);
     }
 
     /**
@@ -242,8 +384,19 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<FormatResult> formatAsync(final String addressKey) {
+        return formatAsync(addressKey, "");
+    }
+
+    /**
+     * Formats an address asynchronously using the specified address key.
+     *
+     * @param addressKey    The key of the address to format.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<FormatResult> formatAsync(final String addressKey, final String referenceId) {
         final RestApiFormatRequest request = RestApiFormatRequest.using(this.configuration);
-        final Map<String, Object> headers = getFormatRequestHeaders();
+        final Map<String, Object> headers = getFormatRequestHeaders(referenceId);
         final Future<RestApiAddressFormatResponse> formatResponse = this.restApiAsyncStub.formatV1(addressKey, request, headers);
 
         return new FormatResultFuture(formatResponse);
@@ -256,7 +409,18 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<ValidateResult> validateAsync(final String address) {
-        return validateAsync(List.of(address));
+        return validateImpl(List.of(address), "");
+    }
+
+    /**
+     * Validates an address asynchronously using the supplied search input.
+     *
+     * @param address       The search input to validate.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<ValidateResult> validateAsync(final String address, final String referenceId) {
+        return validateImpl(List.of(address), referenceId);
     }
 
     /**
@@ -266,7 +430,18 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<ValidateResult> validateAsync(final List<String> addressLines) {
-        return validateImpl(addressLines);
+        return validateImpl(addressLines, "");
+    }
+
+    /**
+     * Validates an address asynchronously using the supplied address lines.
+     *
+     * @param addressLines  The address lines to validate.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<ValidateResult> validateAsync(final List<String> addressLines, final String referenceId) {
+        return validateImpl(addressLines, referenceId);
     }
 
     /**
@@ -276,7 +451,18 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<SearchResult> suggestionsStepInAsync(final String globalAddressKey) {
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        return suggestionsStepInAsync(globalAddressKey, "");
+    }
+
+    /**
+     * Steps into a suggestion asynchronously using the specified global address key.
+     *
+     * @param globalAddressKey  The global address key to step into.
+     * @param referenceId       The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<SearchResult> suggestionsStepInAsync(final String globalAddressKey, final String referenceId) {
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         final Future<RestApiAddressSearchResponse> suggestionsStepInResponse = this.restApiAsyncStub.suggestionsStepInV1(globalAddressKey, headers);
         return new SearchResultFuture(suggestionsStepInResponse);
     }
@@ -289,9 +475,21 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<SearchResult> suggestionsRefineAsync(final String key, final String refinement) {
+        return suggestionsRefineAsync(key, refinement, "");
+    }
+
+    /**
+     * Refines a suggestion asynchronously using the specified key and refinement input.
+     *
+     * @param key           The key of the suggestion to refine.
+     * @param refinement    The refinement input to use.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<SearchResult> suggestionsRefineAsync(final String key, final String refinement, final String referenceId) {
         final RestApiSuggestionsRefineRequest request = RestApiSuggestionsRefineRequest.using(this.configuration);
         request.setRefinement(refinement);
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         final Future<RestApiAddressSearchResponse> suggestionsRefineResponse = this.restApiAsyncStub.suggestionsRefineV1(key, request, headers);
         return new SearchResultFuture(suggestionsRefineResponse);
     }
@@ -303,18 +501,29 @@ public class AddressClient implements Closeable {
      * @return A future representing the asynchronous operation.
      */
     public Future<SuggestionsFormatResult> suggestionsFormatAsync(final String searchInput) {
+        return suggestionsFormatAsync(searchInput, "");
+    }
+
+    /**
+     * Formats suggestions asynchronously using the supplied search input.
+     *
+     * @param searchInput   The search input to format.
+     * @param referenceId   The reference ID for tracking the request.
+     * @return A future representing the asynchronous operation.
+     */
+    public Future<SuggestionsFormatResult> suggestionsFormatAsync(final String searchInput, final String referenceId) {
         final RestApiSuggestionsFormatRequest request = RestApiSuggestionsFormatRequest.using(this.configuration);
         request.setAddress(new Address(searchInput));
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         final Future<RestApiSuggestionsFormatResponse> suggestionsFormatResponse = this.restApiAsyncStub.suggestionsFormatV1(request, headers);
         return new SuggestionsFormatResultFuture(suggestionsFormatResponse);
     }
 
-    private Future<ValidateResult> validateImpl(final List<String> addressLines) {
+    private Future<ValidateResult> validateImpl(final List<String> addressLines, final String referenceId) {
         final RestApiAddressValidateRequest request = RestApiAddressValidateRequest.using(this.configuration);
         request.setAddress(new Address(addressLines));
 
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         if (this.configuration.getComponents()) {
             headers.put("Add-Components", Boolean.TRUE.toString());
         }
@@ -332,7 +541,7 @@ public class AddressClient implements Closeable {
         return new ValidateResultFuture(response);
     }
 
-    private Future<SearchResult> performSearchWithSearchType(final SearchType searchType, final String searchInput) {
+    private Future<SearchResult> performSearchWithSearchType(final SearchType searchType, final String searchInput, final String referenceId) {
         validateDatasetsSearchTypeCombination(this.configuration.getDatasets(), searchType);
         final RestApiAddressSearchRequest request = RestApiAddressSearchRequest.using(this.configuration);
         request.setAddress(new Address(searchInput));
@@ -341,7 +550,7 @@ public class AddressClient implements Closeable {
             request.addOption("search_type", searchType.toString());
         }
 
-        final Map<String, Object> headers = getSearchRequestHeaders();
+        final Map<String, Object> headers = getSearchRequestHeaders(referenceId);
         return getSearchResult(request, headers);
     }
 
@@ -351,9 +560,9 @@ public class AddressClient implements Closeable {
         return new SearchResultFuture(searchResponse);
     }
 
-    private Map<String, Object> getSearchRequestHeaders() {
+    private Map<String, Object> getSearchRequestHeaders(final String referenceId) {
 
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         if (this.configuration.getTransliterate()) {
             headers.put("Transliterate", Boolean.TRUE.toString());
         }
@@ -375,9 +584,9 @@ public class AddressClient implements Closeable {
         throw new EDVSException("Unsupported dataset / search type combination.");
     }
 
-    private Map<String, Object> getFormatRequestHeaders() {
+    private Map<String, Object> getFormatRequestHeaders(final String referenceId) {
 
-        final Map<String, Object> headers = this.configuration.getCommonHeaders();
+        final Map<String, Object> headers = this.configuration.getCommonHeaders(referenceId);
         if (this.configuration.getComponents()) {
             headers.put("Add-Components", Boolean.TRUE.toString());
         }

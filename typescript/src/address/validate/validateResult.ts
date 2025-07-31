@@ -28,6 +28,7 @@ export type ValidateResult = {
     metadata?: AddressMetadata;
     enrichment?: AddressEnrichment;
     matchInfo?: ValidateMatchInfo;
+    referenceId?: string;
 }
 
 export function restApiResponseToValidationResult(response: RestApiAddressValidateResponse): ValidateResult {
@@ -91,6 +92,8 @@ export function restApiResponseToValidationResult(response: RestApiAddressValida
     if (apiEnrichment) {
         result.enrichment = restApiResponseToAddressEnrichment(apiEnrichment);
     }
+
+    result.referenceId = response.referenceId;
 
     return result;
 }

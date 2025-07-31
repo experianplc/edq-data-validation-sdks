@@ -1,4 +1,6 @@
-﻿using DVSClient.Address.Layout.Elements;
+﻿using DVSClient.Address;
+using DVSClient.Address.Layout;
+using DVSClient.Address.Layout.Elements;
 using DVSClient.Exceptions;
 using DVSClientTests;
 using NUnit.Framework;
@@ -47,10 +49,9 @@ namespace DVSClient.Address.Layout.Tests
         {
             var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
-            var result = client.GetLayout(Setup.ExistingTestLayout);
+            var result = client.GetLayout(Setup.ExistingTestLayout, Setup.GetUniqueReferenceId());
             Assert.That(result.Error, Is.Null);
         }
-
 
         [Test]
         public void Layout_Create()
@@ -62,9 +63,9 @@ namespace DVSClient.Address.Layout.Tests
             var line3 = new LayoutLineFixed("post_code", Aus.PostalCode);
             var line4 = new LayoutLineFixed("country_name", Aus.CountryName);
             var layoutName = GetUniqueLayoutName();
-            var createLayoutResult = client.CreateLayout(layoutName, new List<LayoutLineVariable> { line1, line2 }, new List<LayoutLineFixed> { line3, line4 }, Dataset.AuAddress);
+            var createLayoutResult = client.CreateLayout(layoutName, new List<LayoutLineVariable> { line1, line2 }, new List<LayoutLineFixed> { line3, line4 }, Setup.GetUniqueReferenceId(), Dataset.AuAddress);
             Assert.That(createLayoutResult.Error, Is.Null);
-            var result = client.GetLayout(layoutName);
+            var result = client.GetLayout(layoutName, Setup.GetUniqueReferenceId());
             Assert.That(result.Error, Is.Null);
         }
 
@@ -72,7 +73,6 @@ namespace DVSClient.Address.Layout.Tests
         public void Layout_Create_WithOptions()
         {
             var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress)
-                .SetTransactionId(Guid.NewGuid().ToString())
                 .Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             // TODO
@@ -86,21 +86,21 @@ namespace DVSClient.Address.Layout.Tests
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
             var layoutName = "ThisLayoutDoesntExist";
 
-            var ex = Assert.Throws<NotFoundException>(() => client.DeleteLayout(layoutName));
+            var ex = Assert.Throws<NotFoundException>(() => client.DeleteLayout(layoutName, Setup.GetUniqueReferenceId()));
         }
 
         [Test]
         public void Format_WithCustomLayout_WithComponents()
         {
-            var configuration = Address.AddressConfiguration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
                 .UseDataset(Dataset.GbAddress)
-                .UseLayout(Setup.ExistingTestLayout)
+                .UseLayoutName(Setup.ExistingTestLayout)
                 .IncludeComponents()
                 .Build();
-            var client = ExperianDataValidation.GetAddressClient((Address.AddressConfiguration)configuration);
-            var searchResultAutoComplete = client.Search(SearchType.Autocomplete, "56 Queens R");
-            var formatResult = client.Format(searchResultAutoComplete.Suggestions.First().GlobalAddressKey);
+            var client = ExperianDataValidation.GetAddressClient(configuration);
+            var searchResultAutoComplete = client.Search(SearchType.Autocomplete, "56 Queens R", Setup.GetUniqueReferenceId());
+            var formatResult = client.Format(searchResultAutoComplete.Suggestions.First().GlobalAddressKey, Setup.GetUniqueReferenceId());
             Assert.That(formatResult.Confidence, Is.EqualTo(AddressConfidence.VerifiedMatch));
             //Assert.That(formatResult.GlobalAddressKey, Is.EqualTo(searchResultAutoComplete.Suggestions.First().GlobalAddressKey));
             Assert.That(formatResult.AddressFormatted, Is.Not.Null);
@@ -121,15 +121,14 @@ namespace DVSClient.Address.Layout.Tests
         [Test]
         public void Suggestions_Format_WithCustomLayout()
         {
-            var configuration = Address.AddressConfiguration
+            var configuration = AddressConfiguration
                 .NewBuilder(Setup.ValidTokenAddress)
-                .SetTransactionId(Guid.NewGuid().ToString())
                 .UseDataset(Dataset.AuAddress)
-                .UseLayout(Setup.ExistingTestLayout)
+                .UseLayoutName(Setup.ExistingTestLayout)
                 .Build();
             var client = ExperianDataValidation.GetAddressClient(configuration);
 
-            var searchResult = client.SuggestionsFormat("onslow st, perth");
+            var searchResult = client.SuggestionsFormat("onslow st, perth", Setup.GetUniqueReferenceId());
 
             Assert.That(searchResult.Suggestions, Is.Not.Empty);
 
@@ -137,6 +136,75 @@ namespace DVSClient.Address.Layout.Tests
             Assert.That(searchResult.Suggestions.All(x => x.Address == null));
             // When using a custom layout the AddressFormatted objects should all be empty
             Assert.That(searchResult.Suggestions.All(x => x.AddressFormatted != null));
+        }
+
+        [Test]
+        public void ReferenceId_OnBuilderStillWorks()
+        {
+            // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
+            var configuration = LayoutConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(Setup.StaticReferenceId)
+                .Build();
+            var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
+            var result = client.GetLayout(Setup.ExistingTestLayout);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ReferenceId, Is.EqualTo(Setup.StaticReferenceId));
+        }
+
+        [Test]
+        public void ReferenceId_OnMethodTakesPrecedence()
+        {
+            // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
+            // Setting the reference ID on the method should take precedence
+            var configuration = LayoutConfiguration
+                .NewBuilder(Setup.ValidTokenAddress)
+                .SetTransactionId(Setup.GetUniqueReferenceId())
+                .Build();
+            var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
+            var result = client.GetLayout(Setup.ExistingTestLayout, Setup.StaticReferenceId);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ReferenceId, Is.EqualTo(Setup.StaticReferenceId));
+        }
+
+        [Test]
+        public void ReferenceId_OnMethod()
+        {
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
+
+            var line1 = new LayoutLineVariable("addr_line_1");
+            var line2 = new LayoutLineVariable("addr_line_2");
+            var line3 = new LayoutLineFixed("post_code", Gbr.Postcode);
+            var line4 = new LayoutLineFixed("country_name", Gbr.Town);
+
+            var createLayoutResult = client.CreateLayout(
+                this.GetUniqueLayoutName(),
+                new List<LayoutLineVariable> { line1, line2 },
+                new List<LayoutLineFixed> { line3, line4 },
+                Setup.StaticReferenceId,
+                Dataset.GbAddress);
+            Assert.That(createLayoutResult.ReferenceId, Is.EqualTo(Setup.StaticReferenceId));
+
+            var getLayoutResult = client.GetLayout(Setup.ExistingTestLayout, Setup.StaticReferenceId);
+            Assert.That(getLayoutResult.ReferenceId, Is.EqualTo(Setup.StaticReferenceId));
+
+            var getLayoutsResult = client.GetLayouts(Setup.StaticReferenceId);
+            Assert.That(getLayoutsResult.ReferenceId, Is.EqualTo(Setup.StaticReferenceId));
+        }
+
+        [Test]
+        public void ReferenceId_NotValueSpecified_UsesRandomValue()
+        {
+            var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
+            var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
+            var result = client.GetLayout(Setup.ExistingTestLayout);
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.ReferenceId, Is.Not.Empty);
+            Assert.That(result.ReferenceId, Is.Not.EqualTo(Setup.StaticReferenceId));
         }
 
         private string GetUniqueLayoutName()
@@ -148,7 +216,7 @@ namespace DVSClient.Address.Layout.Tests
         {
             var configuration = LayoutConfiguration.NewBuilder(Setup.ValidTokenAddress).Build();
             var client = ExperianDataValidation.GetAddressLayoutClient(configuration);
-            return client.GetLayout(layoutName);
+            return client.GetLayout(layoutName, Setup.GetUniqueReferenceId());
         }
 
         private void CreateTestLayout()
@@ -164,9 +232,10 @@ namespace DVSClient.Address.Layout.Tests
                 layoutName, 
                 new List<LayoutLineVariable> { line1, line2 },
                 new List<LayoutLineFixed> { line3, line4 },
+                Setup.GetUniqueReferenceId(),
                 Dataset.AuAddress, Dataset.GbAddress);
             Assert.That(createLayoutResult.Error, Is.Null);
-            var result = client.GetLayout(layoutName);
+            var result = client.GetLayout(layoutName, Setup.GetUniqueReferenceId());
             Assert.That(result?.Layout?.Status.HasValue, Is.True);
             Assert.That(result?.Layout?.Status, Is.EqualTo(LayoutStatus.CreationInProgress));
         }
@@ -180,7 +249,7 @@ namespace DVSClient.Address.Layout.Tests
 
             try
             {
-                layoutsResult = client.GetLayouts(null, new List<Dataset>(), Setup.TestLayoutPrefix);
+                layoutsResult = client.GetLayouts(null, new List<Dataset>(), Setup.TestLayoutPrefix, Setup.GetUniqueReferenceId());
             }
             catch (NotFoundException)
             {
@@ -195,7 +264,7 @@ namespace DVSClient.Address.Layout.Tests
                 {
                     try
                     {
-                        client.DeleteLayout(layout.Name);
+                        client.DeleteLayout(layout.Name, Setup.GetUniqueReferenceId());
                     }
                     catch (EDVSException)
                     {

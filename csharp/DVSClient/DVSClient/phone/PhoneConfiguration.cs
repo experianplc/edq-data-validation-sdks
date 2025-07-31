@@ -111,13 +111,14 @@ namespace DVSClient.Phone
             }
 
             /// <summary>
-            /// Sets a custom transaction ID for API requests.
+            /// Sets a custom reference ID for API requests.
             /// </summary>
-            /// <param name="transactionId">The transaction ID to use.</param>
+            /// <param name="referenceId">The reference ID to use.</param>
             /// <returns>The current Builder instance for method chaining.</returns>
-            public new PhoneBuilder SetTransactionId(string transactionId)
+            [Obsolete("Set your reference ID as part every API interaction like the Validate call instead.")]
+            public new PhoneBuilder SetTransactionId(string referenceId)
             {
-                base.SetTransactionId(transactionId);
+                base.SetTransactionId(referenceId);
                 return this;
             }
 

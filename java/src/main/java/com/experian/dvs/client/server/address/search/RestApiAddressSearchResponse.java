@@ -1,11 +1,12 @@
 package com.experian.dvs.client.server.address.search;
 
+import com.experian.dvs.client.server.RestApiResponse;
 import com.experian.dvs.client.server.RestApiResponseError;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Optional;
 
-public class RestApiAddressSearchResponse {
+public class RestApiAddressSearchResponse extends RestApiResponse {
 
     @JsonProperty("error")
     private RestApiResponseError error;

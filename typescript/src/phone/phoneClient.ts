@@ -26,12 +26,14 @@ export class PhoneClient {
     /**
      * Validates a phone number asynchronously.
      *
-     * @param phoneNumber The phone number to validate.
+     * @param phoneNumber   The phone number to validate.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the validation result.
      * @throws EDVSError If the API response contains an error.
      */
-    public async validate(phoneNumber: string): Promise<ValidateResult> {
-        const headers = this.configuration.getCommonHeaders(false);
+    public async validate(phoneNumber: string, referenceId?: string): Promise<ValidateResult> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId, false);
         const request = getPhoneValidateRequestFromConfig(this.configuration);
         request.number = phoneNumber;
 

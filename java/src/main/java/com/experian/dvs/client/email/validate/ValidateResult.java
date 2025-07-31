@@ -16,6 +16,7 @@ public class ValidateResult {
     private final List<String> didYouMean;
     private final VerboseOutput verboseOutput;
     private final DomainType domainType;
+    private final String referenceId;
 
     public ValidateResult(RestApiEmailValidateResponse apiResponse) {
         this.error = apiResponse.getError() != null ? new ResponseError(apiResponse.getError()) : null;
@@ -31,12 +32,15 @@ public class ValidateResult {
             this.verboseOutput = null;
 
         }
+
         final RestApiEmailMetadata metadata = apiResponse.getMetadata();
         if (metadata != null) {
             this.domainType = metadata.getDomainDetail() != null && metadata.getDomainDetail().getType() != null ? DomainType.fromName(metadata.getDomainDetail().getType()) : null;
         } else {
             this.domainType = null;
         }
+
+        this.referenceId = apiResponse.getReferenceId();
     }
 
     public Optional<ResponseError> getError() {
@@ -57,5 +61,9 @@ public class ValidateResult {
 
     public DomainType getDomainType() {
         return domainType;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

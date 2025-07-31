@@ -1,9 +1,10 @@
 package com.experian.dvs.client.server.email;
 
+import com.experian.dvs.client.server.RestApiResponse;
 import com.experian.dvs.client.server.RestApiResponseError;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RestApiEmailValidateResponse {
+public class RestApiEmailValidateResponse extends RestApiResponse {
 
     @JsonProperty("error")
     private RestApiResponseError error;

@@ -25,8 +25,8 @@ export function getSuggestionsFormatRequestFromConfig(config: AddressConfigurati
         request.max_suggestions = config.options.maxSuggestions;
     }
     //Layout name
-    if (config.options.formatLayoutName && config.options.formatLayoutName.length > 0) {
-        request.layouts = [config.options.formatLayoutName];
+    if (config.options.layoutName && config.options.layoutName.length > 0) {
+        request.layouts = [config.options.layoutName];
     }
 
     return request;

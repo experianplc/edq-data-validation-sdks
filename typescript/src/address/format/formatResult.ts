@@ -14,6 +14,7 @@ export type FormatResult = {
     components?: AddressComponents;
     metadata?: AddressMetadata;
     enrichment?: AddressEnrichment;
+    referenceId?: string;
 };
 
 export function restApiResponseToFormatResult(response: RestApiAddressFormatResponse): FormatResult {
@@ -44,6 +45,6 @@ export function restApiResponseToFormatResult(response: RestApiAddressFormatResp
         result.enrichment = restApiResponseToAddressEncrichment(apiEnrichment);
     }
 
+    result.referenceId = response.referenceId;
     return result;
-
 }

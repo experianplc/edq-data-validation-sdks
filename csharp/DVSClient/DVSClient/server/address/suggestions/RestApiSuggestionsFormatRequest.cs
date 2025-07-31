@@ -43,9 +43,9 @@ namespace DVSClient.Server.Address.Suggestions
             }
 
             // Layout name
-            if (!string.IsNullOrEmpty(configuration.FormatLayoutName))
+            if (!string.IsNullOrEmpty(configuration.LayoutName))
             {
-                suggestionsFormat.Layouts = new List<string> { configuration.FormatLayoutName };
+                suggestionsFormat.Layouts = new List<string> { configuration.LayoutName };
             }
 
             return suggestionsFormat;

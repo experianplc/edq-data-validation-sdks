@@ -11,6 +11,7 @@ public class SuggestionsFormatResult {
     private final boolean moreResultsAvailable;
     private final AddressConfidence confidence;
     private final List<SuggestionsFormatSuggestion> suggestions;
+    private final String referenceId;
 
     public SuggestionsFormatResult(RestApiSuggestionsFormatResponse response) {
         final RestApiSuggestionsFormatResult result = response.getResult();
@@ -23,6 +24,8 @@ public class SuggestionsFormatResult {
             this.confidence = null;
             this.suggestions = List.of();
         }
+
+        this.referenceId = response.getReferenceId();
     }
 
     public boolean isMoreResultsAvailable() {
@@ -35,5 +38,9 @@ public class SuggestionsFormatResult {
 
     public List<SuggestionsFormatSuggestion> getSuggestions() {
         return suggestions;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

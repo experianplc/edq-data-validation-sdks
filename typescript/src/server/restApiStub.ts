@@ -23,6 +23,7 @@ import { RestApiDeleteLayoutResponse } from "./address/layout/restApiDeleteLayou
 import { isDevMode } from "../testSetup";
 import { RestApiAddressLookupV2Request } from "./address/lookup/restApiAddressLookupV2Request";
 import { RestApiAddressLookupV2Response } from "./address/lookup/restApiAddressLookupV2Response";
+import { RestApiResponse } from "./restApiResponse";
 
 interface RestApiStub {
     // Address utilities
@@ -177,12 +178,14 @@ export class RestApiStubImpl implements RestApiStub {
         if (error) {
             throw EDVSError.using(error);
         } else {
-            return await response.json();
+            const resp = await response.json();
+            resp.referenceId = this.getRefIdFromHeaderValue(response.headers.get("reference-id"));
+            return resp;
         }
     }
     
     private async post<T>(endPoint: string, requestObject: any, headers: Map<string, object>, ): Promise<T> {
-        return this.fetchImpl(endPoint, 'POST', headers, new Map(), JSON.stringify(requestObject));        
+        return this.fetchImpl(endPoint, 'POST', headers, new Map(), JSON.stringify(requestObject));
     }
 
     private async get<T>(endPoint: string, headers: Map<string, object>, parameters: Map<string, string>): Promise<T> {
@@ -243,5 +246,14 @@ export class RestApiStubImpl implements RestApiStub {
             return error;
         }
         return undefined;
+    }
+
+    private getRefIdFromHeaderValue(referenceId: string|null): string|null {
+        const pattern = "/transaction:";
+        if (referenceId != null && referenceId.includes(pattern))
+        {
+            referenceId = referenceId.substring(referenceId.lastIndexOf(pattern)+ pattern.length);
+        }
+        return referenceId;
     }
 }

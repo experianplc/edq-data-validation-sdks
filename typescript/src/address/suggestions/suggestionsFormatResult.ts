@@ -6,6 +6,7 @@ export type SuggestionsFormatResult = {
     moreResultsAvailable: boolean;
     confidence?: AddressConfidence;
     suggestions: suggestionsFormatSuggestion[];
+    referenceId?: string;
 };
 
 export function restApiResponseToSuggestionsResult(response: RestApiSuggestionsFormatResponse): SuggestionsFormatResult {
@@ -15,13 +16,15 @@ export function restApiResponseToSuggestionsResult(response: RestApiSuggestionsF
         return {
             moreResultsAvailable: apiResult.more_results_available??false,
             confidence: lookupConfidence(apiResult.confidence),
-            suggestions: apiResult.suggestions ? apiResult.suggestions.map(p => restApiResponseToSuggestion(p)): []
+            suggestions: apiResult.suggestions ? apiResult.suggestions.map(p => restApiResponseToSuggestion(p)): [],
+            referenceId: response.referenceId
         }
     } else {
         return {
             moreResultsAvailable: false,
             confidence: AddressConfidence.Unknown,
-            suggestions: []
+            suggestions: [],
+            referenceId: response.referenceId
         }
     }
 }

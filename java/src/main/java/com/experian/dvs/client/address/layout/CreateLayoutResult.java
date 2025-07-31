@@ -9,10 +9,12 @@ public class CreateLayoutResult {
 
     private final ResponseError error;
     private final String id;
+    private final String referenceId;
 
     public CreateLayoutResult(final RestApiCreateLayoutResponse response) {
         this.error = response.getError() != null ? new ResponseError(response.getError()) : null;
         this.id = response.getResult() != null ? response.getResult().getId() : "";
+        this.referenceId = response.getReferenceId();
     }
 
     public Optional<ResponseError> getError() {
@@ -21,5 +23,9 @@ public class CreateLayoutResult {
 
     public String getId() {
         return id;
+    }
+
+    public String getReferenceId() {
+        return referenceId;
     }
 }

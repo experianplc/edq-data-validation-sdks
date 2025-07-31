@@ -3,8 +3,8 @@ package com.experian.dvs.client.address;
 import com.experian.dvs.client.ExperianDataValidation;
 import com.experian.dvs.client.Setup;
 import com.experian.dvs.client.address.datasets.GetDatasetsResult;
-import com.experian.dvs.client.address.format.GeocodeMatchLevel;
 import com.experian.dvs.client.address.format.FormatResult;
+import com.experian.dvs.client.address.format.GeocodeMatchLevel;
 import com.experian.dvs.client.address.layout.attributes.GlobalGeocodeAttribute;
 import com.experian.dvs.client.address.search.SearchResult;
 import com.experian.dvs.client.address.suggestions.format.SuggestionsFormatResult;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ClientTests {
+public class AddressClientTests {
     @BeforeAll
     public static void setup() {
         Setup.loadEnv();
@@ -34,11 +34,11 @@ public class ClientTests {
 
     @Test
     void authentication_TokenNotSupplied() {
-        final Exception ex1 =  assertThrows(InvalidConfigurationException.class, () -> AddressConfiguration.newBuilder("").build());
-        assertThat(ex1.getMessage().equals("The supplied configuration must contain an authorisation token"));
+        final Exception ex1 = assertThrows(InvalidConfigurationException.class, () -> AddressConfiguration.newBuilder("").build());
+        assertThat(ex1.getMessage()).isEqualTo("The supplied configuration must contain an authorisation token");
 
-        final Exception ex2 =  assertThrows(InvalidConfigurationException.class, () -> AddressConfiguration.newBuilder(null).build());
-        assertThat(ex2.getMessage().equals("The supplied configuration must contain an authorisation token"));
+        final Exception ex2 = assertThrows(InvalidConfigurationException.class, () -> AddressConfiguration.newBuilder(null).build());
+        assertThat(ex2.getMessage()).isEqualTo("The supplied configuration must contain an authorisation token");
     }
 
     @Test
@@ -50,12 +50,12 @@ public class ClientTests {
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        final Exception ex = assertThrows(UnauthorizedException.class, () -> client.search(SearchType.AUTOCOMPLETE, "56 Queens R"));
-        assertThat(ex.getMessage().equals("The authentication token you've provided is incorrect. Please check the Self Service Portal to find the right token."));
+        final Exception ex = assertThrows(UnauthorizedException.class, () -> client.search(SearchType.AUTOCOMPLETE, "56 Queens R", Setup.getUniqueReferenceId()));
+        assertThat(ex.getMessage()).isEqualTo("The authentication token you've provided is incorrect. Please check the Self Service Portal to find the right token.");
     }
 
     @Test
-    void  authentication_AlternateTokenSupplied() {
+    void authentication_AlternateTokenSupplied() {
         // Use the alternate token in the x-app-key header instead of Auth-Token header
         final AddressConfiguration configuration = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
@@ -64,14 +64,96 @@ public class ClientTests {
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        assertThat(configuration.getCommonHeaders().containsKey("x-app-key"));
-        assertThat(configuration.getCommonHeaders().get("x-app-key").equals(Setup.VALID_TOKEN_ADDRESS));
+
+        assertThat(configuration.getCommonHeaders(Setup.getUniqueReferenceId())).containsKey("x-app-key");
+        assertThat(configuration.getCommonHeaders(Setup.getUniqueReferenceId()).get("x-app-key")).isEqualTo(Setup.VALID_TOKEN_ADDRESS);
 
         // Search
-        var searchResult = client.search(SearchType.AUTOCOMPLETE, "experian, nottingham, NG80 1ZZ");
+        var searchResult = client.search(SearchType.AUTOCOMPLETE, "experian, nottingham, NG80 1ZZ", Setup.getUniqueReferenceId());
 
         // Just assert that there is no error, which means the alternative token was used successfully to search
         assertThat(searchResult).isNotNull();
+    }
+
+    @Test
+    void referenceId_OnBuilderStillWorks() {
+        // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId("specialRefId")
+                .useDataset(Dataset.GB_ADDRESS)
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        var searchResult = client.search(SearchType.AUTOCOMPLETE, "experian, nottingham, NG80 1ZZ");
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getReferenceId()).isEqualTo("specialRefId");
+    }
+
+    @Test
+    void referenceId_OnMethodTakesPrecedence() {
+        // Set reference ID on builder. Method is deprecated, but still provided for backwards compatibility
+        // Setting the reference ID on the method should take precedence
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .setTransactionId(Setup.getUniqueReferenceId())
+                .useDataset(Dataset.GB_ADDRESS)
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        var searchResult = client.search(SearchType.AUTOCOMPLETE, "experian, nottingham, NG80 1ZZ", "specialRefId");
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getReferenceId()).isEqualTo("specialRefId");
+    }
+
+    @Test
+    void referenceId_OnMethod() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .useDataset(Dataset.GB_ADDRESS)
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+
+        // Checking setting ID on all address methods is supported
+        var searchResult = client.search(SearchType.AUTOCOMPLETE, "experian, nottingham, NG80 1ZZ", Setup.STATIC_REFERENCE_ID);
+        assertThat(searchResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        var validateResult = client.validate("experian, nottingham, NG80 1ZZ", Setup.STATIC_REFERENCE_ID);
+        assertThat(validateResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        // TODO
+        //var lookupResult = client.lookup("NG80 1ZZ", Setup.STATIC_REFERENCE_ID);
+        //assertThat(validateResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        var formatResult = client.format(searchResult.getSuggestions().get(0).getGlobalAddressKey(), Setup.STATIC_REFERENCE_ID);
+        assertThat(formatResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        var suggestionsFormatResult = client.suggestionsFormat("160, SE1 8EZ", Setup.STATIC_REFERENCE_ID);
+        assertThat(suggestionsFormatResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        var typedownResult = client.search(SearchType.TYPEDOWN, "mk65bj");
+        var suggestionsStepInResult = client.suggestionsStepIn(typedownResult.getSuggestions().get(0).getGlobalAddressKey(), Setup.STATIC_REFERENCE_ID);
+        assertThat(suggestionsStepInResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        suggestionsStepInResult = client.suggestionsStepIn(suggestionsStepInResult.getSuggestions().get(0).getGlobalAddressKey());
+        var suggestionsRefineResult = client.suggestionsRefine(suggestionsStepInResult.getSuggestions().get(0).getGlobalAddressKey(), "30", Setup.STATIC_REFERENCE_ID);
+        assertThat(suggestionsRefineResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+
+        var getDatasetsResult = client.getDatasets(Country.UNITED_KINGDOM, Setup.STATIC_REFERENCE_ID);
+        assertThat(getDatasetsResult.getReferenceId()).isEqualTo(Setup.STATIC_REFERENCE_ID);
+    }
+
+    @Test
+    void referenceId_NotValueSpecified_UsesRandomValue() {
+        final AddressConfiguration configuration = AddressConfiguration
+                .newBuilder(Setup.VALID_TOKEN_ADDRESS)
+                .useDataset(Dataset.GB_ADDRESS)
+                .build();
+        final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
+        var searchResult = client.search(SearchType.AUTOCOMPLETE, "experian, nottingham, NG80 1ZZ");
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getReferenceId()).isNotEmpty();
     }
 
     @Test
@@ -82,7 +164,7 @@ public class ClientTests {
                     .useDataset(Dataset.IE_ADDITIONAL_EIRCODE)
                     .build();
             final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-            client.search(SearchType.SINGLELINE, "some input");
+            client.search(SearchType.SINGLELINE, "some input", Setup.getUniqueReferenceId());
             fail();
         } catch (EDVSException e) {
             assertThat(e.getMessage()).isEqualTo("Unsupported dataset / search type combination.");
@@ -98,7 +180,7 @@ public class ClientTests {
                 .build();
 
         final AddressClient clientAutocomplete = ExperianDataValidation.getAddressClient(configurationAutocomplete);
-        clientAutocomplete.search(SearchType.AUTOCOMPLETE, "80 Victoria St");
+        clientAutocomplete.search(SearchType.AUTOCOMPLETE, "80 Victoria St", Setup.getUniqueReferenceId());
 
         final AddressConfiguration configurationSingleline = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
@@ -108,7 +190,7 @@ public class ClientTests {
                 .build();
 
         final AddressClient clientSingleline = ExperianDataValidation.getAddressClient(configurationSingleline);
-        clientSingleline.search(SearchType.SINGLELINE, "Experian, Cardinal Place, 80 Victoria St, London");
+        clientSingleline.search(SearchType.SINGLELINE, "Experian, Cardinal Place, 80 Victoria St, London", Setup.getUniqueReferenceId());
 
         final AddressConfiguration configurationTypedown = AddressConfiguration
                 .newBuilder(Setup.VALID_TOKEN_ADDRESS)
@@ -116,7 +198,7 @@ public class ClientTests {
                 .useDataset(Dataset.GB_ADDITIONAL_NOTYETBUILT)
                 .build();
         final AddressClient clientTypedown = ExperianDataValidation.getAddressClient(configurationTypedown);
-        clientTypedown.search(SearchType.TYPEDOWN, "London");
+        clientTypedown.search(SearchType.TYPEDOWN, "London", Setup.getUniqueReferenceId());
     }
 
     @Test
@@ -127,7 +209,7 @@ public class ClientTests {
                 .useDataset(Dataset.GB_ADDITIONAL_BUSINESS)
                 .build();
         final AddressClient clientAutocomplete = ExperianDataValidation.getAddressClient(configurationAutocomplete);
-        clientAutocomplete.search(SearchType.AUTOCOMPLETE, "80 Victoria St");
+        clientAutocomplete.search(SearchType.AUTOCOMPLETE, "80 Victoria St", Setup.getUniqueReferenceId());
     }
 
     @Test
@@ -140,7 +222,7 @@ public class ClientTests {
                     .build()
                     ;
             final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-            client.search(SearchType.SINGLELINE, "Experian, Cardinal Place, 80 Victoria St, London");
+            client.search(SearchType.SINGLELINE, "Experian, Cardinal Place, 80 Victoria St, London", Setup.getUniqueReferenceId());
             fail();
         } catch (EDVSException e) {
             assertThat(e.getMessage()).isEqualTo("Unsupported dataset / search type combination.");
@@ -157,7 +239,7 @@ public class ClientTests {
                     .build();
 
             final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-            client.search(SearchType.AUTOCOMPLETE, "1 main st,");
+            client.search(SearchType.AUTOCOMPLETE, "1 main st,", Setup.getUniqueReferenceId());
             fail();
         } catch (EDVSException e) {
             assertThat(e.getMessage()).isEqualTo("Unsupported dataset / search type combination.");
@@ -174,7 +256,7 @@ public class ClientTests {
                     .build();
 
             final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-            client.search(SearchType.TYPEDOWN, "London");
+            client.search(SearchType.TYPEDOWN, "London", Setup.getUniqueReferenceId());
             fail();
         } catch (EDVSException e) {
             assertThat(e.getMessage()).isEqualTo("Unsupported dataset / search type combination.");
@@ -190,7 +272,7 @@ public class ClientTests {
                 .build();
         AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        SearchResult result = client.search(SearchType.SINGLELINE, "mk65bj");
+        SearchResult result = client.search(SearchType.SINGLELINE, "mk65bj", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
         assertThat(result.getSuggestions()).hasSize(20);
 
@@ -201,7 +283,7 @@ public class ClientTests {
                 .build();
         client = ExperianDataValidation.getAddressClient(configuration);
 
-        result = client.search(SearchType.SINGLELINE, "mk65bj");
+        result = client.search(SearchType.SINGLELINE, "mk65bj", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
         assertThat(result.getSuggestions()).hasSize(5);
     }
@@ -214,7 +296,7 @@ public class ClientTests {
                 .build();
         AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        SearchResult result = client.search(SearchType.AUTOCOMPLETE, "1 main st");
+        SearchResult result = client.search(SearchType.AUTOCOMPLETE, "1 main st", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
         // Ensure that not ALL suggestions are in the state of CA. Results are ordered alphabetically by city.
         assertThat(result.getSuggestions()).allMatch(suggestion -> !suggestion.getText().contains(" CA "));
@@ -227,7 +309,7 @@ public class ClientTests {
                 .build();
         client = ExperianDataValidation.getAddressClient(configuration);
 
-        result = client.search(SearchType.AUTOCOMPLETE, "1 main st");
+        result = client.search(SearchType.AUTOCOMPLETE, "1 main st", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
 
         // Ensure all results are in the state of California
@@ -241,13 +323,13 @@ public class ClientTests {
                 .useMaxSuggestions(20)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SearchResult result = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final SearchResult result = client.search(SearchType.AUTOCOMPLETE, "56 Queens R", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
 
         // Pick the first one
         final var globalAddressKey = result.getSuggestions().get(0).getGlobalAddressKey();
         // Format with default layout
-        final var formatResult = client.format(globalAddressKey);
+        final var formatResult = client.format(globalAddressKey, Setup.getUniqueReferenceId());
         assertThat(formatResult.getConfidence()).isNotNull();
         assertThat(formatResult.getGlobalAddressKey()).isNotNull();
     }
@@ -259,13 +341,13 @@ public class ClientTests {
                 .useMaxSuggestions(20)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SearchResult result = client.search(SearchType.SINGLELINE, "56 Queens R");
+        final SearchResult result = client.search(SearchType.SINGLELINE, "56 Queens R", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
 
         // Pick the first one
         final var globalAddressKey = result.getSuggestions().get(0).getGlobalAddressKey();
         // Format with default layout
-        final var formatResult = client.format(globalAddressKey);
+        final var formatResult = client.format(globalAddressKey, Setup.getUniqueReferenceId());
         assertThat(formatResult.getConfidence()).isNotNull();
         assertThat(formatResult.getGlobalAddressKey()).isNotNull();
     }
@@ -278,7 +360,7 @@ public class ClientTests {
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
 
-        SearchResult result = client.search(SearchType.TYPEDOWN, "mk65bj");
+        SearchResult result = client.search(SearchType.TYPEDOWN, "mk65bj", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions()).isNotEmpty();
 
         while (result.getSuggestions().stream()
@@ -289,7 +371,7 @@ public class ClientTests {
                             .anyMatch(attribute -> "can_step_in".equals(attribute.getName()) && "true".equals(attribute.getValue())))
                     .findFirst()
                     .orElseThrow()
-                    .getGlobalAddressKey());
+                    .getGlobalAddressKey(), Setup.getUniqueReferenceId());
         }
 
         final String globalAddressKey = result.getSuggestions().stream()
@@ -300,7 +382,7 @@ public class ClientTests {
                 .getGlobalAddressKey();
 
         // Format with default layout
-        final FormatResult formatResult = client.format(globalAddressKey);
+        final FormatResult formatResult = client.format(globalAddressKey, Setup.getUniqueReferenceId());
         assertThat(formatResult.getConfidence()).isNotNull();
         assertThat(formatResult.getGlobalAddressKey()).isNotEmpty();
     }
@@ -311,11 +393,11 @@ public class ClientTests {
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        SearchResult result = client.search(SearchType.TYPEDOWN, "melbourne");
+        SearchResult result = client.search(SearchType.TYPEDOWN, "melbourne", Setup.getUniqueReferenceId());
         result = client.suggestionsStepIn(result.getSuggestions().stream()
                 .findFirst()
                 .orElseThrow()
-                .getGlobalAddressKey());
+                .getGlobalAddressKey(), Setup.getUniqueReferenceId());
 
         // Ensure an informational picklist was returned that prompts for more user input
         assertThat(result.getSuggestions()).isNotEmpty();
@@ -329,7 +411,7 @@ public class ClientTests {
         result = client.suggestionsRefine(result.getSuggestions().stream()
                 .findFirst()
                 .orElseThrow()
-                .getGlobalAddressKey(), "ro");
+                .getGlobalAddressKey(), "ro", Setup.getUniqueReferenceId());
 
         assertThat(result.getSuggestions()).isNotEmpty();
         assertThat(result.getSuggestions().stream()
@@ -342,7 +424,7 @@ public class ClientTests {
                 .useDataset(Dataset.GB_ADDRESS)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SuggestionsFormatResult searchResult = client.suggestionsFormat("160, SE1 8EZ");
+        final SuggestionsFormatResult searchResult = client.suggestionsFormat("160, SE1 8EZ", Setup.getUniqueReferenceId());
 
         assertThat(searchResult.getSuggestions()).isNotEmpty();
         assertThat(searchResult.getSuggestions()).allMatch(suggestion -> suggestion.getAddress() != null);
@@ -356,7 +438,7 @@ public class ClientTests {
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141", Setup.getUniqueReferenceId());
         assertThat(validateResult.getConfidence()).isEqualTo(AddressConfidence.VERIFIED_MATCH);
         assertThat(validateResult.getAddress().getAddressLine1()).isEqualTo("U 1  8 Main Ave");
         assertThat(validateResult.getAddress().getAddressLine2()).isEmpty();
@@ -376,7 +458,7 @@ public class ClientTests {
                 .useDataset(Dataset.AU_ADDRESS)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final ValidateResult validateResult = client.validate("Main Ave, Lidcombe, 2141");
+        final ValidateResult validateResult = client.validate("Main Ave, Lidcombe, 2141", Setup.getUniqueReferenceId());
 
         assertThat(validateResult.getConfidence()).isEqualTo(AddressConfidence.STREET_PARTIAL);
         assertThat(validateResult.getSuggestions().size()).isEqualTo(7);
@@ -394,7 +476,7 @@ public class ClientTests {
                 .includeComponents()
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141", Setup.getUniqueReferenceId());
 
         assertThat(validateResult.getComponents()).isNotNull();
         assertThat(validateResult.getComponents().get().getPostalCode()).isNotNull();
@@ -414,7 +496,7 @@ public class ClientTests {
                 .includeAusRegionalGeocodes()
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141", Setup.getUniqueReferenceId());
 
         assertThat(validateResult.getEnrichment()).isNotNull();
         assertThat(validateResult.getEnrichment().get().getAusRegionalGeocodes()).isNotNull();
@@ -430,7 +512,7 @@ public class ClientTests {
                 .includeMetadata()
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+        final ValidateResult validateResult = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141", Setup.getUniqueReferenceId());
 
         assertThat(validateResult.getMetadata()).isNotNull();
         assertThat(validateResult.getMetadata().get().getDpid()).isNotNull();
@@ -445,7 +527,7 @@ public class ClientTests {
                 .includeExtraMatchInfo()
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final ValidateResult result = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141");
+        final ValidateResult result = client.validate("Unit 1, 8 Main Ave, Lidcombe, 2141", Setup.getUniqueReferenceId());
 
         assertThat(result.getMatchInfo()).isNotNull();
         assertThat(result.getMatchInfo().get().getAddressAction()).isEqualTo(AddressAction.CORRECTED);
@@ -467,7 +549,7 @@ public class ClientTests {
                 .build();
 
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final GetDatasetsResult result = client.getDatasets(Country.UNITED_KINGDOM);
+        final GetDatasetsResult result = client.getDatasets(Country.UNITED_KINGDOM, Setup.getUniqueReferenceId());
         assertThat(result.getResult()).isNotEmpty();
         assertThat(result.getResult().stream().allMatch(p -> p.getCountry() == Country.UNITED_KINGDOM)).isTrue();
     }
@@ -480,11 +562,11 @@ public class ClientTests {
                 .includeMetadata()
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R", Setup.getUniqueReferenceId());
         assertThat(resultAutoComplete.getSuggestions()).isNotEmpty();
 
         final var globalAddressKey = resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey();
-        var formatted = client.format(globalAddressKey);
+        var formatted = client.format(globalAddressKey, Setup.getUniqueReferenceId());
 
         assertThat(formatted.getMetadata()).isPresent();
         assertThat(formatted.getMetadata().get().getUdprn()).isNotNull();
@@ -500,7 +582,7 @@ public class ClientTests {
                 .build();
 
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        var result = client.search("flat 3, block a, oxford court, 23 stretford road, manchester, m15 6dd");
+        var result = client.search("flat 3, block a, oxford court, 23 stretford road, manchester, m15 6dd", Setup.getUniqueReferenceId());
         assertThat(result.getSuggestions().stream().anyMatch(p -> p.getDataset().equals("Multiple Residence")));
     }
 
@@ -515,11 +597,11 @@ public class ClientTests {
                 .includeGlobalGeocodes()
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R", Setup.getUniqueReferenceId());
         assertThat(resultAutoComplete.getSuggestions()).isNotEmpty();
 
         final var globalAddressKey = resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey();
-        var formatted = client.format(globalAddressKey);
+        var formatted = client.format(globalAddressKey, Setup.getUniqueReferenceId());
 
         assertThat(formatted.getEnrichment()).isPresent();
         assertThat(formatted.getEnrichment().get().getGeocodes()).isPresent();
@@ -540,11 +622,11 @@ public class ClientTests {
                 .includeGlobalGeocodeAttribute(GlobalGeocodeAttribute.LONGITUDE)
                 .build();
         final AddressClient client = ExperianDataValidation.getAddressClient(configuration);
-        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R");
+        final SearchResult resultAutoComplete = client.search(SearchType.AUTOCOMPLETE, "56 Queens R", Setup.getUniqueReferenceId());
         assertThat(resultAutoComplete.getSuggestions()).isNotEmpty();
 
         final var globalAddressKey = resultAutoComplete.getSuggestions().get(0).getGlobalAddressKey();
-        var formatted = client.format(globalAddressKey);
+        var formatted = client.format(globalAddressKey, Setup.getUniqueReferenceId());
 
         assertThat(formatted.getEnrichment()).isPresent();
         assertThat(formatted.getEnrichment().get().getGeocodes()).isPresent();

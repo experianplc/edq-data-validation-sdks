@@ -2,7 +2,7 @@
 
 namespace DVSClient.Server.Address.Datasets
 {
-    public class RestApiGetDatasetsResponse
+    public class RestApiGetDatasetsResponse : RestApiResponse
     {
         [JsonProperty("error")]
         public RestApiResponseError? Error { get; set; }

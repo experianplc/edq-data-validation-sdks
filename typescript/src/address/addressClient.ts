@@ -19,6 +19,25 @@ import { LookupType } from "./lookup/lookupType";
 import { getLookupRequestFromConfig } from "../server/address/lookup/restApiAddressLookupV2Request";
 import { LookupResult, restApiResponseToLookupResult } from "./lookup/lookupResult";
 
+
+/**
+ * Interface defining the options for address searching.
+ */
+interface AddressSearchOptions {
+    /**
+     * The search input to use (e.g., what the user has typed in).
+     */
+     searchInput : string,
+    /**
+     * The type of search to perform. (optional)
+     */
+     searchType? : SearchType,
+    /**
+     * The reference ID for tracking the request. (optional)
+     */
+    referenceId? : string,
+}
+
 /**
  * Client class for interacting with the address-related APIs.
  * Provides methods for searching, validating, formatting, and refining addresses.
@@ -41,23 +60,27 @@ export class AddressClient {
     /**
      * Retrieves the datasets available for the specified country.
      *
-     * @param country The country for which to retrieve datasets.
+     * @param country       The country for which to retrieve datasets.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the result containing the list of datasets.
      */
-    public async getDatasets(country: Country): Promise<GetDatasetResult> {
-        const headers = this.configuration.getCommonHeaders();
+    public async getDatasets(country: Country, referenceId?: string): Promise<GetDatasetResult> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         const resp = await this.restApiStub.getDatasetsV1(country.iso3Code, headers);
         return restApiGetDatasetsResponseToResult(resp);
     }
 
     /**
      * Looks up an address based on a key.
-     * @param value The key being used to perform the lookup
-     * @param lookupType The type of lookup that you wish to perform.
+     * @param value         The key being used to perform the lookup
+     * @param lookupType    The type of lookup that you wish to perform.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @returns A promise that resolves to the result containing the found addresses / suggestions.
      */
-    public async lookup(value: string, lookupType: LookupType): Promise<LookupResult> {
-        const headers = this.configuration.getCommonHeaders();
+    public async lookup(value: string, lookupType: LookupType, referenceId?: string): Promise<LookupResult> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         const lookupOptions = this.configuration.options.lookup;
         if (lookupOptions) {
             if (lookupOptions.addAddresses) {
@@ -82,19 +105,48 @@ export class AddressClient {
     /**
      * Searches for addresses using the supplied search input and optional search type.
      *
-     * @param searchInput The search input to use (e.g., what the user has typed in).
-     * @param searchType  The type of search to perform (optional).
+     * @param searchInput   The search input to use (e.g., what the user has typed in).
+     * @param searchType    The type of search to perform (optional).
+     * @return A promise that resolves to the search result containing a list of suggested addresses.
+     * @deprecated This method signature will be removed. Use {@link search(options: AddressSearchOptions)} instead.
+     */
+    public async search(searchInput: string, searchType?: SearchType): Promise<SearchResult>
+
+    /**
+     * Searches for addresses using the supplied search input and optional search type.
+     *
+     * @param options       Defining the options for address searching.
      * @return A promise that resolves to the search result containing a list of suggested addresses.
      */
-    public async search(searchInput: string, searchType?: SearchType): Promise<SearchResult> {
-        if (!searchType) {
-            return this.performSearchWithSearchType(SearchType.Autocomplete, searchInput);
+    public async search(options: AddressSearchOptions): Promise<SearchResult>
+
+    public async search(searchInputOrSearchOptions: string | AddressSearchOptions, searchType?: SearchType): Promise<SearchResult> {
+        let options : AddressSearchOptions;
+        if (typeof searchInputOrSearchOptions === 'string') {
+            // keep for backwards compatibility
+            options = {
+                searchInput: searchInputOrSearchOptions,
+                searchType: searchType,
+                referenceId: "",
+            }
         } else {
-            return this.performSearchWithSearchType(searchType, searchInput!);
+            options = searchInputOrSearchOptions;
+        }
+
+        return this.searchImpl(options);
+    }
+
+    private async searchImpl(options: AddressSearchOptions): Promise<SearchResult> {
+        const { searchInput, searchType, referenceId } = options;
+
+        if (!searchType) {
+            return this.performSearchWithSearchType(SearchType.Autocomplete, searchInput, referenceId ?? "");
+        } else {
+            return this.performSearchWithSearchType(searchType, searchInput, referenceId ?? "");
         }
     }
 
-    private async performSearchWithSearchType(searchType: SearchType, searchInput: string): Promise<SearchResult> {
+    private async performSearchWithSearchType(searchType: SearchType, searchInput: string, referenceId: string): Promise<SearchResult> {
         this.validateDatasetsSearchTypeCombination(this.configuration.options.datasets ?? [], searchType);
         const request = getAddressSearchRequestFromConfig(this.configuration);
         request.components = { unspecified: [searchInput] };
@@ -102,12 +154,12 @@ export class AddressClient {
         if (searchType === SearchType.Singleline || searchType === SearchType.Typedown) {
             request.options?.push({ name: "search_type", value: searchType });
         }
-        const headers = this.getSearchRequestHeaders();
+        const headers = this.getSearchRequestHeaders(referenceId);
         return this.getSearchResult(request, headers);
     }
 
-    private getSearchRequestHeaders(): Map<string, object> {
-        const headers = this.configuration.getCommonHeaders();
+    private getSearchRequestHeaders(referenceId: string): Map<string, object> {
+        const headers = this.configuration.getCommonHeaders(referenceId);
         if (this.configuration.options.transliterate) {
             headers.set("Transliterate", { value: "true" });
         }
@@ -142,18 +194,21 @@ export class AddressClient {
         throw new EDVSError("Unsupported dataset / search type combination.");
     }
 
-
     /**
-     * Validates an address using the supplied address lines.
+     * Validates an address using the supplied address line(s).
      *
-     * @param addressLines The address lines to validate.
+     * @param addressLines  The address lines to validate.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the validation result.
      */
-    public async validate(addressLines: string[]): Promise<ValidateResult> {
+    public async validate(addressLines: string | string[], referenceId?: string): Promise<ValidateResult> {
         const request = getAddressValidateRequestFromConfig(this.configuration);
-        request.components = { unspecified: addressLines };
 
-        const headers = this.configuration.getCommonHeaders();
+        const lines: string[] = Array.isArray(addressLines) ? addressLines : [addressLines];
+        request.components = { unspecified: lines };
+        
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
 
         if (this.configuration.options.includeComponents) {
             headers.set("Add-Components", "true" as String); //NOSONAR
@@ -182,12 +237,14 @@ export class AddressClient {
     /**
      * Formats an address using the specified address key.
      *
-     * @param addressKey The key of the address to format.
+     * @param addressKey    The key of the address to format.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the formatted address result.
      */
-    public format(addressKey: string): Promise<FormatResult> {
+    public format(addressKey: string, referenceId?: string): Promise<FormatResult> {
+        if (!referenceId) { referenceId=""; }
         const request = getFormatRequestFromConfig(this.configuration);
-        const headers = this.getFormatRequestHeaders();
+        const headers = this.getFormatRequestHeaders(referenceId);
         return this.restApiStub.formatV1(addressKey, request, headers).then(
             resp => {
                 if (resp.error) {
@@ -201,11 +258,13 @@ export class AddressClient {
     /**
      * Steps into a suggestion using the specified global address key.
      *
-     * @param globalAddressKey The global address key to step into.
+     * @param globalAddressKey  The global address key to step into.
+     * @param referenceId       The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the search result containing refined suggestions.
      */
-    public suggestionsStepIn(globalAddressKey: string): Promise<SearchResult> {
-        const headers = this.configuration.getCommonHeaders();
+    public suggestionsStepIn(globalAddressKey: string, referenceId?: string): Promise<SearchResult> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         return this.restApiStub.suggestionsStepInV1(globalAddressKey, headers).then(
             resp => {
                 if (resp.error) {
@@ -219,12 +278,14 @@ export class AddressClient {
     /**
      * Refines a suggestion using the specified global address key and refinement input.
      *
-     * @param globalAddressKey The global address key to refine.
-     * @param refinement       The refinement input to use.
+     * @param globalAddressKey  The global address key to refine.
+     * @param refinement        The refinement input to use.
+     * @param referenceId       The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the search result containing refined suggestions.
      */
-    public async suggestionsRefine(globalAddressKey: string, refinement: string): Promise<SearchResult> {
-        const headers = this.configuration.getCommonHeaders();
+    public async suggestionsRefine(globalAddressKey: string, refinement: string, referenceId?: string): Promise<SearchResult> {
+        if (!referenceId) { referenceId=""; }
+        const headers = this.configuration.getCommonHeaders(referenceId);
         const request: RestApiSuggestionsRefineRequest = {
             refinement
         };
@@ -242,13 +303,15 @@ export class AddressClient {
     /**
      * Formats suggestions using the supplied search input.
      *
-     * @param searchInput The search input to format.
+     * @param searchInput   The search input to format.
+     * @param referenceId   The reference ID for tracking the request. (optional)
      * @return A promise that resolves to the formatted suggestions result.
      */
-    public async suggestionsFormat(searchInput: string): Promise<SuggestionsFormatResult> {
+    public async suggestionsFormat(searchInput: string, referenceId?: string): Promise<SuggestionsFormatResult> {
+        if (!referenceId) { referenceId=""; }
         const request = getSuggestionsFormatRequestFromConfig(this.configuration);
         request.components = { unspecified: [searchInput] };
-        const headers = this.configuration.getCommonHeaders();
+        const headers = this.configuration.getCommonHeaders(referenceId);
 
         try {
             const resp = await this.restApiStub.suggestionsFormatV1(request, headers);
@@ -261,10 +324,8 @@ export class AddressClient {
         }
     }
 
-    
-
-    private getFormatRequestHeaders(): Map<string, object> {
-        const headers = this.configuration.getCommonHeaders();
+    private getFormatRequestHeaders(referenceId : string): Map<string, object> {
+        const headers = this.configuration.getCommonHeaders(referenceId);
 
         if (this.configuration.options.includeComponents) {
             headers.set("Add-Components", "true" as String); //NOSONAR

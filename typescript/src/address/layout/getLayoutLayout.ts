@@ -14,9 +14,10 @@ export type GetLayoutLayout = {
     lines: (LayoutLineFixed | LayoutLineVariable)[];
     status?: LayoutStatus;
     licenseId: string;
+    referenceId?: string;
 };
 
-export function restApiResponseToGetLayoutLayout(apiItem: RestApiGetLayoutLayout): GetLayoutLayout {
+export function restApiResponseToGetLayoutLayout(apiItem: RestApiGetLayoutLayout, refId?: string): GetLayoutLayout {
 
     const appliesTo = apiItem.applies_to ? apiItem.applies_to.map(p => restApiResponseToAppliesTo(p)): [];
     return {
@@ -26,7 +27,8 @@ export function restApiResponseToGetLayoutLayout(apiItem: RestApiGetLayoutLayout
         appliesTo: appliesTo,
         lines: apiItem.lines ? apiItem.lines.map(line => getLayoutLine(appliesTo, line)) : [],
         status: lookupAddressLayoutStatus(apiItem.status),
-        licenseId: apiItem.license_id??""
+        licenseId: apiItem.license_id??"",
+        referenceId: refId,
     }
 }
 

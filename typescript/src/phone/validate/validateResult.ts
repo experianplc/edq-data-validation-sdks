@@ -13,6 +13,7 @@ export type ValidateResult = {
     portedDate: string;
     disposableNumber: string;
     metadata?: Metadata;
+    referenceId?: string;
 };
 
 export function restApiResponseToPhoneValidateResult(response: RestApiPhoneValidateResponse): ValidateResult {
@@ -46,10 +47,8 @@ export function restApiResponseToPhoneValidateResult(response: RestApiPhoneValid
         if (apiMetadata.phone_detail) {
             result.metadata.phoneDetail = restApiResponseToPhoneDetail(apiMetadata.phone_detail);
         }
-
     }
 
+    result.referenceId = response.referenceId;
     return result;
-
-
 }

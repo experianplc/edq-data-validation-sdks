@@ -2,8 +2,9 @@ import { RestApiCreateLayoutResponse } from "../../server/address/layout/restApi
 
 export type CreateLayoutResult = {
     id: string;
+    referenceId? : string,
 };
 
 export function restApiResponseToCreateLayoutResult(response: RestApiCreateLayoutResponse): CreateLayoutResult {
-    return {id: response.result?.id??""}
+    return {id: response.result?.id??"", referenceId: response.referenceId,}
 }

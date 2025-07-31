@@ -40,7 +40,7 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
     private final boolean metadata;
     private final boolean enrichment;
     private final boolean extraMatchInfo;
-    private final String formatLayoutName;
+    private final String layoutName;
     private final LayoutFormat layoutFormat;
     private final List<GlobalGeocodeAttribute> geocodes;
     private final List<PremiumLocationInsightAttribute> premiumLocationInsights;
@@ -72,7 +72,7 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
         this.metadata = builder.metadata;
         this.enrichment = builder.enrichment;
         this.extraMatchInfo = builder.extraMatchInfo;
-        this.formatLayoutName = builder.formatLayoutName;
+        this.layoutName = builder.layoutName;
         this.layoutFormat = builder.layoutFormat;
         this.geocodes = builder.globalGeocode;
         this.premiumLocationInsights = builder.premiumLocationInsights;
@@ -183,12 +183,12 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
     }
 
     /**
-     * Retrieves the format layout name for address formatting.
+     * Retrieves the layout name for address formatting.
      *
-     * @return The format layout name as a string.
+     * @return The layout name as a string.
      */
-    public String getFormatLayoutName() {
-        return formatLayoutName;
+    public String getLayoutName() {
+        return layoutName;
     }
 
     /**
@@ -351,7 +351,7 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
         private boolean metadata;
         private boolean enrichment;
         private boolean extraMatchInfo;
-        private String formatLayoutName = "";
+        private String layoutName = "";
         private LayoutFormat layoutFormat;
         private List<GlobalGeocodeAttribute> globalGeocode = new ArrayList<>();
         private List<PremiumLocationInsightAttribute> premiumLocationInsights = new ArrayList<>();
@@ -374,7 +374,7 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
             super(token);
             maxSuggestions = DEFAULT_MAX_SUGGESTIONS;
             layoutFormat = DEFAULT_LAYOUT_FORMAT;
-            formatLayoutName = DEFAULT_LAYOUT_NAME;
+            layoutName = DEFAULT_LAYOUT_NAME;
         }
 
         /**
@@ -389,11 +389,13 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
         /**
          * Sets a custom transaction ID for API requests.
          *
-         * @param transactionId The transaction ID to use.
+         * @param referenceId The transaction ID to use.
          * @return The current {@link AddressBuilder} instance for method chaining.
+         * @deprecated Set your reference ID as part every API interaction like the Search, Format, or Validate call instead.
          */
-        public AddressBuilder setTransactionId(String transactionId) {
-            super.setTransactionId(transactionId);
+        @Deprecated(since="1.1.10", forRemoval=true)
+        public AddressBuilder setTransactionId(String referenceId) {
+            super.setTransactionId(referenceId);
             return this;
         }
 
@@ -520,8 +522,8 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
          * @param layoutName The layout name to use.
          * @return The current {@link AddressBuilder} instance for method chaining.
          */
-        public AddressBuilder setFormatLayoutName(String layoutName) {
-            this.formatLayoutName = layoutName;
+        public AddressBuilder useLayoutName(String layoutName) {
+            this.layoutName = layoutName;
             return this;
         }
 
@@ -531,7 +533,7 @@ public class AddressConfiguration extends com.experian.dvs.client.common.Configu
          * @param layoutFormat The layout format to use.
          * @return The current {@link AddressBuilder} instance for method chaining.
          */
-        public AddressBuilder useLayout(LayoutFormat layoutFormat) {
+        public AddressBuilder useLayoutFormat(LayoutFormat layoutFormat) {
             this.layoutFormat = layoutFormat;
             return this;
         }
