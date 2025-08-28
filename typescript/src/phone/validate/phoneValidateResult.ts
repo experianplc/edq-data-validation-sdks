@@ -4,7 +4,7 @@ import { Metadata } from "./metadata";
 import { restApiResponseToPhoneDetail } from "./phoneDetail";
 import { lookupPhoneType, PhoneType } from "./phoneType";
 
-export type ValidateResult = {
+export type PhoneValidateResult = {
     number: string;
     validatedPhoneNumber: string;
     formattedPhoneNumber: string;
@@ -16,12 +16,12 @@ export type ValidateResult = {
     referenceId?: string;
 };
 
-export function restApiResponseToPhoneValidateResult(response: RestApiPhoneValidateResponse): ValidateResult {
+export function restApiResponseToPhoneValidateResult(response: RestApiPhoneValidateResponse): PhoneValidateResult {
 
     const apiResult = response.result;
     const apiMetadata = response.metadata;
 
-    const result: ValidateResult = {
+    const result: PhoneValidateResult = {
         number: "",
         validatedPhoneNumber: "",
         formattedPhoneNumber: "",

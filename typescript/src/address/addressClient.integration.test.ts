@@ -3,7 +3,6 @@ import { staticReferenceId, validTokenAddress, validTokenAddressWithEnrichment, 
 import { AddressClient, AddressConfiguration, Countries, Datasets, GlobalGeocodeAttribute, SearchType } from '../index';
 import { LookupType } from './lookup/lookupType';
 import { AusRegionalGeocodeAttribute } from './layout/attributes/ausRegionalGeocodeAttribute';
-import { v4 as uuidv4 } from 'uuid';
 
 describe('Address client tests', async () => {
 

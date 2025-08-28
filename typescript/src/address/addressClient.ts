@@ -23,7 +23,7 @@ import { LookupResult, restApiResponseToLookupResult } from "./lookup/lookupResu
 /**
  * Interface defining the options for address searching.
  */
-interface AddressSearchOptions {
+export interface AddressSearchOptions {
     /**
      * The search input to use (e.g., what the user has typed in).
      */
