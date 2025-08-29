@@ -1,3 +1,5 @@
+import { RestApiAddressLookupSuggestionV2 } from "../../server/address/lookup/restApiAddressLookupSuggestionV2";
+
 export type LookupAddressSuggestionV2 = {
     text?: string;
     matched?: number[];

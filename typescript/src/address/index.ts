@@ -25,14 +25,12 @@ import { SearchResult } from './search/searchResult';
 import { FormatResult } from './format/formatResult';
 
 export {
-    AddressConfiguration, 
-    AddressConfigurationOptions,
-    AddressClient, 
+    AddressConfiguration,
+    AddressClient,
     Datasets,
-    Dataset,
     SearchType, 
     AddressConfidence, 
-    GlobalGeocodeAttribute, 
+    GlobalGeocodeAttribute,
     Accuracy,
     Intensity,
     LayoutFormat,
@@ -48,10 +46,16 @@ export {
     UsaRegionalGeocodeAttribute,
     LookupLocality,
     LookupPostalCode,
+    Countries,
+    LookupType
+
+}
+
+export type {
+    AddressConfigurationOptions,
+    Dataset,    
     Country,
-    LookupType,
     AddressSearchOptions,
     SearchResult,
-    FormatResult,
-    Countries
+    FormatResult
 }

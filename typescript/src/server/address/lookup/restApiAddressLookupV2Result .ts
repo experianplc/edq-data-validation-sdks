@@ -1,3 +1,5 @@
+import { RestApiAddressLookupSuggestion } from "./restApiAddresslookupSuggestion";
+import { RestApiAddressLookupSuggestionV2 } from "./restApiAddressLookupSuggestionV2";
 import { RestApiAddressLookupV2ResultAddressFormatted } from "./restApiAddressLookupV2ResultAddressFormatted";
 
 export type RestApiAddressLookupV2Result = {

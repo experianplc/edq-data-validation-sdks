@@ -9,10 +9,13 @@ import { DomainType } from './validate/domainType';
 export {
     EmailConfiguration, 
     EmailClient, 
-    EmailConfigurationOptions, 
-    ValidateResult,
-    ResponseError,
     EmailConfidence,
     VerboseOutput,
     DomainType
 };
+
+export type {
+    EmailConfigurationOptions,
+    ValidateResult,
+    ResponseError
+}

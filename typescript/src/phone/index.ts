@@ -9,9 +9,12 @@ import { Metadata } from './validate/metadata';
 export { 
     PhoneConfiguration, 
     PhoneClient,
-    Country,
     PhoneType,
-    PhoneConfidence,
+    PhoneConfidence
+};
+
+export type {
+    Country,
     Metadata,
     PhoneValidateResult
-};
+}

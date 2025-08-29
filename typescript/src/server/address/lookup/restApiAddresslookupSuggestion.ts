@@ -1,4 +1,6 @@
-type RestApiAddressLookupSuggestion = {
+import { RestApiAddressLookupLocalityItem } from "./restApiAddressLookupLocalityItem";
+
+export type RestApiAddressLookupSuggestion = {
     locality?: {
         region?: RestApiAddressLookupLocalityItem;
         sub_region?: RestApiAddressLookupLocalityItem;
