@@ -1,5 +1,4 @@
 name: main
-run-name: main - ${{ vars.SDKVERSION }}
 
 on:
   push:
