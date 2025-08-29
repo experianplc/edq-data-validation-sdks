@@ -1,4 +1,5 @@
 name: release
+run-name: release - ${{ vars.SDKVERSION }}
 
 on: workflow_dispatch
 
