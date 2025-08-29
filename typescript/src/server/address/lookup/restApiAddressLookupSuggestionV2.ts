@@ -1,4 +1,4 @@
-type RestApiAddressLookupSuggestionV2 = {
+export type RestApiAddressLookupSuggestionV2 = {
     text?: string;
     matched?: number[];
     global_address_key?: string;

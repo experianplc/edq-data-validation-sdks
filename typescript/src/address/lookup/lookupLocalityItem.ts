@@ -1,3 +1,5 @@
+import { RestApiAddressLookupLocalityItem } from "../../server/address/lookup/restApiAddressLookupLocalityItem";
+
 export type LookupLocalityItem = {
     name?: string;
     code?: string;

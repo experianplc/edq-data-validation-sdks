@@ -2,7 +2,7 @@ import { EDVSError } from "../exceptions/edvsException";
 import { getPhoneValidateRequestFromConfig } from "../server/phone/restApiPhoneValidateRequest";
 import { RestApiStubImpl } from "../server/restApiStub";
 import { PhoneConfiguration } from "./phoneConfiguration";
-import { ValidateResult, restApiResponseToPhoneValidateResult } from "./validate/validateResult";
+import { PhoneValidateResult, restApiResponseToPhoneValidateResult } from "./validate/phoneValidateResult";
 
 /**
  * Client class for interacting with the phone-related APIs.
@@ -31,7 +31,7 @@ export class PhoneClient {
      * @return A promise that resolves to the validation result.
      * @throws EDVSError If the API response contains an error.
      */
-    public async validate(phoneNumber: string, referenceId?: string): Promise<ValidateResult> {
+    public async validate(phoneNumber: string, referenceId?: string): Promise<PhoneValidateResult> {
         if (!referenceId) { referenceId=""; }
         const headers = this.configuration.getCommonHeaders(referenceId, false);
         const request = getPhoneValidateRequestFromConfig(this.configuration);

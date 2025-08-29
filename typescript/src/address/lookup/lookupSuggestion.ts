@@ -1,3 +1,4 @@
+import { RestApiAddressLookupSuggestion } from "../../server/address/lookup/restApiAddresslookupSuggestion";
 import { LookupLocalityItem, restApiResponseToLookupLocalityItem } from "./lookupLocalityItem";
 
 
