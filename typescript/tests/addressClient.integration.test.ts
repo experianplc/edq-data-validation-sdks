@@ -1,17 +1,21 @@
-import { describe, expect, test, vi } from 'vitest';
-import { staticReferenceId, validTokenAddress, validTokenAddressWithEnrichment, GenerateUniqueReferenceId } from '../testSetup';
-import { AddressClient, AddressConfiguration, Countries, Datasets, GlobalGeocodeAttribute, SearchType } from '../index';
-import { LookupType } from './lookup/lookupType';
-import { AusRegionalGeocodeAttribute } from './layout/attributes/ausRegionalGeocodeAttribute';
+import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { staticReferenceId, validTokenAddress, validTokenAddressWithEnrichment, GenerateUniqueReferenceId, isDevMode } from './testSetup';
+import { AddressClient, AddressConfiguration, Countries, Datasets, AusRegionalGeocodeAttribute, GlobalGeocodeAttribute, SearchType, LookupType } from '../src';
 
 describe('Address client tests', async () => {
+    beforeAll(async () => {
+        if (isDevMode()) {
+            // Disable SSL certificate validation for integration tests against dev environment
+            // DO NOT use this in production code
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        }
+    });
 
     test(`Authentication token not supplied throws`, async () => {
-        expect(() => new AddressConfiguration("")).toThrow('The supplied configuration must contain an authorisation token');        
+        expect(() => new AddressConfiguration("")).toThrow('The supplied configuration must contain an authorisation token');
     });
 
     test(`Authentication invalid token throws`, async () => {
-        
         const token = "ThisIsNotAValidToken";
         const config = new AddressConfiguration(token, {transactionId: GenerateUniqueReferenceId(), datasets: [Datasets.AuAddress]});
         const client = new AddressClient(config);
@@ -27,7 +31,6 @@ describe('Address client tests', async () => {
                 transactionId: staticReferenceId,
                 datasets: [Datasets.GbAddress]
             }
-
         );
         const client = new AddressClient(config);
         const result = await client.validate("experian, nottingham, NG80 1ZZ");
@@ -124,10 +127,9 @@ describe('Address client tests', async () => {
             {
                 datasets: [Datasets.GbAddress, Datasets.AuAddress]
             })
-        
-            const client = new AddressClient(config);
-            await expect(client.lookup("SW1E 5JL", LookupType.PostalCode, GenerateUniqueReferenceId())).rejects.toThrow("All datasets must belong to the same country.");        
 
+        const client = new AddressClient(config);
+        await expect(client.lookup("SW1E 5JL", LookupType.PostalCode, GenerateUniqueReferenceId())).rejects.toThrow("All datasets must belong to the same country.");
     });
 
     test(`Lookup with no options`, async () => {

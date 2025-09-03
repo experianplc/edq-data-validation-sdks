@@ -1,4 +1,5 @@
 import { RestApiAddressFormatMetadata } from "../../server/address/format/restApiAddressFormatMetadata";
+import { RestApiAddressMetadataInfoIdentifier } from "../../server/address/format/restApiAddressMetadataInfoIdentifier";
 
 export type AddressMetadata = {
     sources: string[];
@@ -44,7 +45,7 @@ export function restApiResponseToAddressMetadata(response: RestApiAddressFormatM
     };
 }
 
-function extractIdentifier(identifier: any) {
+function extractIdentifier(identifier?: RestApiAddressMetadataInfoIdentifier): Pick<AddressMetadata, "umrrn" | "udprn" | "dpid" | "gnafpid" | "pafAddressKey" | "hin"> {
     return {
         umrrn: identifier?.umrrn ?? "",
         udprn: identifier?.udprn ?? "",
@@ -55,7 +56,7 @@ function extractIdentifier(identifier: any) {
     };
 }
 
-function extractBarcode(response: RestApiAddressFormatMetadata) {
+function extractBarcode(response: RestApiAddressFormatMetadata): Pick<AddressMetadata, "deliveryPointBarcode" | "barcodeCheckDigit" | "barcodeSortPlanNumber"> {
     return {
         deliveryPointBarcode: response.barcode?.delivery_point_barcode ?? "",
         barcodeCheckDigit: response.barcode?.check_digit ?? "",

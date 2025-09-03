@@ -103,7 +103,7 @@ export class AddressConfiguration extends Configuration {
         return result;
     }
 
-    public validateDatasetCountry() {
+    public validateDatasetCountry(): void {
         //Datasets must all be for the same underlying country
         const datasets = this.options.datasets;
         if (datasets) {

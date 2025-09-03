@@ -3,7 +3,6 @@ import { AppliesTo } from "../appliesTo";
 import { AugAddressElements } from "./augAddressElements";
 import { AusAddressElements } from "./ausAddressElements"
 import { GbrAddressElements } from "./gbrAddressElements";
-(global as any).AusAddressElements = AusAddressElements;
 
 export type AddressElement = {
     elementName: string,
@@ -11,16 +10,16 @@ export type AddressElement = {
     example: string
 }
 
-const datasetToElementNamespaceMap: Map<string, any> = new Map<string, any>([
+const datasetToElementNamespaceMap: Map<string, object> = new Map<string, object>([
     [Datasets.AuAddress.datasetCode, AusAddressElements],
     [Datasets.AuAddressGnaf.datasetCode, AugAddressElements],
     [Datasets.GbAddress.datasetCode, GbrAddressElements]
 ]);
 
 const datasetToElementLookupMap: Map<string, (elementName: string) => AddressElement | undefined> = new Map([
-    [Datasets.AuAddress.datasetCode, (elementName: string) => AusAddressElements.getElementByName(elementName)],
-    [Datasets.AuAddressGnaf.datasetCode, (elementName: string) => AugAddressElements.getElementByName(elementName)],
-    [Datasets.GbAddress.datasetCode, (elementName: string) => GbrAddressElements.getElementByName(elementName)]
+    [Datasets.AuAddress.datasetCode, (elementName: string): AddressElement | undefined => AusAddressElements.getElementByName(elementName)],
+    [Datasets.AuAddressGnaf.datasetCode, (elementName: string): AddressElement | undefined => AugAddressElements.getElementByName(elementName)],
+    [Datasets.GbAddress.datasetCode, (elementName: string): AddressElement | undefined => GbrAddressElements.getElementByName(elementName)]
 ]);
 
 export function getAddressElementFromElementName(appliesTo: AppliesTo[], elementName?: string): AddressElement | null {

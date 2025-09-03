@@ -1,8 +1,15 @@
-import { describe, expect, test } from 'vitest';
-import { staticReferenceId, validTokenEmail, GenerateUniqueReferenceId } from '../testSetup';
-import { EmailConfiguration, EmailClient } from '../index';
+import { beforeAll, describe, expect, test } from 'vitest';
+import { staticReferenceId, validTokenEmail, GenerateUniqueReferenceId, isDevMode } from './testSetup';
+import { EmailConfiguration, EmailClient } from '../src';
 
 describe('Email client tests', async () => {
+    beforeAll(async () => {
+        if (isDevMode()) {
+            // Disable SSL certificate validation for integration tests against dev environment
+            // DO NOT use this in production code
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        }
+    });
 
     test(`Authentication token not supplied throws`, async () => {
         expect(() => new EmailConfiguration("")).toThrow('The supplied configuration must contain an authorisation token');

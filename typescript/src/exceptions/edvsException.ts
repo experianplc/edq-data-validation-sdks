@@ -5,7 +5,7 @@ import { RestApiResponseError } from "../server/restApiResponseError";
  * Provides constructors for various error scenarios and a factory method for creating specific errors based on API response errors.
  */
 export class EDVSError extends Error {
-    public readonly detail;
+    public readonly detail: unknown;
 
     /**
      * Initializes a new instance of the {@link EDVSError} class with a specified error message and optional details.
@@ -13,7 +13,7 @@ export class EDVSError extends Error {
      * @param message The error message that explains the reason for the error.
      * @param detail  Additional details about the error (optional).
      */
-    constructor(message: string, detail?: any) {
+    constructor(message: string, detail?: unknown) {
         super(message);
         this.detail = detail;
     }

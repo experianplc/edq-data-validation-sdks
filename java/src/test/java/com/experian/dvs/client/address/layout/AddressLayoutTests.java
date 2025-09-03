@@ -88,7 +88,14 @@ public class AddressLayoutTests {
                 Setup.getUniqueReferenceId(),
                 Dataset.AU_ADDRESS);
 
-        assertThat(createLayoutResult.getError()).isNotPresent();
+        assertThat(createLayoutResult.getError())
+                .withFailMessage("Error present.\nError properties: " + createLayoutResult.getError().map(error ->
+                    "\n  Type: " + error.getType() +
+                    "\n  Title: " + error.getTitle() +
+                    "\n  Detail: " + error.getDetail()
+                ))
+                .isNotPresent();
+
         //Check if the layout was created
         final GetLayoutResult result = client.getLayout(layoutName, Setup.getUniqueReferenceId());
         assertThat(result.getLayout().getStatus()).isEqualTo(LayoutStatus.CREATION_IN_PROGRESS);

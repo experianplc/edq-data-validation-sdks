@@ -1,4 +1,5 @@
 import { RestApiAddressFormatEnrichment } from "../../server/address/format/restApiAddressFormatEnrichment";
+import { RestApiEnrichmentResultAddress } from "../../server/address/format/restApiEnrichmentResultAddress";
 import { AusRegionalGeocodes, restApiResponseToAusRegionalGeocodes } from "./enrichment/ausRegionalGeocodes";
 import { GbrBusiness, restApiResponseToGbrBusiness } from "./enrichment/gbrBusiness";
 import { GbrGovernment, restApiResponseToGbrGovernment } from "./enrichment/gbrGovernment";
@@ -47,7 +48,7 @@ export function restApiResponseToAddressEncrichment(response: RestApiAddressForm
     return result;
 }
 
-function handleGeocodes(apiResponse: any, result: AddressEnrichment) {
+function handleGeocodes(apiResponse: RestApiEnrichmentResultAddress, result: AddressEnrichment): void {
     if (apiResponse.geocodes) {
         result.geocodes = {
             latitude: apiResponse.geocodes.latitude,
@@ -57,7 +58,7 @@ function handleGeocodes(apiResponse: any, result: AddressEnrichment) {
     }
 }
 
-function handleRegionalGeocodes(apiResponse: any, result: AddressEnrichment) {
+function handleRegionalGeocodes(apiResponse: RestApiEnrichmentResultAddress, result: AddressEnrichment): void {
     if (apiResponse.usa_regional_geocodes) {
         result.usaRegionalGeocodes = {
             latitude: apiResponse.usa_regional_geocodes.latitude,
@@ -78,7 +79,7 @@ function handleRegionalGeocodes(apiResponse: any, result: AddressEnrichment) {
     }
 }
 
-function handleUKLocation(apiResponse: any, result: AddressEnrichment) {
+function handleUKLocation(apiResponse: RestApiEnrichmentResultAddress, result: AddressEnrichment): void {
     if (apiResponse.uk_location_complete) {
         result.gbrLocationComplete = restApiResponseToUKLocationComplete(apiResponse.uk_location_complete);
     }
@@ -87,7 +88,7 @@ function handleUKLocation(apiResponse: any, result: AddressEnrichment) {
     }
 }
 
-function handleGbrSpecificData(apiResponse: any, result: AddressEnrichment) {
+function handleGbrSpecificData(apiResponse: RestApiEnrichmentResultAddress, result: AddressEnrichment): void {
     if (apiResponse.gbr_government) {
         result.gbrGovernment = restApiResponseToGbrGovernment(apiResponse.gbr_government);
     }

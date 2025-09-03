@@ -1,6 +1,5 @@
-
-
-export * from './address/index';
-export * from './email/index';
-export * from './phone/index';
-
+export * from './address';
+export * from './address/layout';
+export * from './email';
+export * from './phone';
+export * from './exceptions';

@@ -1,5 +1,5 @@
-import { randomUUID } from 'crypto';
 import dotenv from 'dotenv';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -42,10 +42,9 @@ export function validTokenPhone(): string {
 export function isDevMode(): boolean {
     const devMode = process.env.DVS_API_DEV_MODE;
     return devMode === "true";
-    
 }
 
 export function GenerateUniqueReferenceId(): string {
-    const token = randomUUID();
+    const token = uuidv4();
     return token;
 }

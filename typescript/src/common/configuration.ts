@@ -1,5 +1,5 @@
-import { randomUUID } from 'node:crypto';
 import { InvalidConfigurationError } from '../exceptions/edvsException';
+import {v4 as uuidv4} from 'uuid';
 
 export const defaultApiRequestTimeoutInSeconds = 15;
 export const defaultHttpClientTimeoutInSeconds = 20;
@@ -84,7 +84,7 @@ export abstract class Configuration {
         if (!referenceId) {
             const builderReferenceId = this.options.transactionId
             if (!builderReferenceId) {
-                referenceId = randomUUID();
+                referenceId = uuidv4();
             } else {
                 referenceId = builderReferenceId;
             }

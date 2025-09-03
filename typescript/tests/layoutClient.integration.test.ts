@@ -1,26 +1,20 @@
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { LayoutConfiguration } from './layoutConfiguration';
-import { existingTestLayout, testLayoutPrefix, validTokenAddress, staticReferenceId, GenerateUniqueReferenceId } from '../../testSetup';
-import { LayoutClient } from './layoutClient';
-import { GetLayoutLayout } from './getLayoutLayout';
-import { LayoutLineVariable } from './layoutLineVariable';
-import { LayoutLineFixed } from './layoutLineFixed';
-import { AusAddressElements } from './elements/ausAddressElements';
-import { Datasets } from '../dataset';
-import { CreateLayoutResult } from './createLayoutResult';
-import { EDVSError } from '../../exceptions/edvsException';
-import { LayoutStatus } from './layoutStatus';
-import { randomUUID } from 'crypto';
-import { AddressConfiguration } from '../addressConfiguration';
-import { AddressClient } from '../addressClient';
-import { SearchType } from '../searchType';
-import { GbrAddressElements } from './elements/gbrAddressElements';
-import { Countries } from '../../common/country';
-
+import { existingTestLayout, testLayoutPrefix, validTokenAddress, staticReferenceId, GenerateUniqueReferenceId, isDevMode } from './testSetup';
+import { v4 as uuidv4 } from 'uuid';
+import { 
+    Datasets, AddressConfiguration, AddressClient, SearchType, Countries, CreateLayoutResult, 
+    GetLayoutLayout, LayoutLineFixed, LayoutLineVariable, EDVSError} from '../src';
+// eslint-disable-next-line no-restricted-imports
+import {LayoutConfiguration, LayoutClient, LayoutStatus, AusAddressElements, GbrAddressElements} from '../src/address/layout';
 
 describe('Address client tests', () => {
-
     beforeAll(async () => {
+        if (isDevMode()) {
+            // Disable SSL certificate validation for integration tests against dev environment
+            // DO NOT use this in production code
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        }
+
         try {
             const layout = await getLayout(existingTestLayout);
             if (layout.status !== LayoutStatus.Completed) {
@@ -200,7 +194,7 @@ describe('Address client tests', () => {
         return client.getLayout(layoutName, GenerateUniqueReferenceId());
     }
 
-    function getUniqueLayoutName() {
-        return testLayoutPrefix + randomUUID();
+    function getUniqueLayoutName(): string {
+        return testLayoutPrefix + uuidv4();
     }
 });

@@ -3,3 +3,5 @@ build
 .env
 .vscode
 *.js
+!eslint.config.js
+dist

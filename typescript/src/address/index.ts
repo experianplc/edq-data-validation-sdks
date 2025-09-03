@@ -6,7 +6,6 @@ import { GlobalGeocodeAttribute } from './layout/attributes/globalGeocodeAttribu
 import { Accuracy } from './accuracy';
 import { Datasets, Dataset } from './dataset';
 import { Intensity } from './intensity';
-import { LayoutFormat } from './layout/layoutFormat';
 import { PremiumLocationInsightAttribute } from './layout/attributes/premiumLocationInsightAttribute';
 import { What3WordsAttribute } from './layout/attributes/what3WordsAttribute';
 import { AusRegionalGeocodeAttribute } from './layout/attributes/ausRegionalGeocodeAttribute';
@@ -33,7 +32,6 @@ export {
     GlobalGeocodeAttribute,
     Accuracy,
     Intensity,
-    LayoutFormat,
     PremiumLocationInsightAttribute,
     What3WordsAttribute,
     AusRegionalGeocodeAttribute,
@@ -48,12 +46,11 @@ export {
     LookupPostalCode,
     Countries,
     LookupType
-
 }
 
 export type {
     AddressConfigurationOptions,
-    Dataset,    
+    Dataset,
     Country,
     AddressSearchOptions,
     SearchResult,

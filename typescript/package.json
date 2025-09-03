@@ -2,12 +2,22 @@
     "name": "@experianplc/edq.dvs.sdk",
     "version": "0.0.1",
     "type": "module",
-    "main": "src/index.js",
-    "types": "src/index.d.ts",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        }
+    },
     "scripts": {
-        "build": "tsc",
+        "build": "tsup src/index.ts --format cjs,esm --out-dir dist --sourcemap --dts --clean",
         "test": "vitest run",
-        "start": "node dist/index.js"
+        "lint": "eslint . --ext .ts",
+        "lint:fix": "eslint . --ext .ts --fix",
+        "lint:report": "eslint . --ext .ts -f checkstyle -o eslint-checkstyle-result.xml",
     },
     "keywords": [
         "Address Validation",
@@ -18,16 +28,28 @@
     "license": "SEE LICENSE IN https://github.com/experianplc/edq-data-validation-sdks?tab=License-1-ov-file",
     "description": "SDK to ease integrating Experian Address Validation, Email Validation and Phone Validation.",
     "devDependencies": {
-        "@types/node": "^22.13.10",
-        "@vitest/coverage-istanbul": "^1.5.0",
-        "dotenv": "^16.3.1",
-        "typescript": "^5.8.2"
+        "@types/node": "^24.3.0",
+        "@types/uuid": "^10.0.0",
+        "@typescript-eslint/eslint-plugin": "^8.41.0",
+        "@typescript-eslint/parser": "^8.41.0",
+        "@vitest/coverage-istanbul": "^3.2.4",
+        "dotenv": "^17.2.1",
+        "eslint": "^9.34.0",
+        "eslint-formatter-checkstyle": "^8.40.0",
+        "eslint-plugin-import": "^2.32.0",
+        "rimraf": "^6.0.1",
+        "tsup": "^8.5.0",
+        "typescript": "^5.9.2"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/experianplc/edq-data-validation-sdks.git"
     },
+    "files": [
+        "dist/**/*"
+    ],
     "dependencies": {
+        "node-fetch": "^3.3.2",
         "uuid": "^11.1.0"
     }
 }

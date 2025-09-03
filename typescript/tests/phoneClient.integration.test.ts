@@ -1,8 +1,15 @@
-import { describe, expect, test } from 'vitest';
-import { PhoneConfiguration, PhoneClient } from '../index';
-import { validTokenPhone, staticReferenceId, GenerateUniqueReferenceId } from '../testSetup';
+import { beforeAll, describe, expect, test } from 'vitest';
+import { PhoneConfiguration, PhoneClient } from '../src';
+import { validTokenPhone, staticReferenceId, GenerateUniqueReferenceId, isDevMode } from './testSetup';
 
 describe('Phone client tests', async () => {
+    beforeAll(async () => {
+        if (isDevMode()) {
+            // Disable SSL certificate validation for integration tests against dev environment
+            // DO NOT use this in production code
+            process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+        }
+    });
 
     test(`Authentication token not supplied throws`, async () => {
         expect(() => new PhoneConfiguration("")).toThrow('The supplied configuration must contain an authorisation token');        
