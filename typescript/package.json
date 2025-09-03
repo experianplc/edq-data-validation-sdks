@@ -17,7 +17,7 @@
         "test": "vitest run",
         "lint": "eslint . --ext .ts",
         "lint:fix": "eslint . --ext .ts --fix",
-        "lint:report": "eslint . --ext .ts -f checkstyle -o eslint-checkstyle-result.xml",
+        "lint:report": "eslint . --ext .ts -f checkstyle -o eslint-checkstyle-result.xml"
     },
     "keywords": [
         "Address Validation",
